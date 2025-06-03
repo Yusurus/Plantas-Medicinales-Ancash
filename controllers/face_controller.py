@@ -1,0 +1,33 @@
+from flask import Blueprint, request, jsonify, render_template
+from utils.image_utils import procesar_imagen_base64
+from services.deepface_service import reconocer_rostro
+
+face_bp = Blueprint('face_bp', __name__)
+
+USUARIOS_MOCK = {'admin': 'password123', 'usuario': '12345', 'test': 'test'}
+
+@face_bp.route('/login')
+def login():
+    return render_template('accesoLogin.html')
+
+@face_bp.route('/api/login', methods=['POST'])
+def login_tradicional():
+    data = request.get_json()
+    username, password = data.get('username'), data.get('password')
+    if username in USUARIOS_MOCK and USUARIOS_MOCK[username] == password:
+        return jsonify({'success': True, 'message': f'Bienvenido, {username}!', 'user': username})
+    return jsonify({'success': False, 'message': 'Usuario o contraseña incorrectos'})
+
+@face_bp.route('/api/verify-face', methods=['POST'])
+def verificar_rostro():
+    data = request.get_json()
+    imagen_base64 = data.get('image')
+    if not imagen_base64:
+        return jsonify({'success': False, 'message': 'No se recibió imagen'})
+
+    imagen_cv = procesar_imagen_base64(imagen_base64)
+    if imagen_cv is None:
+        return jsonify({'success': False, 'message': 'Error procesando la imagen'})
+
+    resultado = reconocer_rostro(imagen_cv)
+    return jsonify(resultado)
