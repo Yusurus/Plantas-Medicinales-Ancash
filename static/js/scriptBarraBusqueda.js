@@ -29,3 +29,8 @@ function filtrarPlantas() {
         card.style.display = visible ? "block" : "none";
     });
 }
+/*
+// Ejemplo de cómo llamar desde tu visualizador
+function verDetalles(idPlanta) {
+    window.open(`detalleplanta.html?id=${idPlanta}`, '_blank');
+}*/

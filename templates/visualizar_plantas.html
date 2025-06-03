@@ -59,7 +59,7 @@
           <h5 class="card-title fst-italic">{{ planta.nombreCientifico }}</h5>
           <p class="card-text text-black-50">{{ planta.nomFamilia }}</p>
           <p class="card-text text-muted small">{{ planta.nombres_comunes }}</p>
-          <a href="#" class="btn-ver-detalles mt-2">
+          <a href="/detalles/{{ planta.idPlanta }}" class="btn-ver-detalles mt-2">
             <i class="bi bi-eye"></i> Ver detalles
           </a>
         </div>
@@ -68,25 +68,6 @@
     {% endfor %}
   </div>
 </div>
-
-<!--<div class="container my-4">
-  <div class="row">
-    {% for planta in plantas %}
-    <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
-      <div class="card h-100 shadow-sm">
-        <img src="{{planta.linkImagen}}" class="card-img-top" alt="{{ planta.nombreCientifico }}" style="height: 180px; object-fit: cover;">
-        <div class="card-body text-center">
-          <h5 class="card-title fst-italic">{{ planta.nombreCientifico }}</h5>
-          <p class="card-text text-black-50">{{ planta.nomFamilia }}</p>
-          <p class="card-text text-muted small">{{ planta.nombres_comunes }}</p>
-          <a href="#" class="btn-ver-detalles mt-2">
-          <i class="bi bi-eye"></i> Ver detalles</a>
-        </div>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-</div>-->
 <script src="../static/js/scriptBarraBusqueda.js"></script>
 </body>
 </html>
