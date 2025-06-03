@@ -1,4 +1,5 @@
-const plantId = { plant_idg };
+// Obtener el ID de la planta desde el atributo data del body
+const plantId = document.body.getAttribute('data-plant-id');
 
 // Función para volver a la página anterior
 function goBack() {
@@ -65,14 +66,26 @@ function displayPlantData(data) {
 
 // Función para cargar los datos de la planta
 function loadPlantData() {
+    console.log('Cargando datos para planta ID:', plantId);
+    
+    // Verificar que plantId existe
+    if (!plantId) {
+        console.error('Plant ID no está definido');
+        document.getElementById('loadingSection').innerHTML =
+            '<p style="color: red;">Error: ID de planta no válido.</p>';
+        return;
+    }
+    
     fetch(`/api/planta/${plantId}`)
         .then(response => {
+            console.log('Response status:', response.status);
             if (!response.ok) {
                 throw new Error('Planta no encontrada');
             }
             return response.json();
         })
         .then(data => {
+            console.log('Datos recibidos:', data);
             displayPlantData(data);
 
             // Ocultar loading y mostrar contenido
