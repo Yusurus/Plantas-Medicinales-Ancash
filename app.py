@@ -4,9 +4,7 @@ from flask_cors import CORS
 from config.db import verificar_base_datos_rostros
 from controllers.face_controller import face_bp
 from controllers.user_controller import user_bp
-#from controllers.planta_controller import planta_bp
-
-from controllers.planta_controller import visualizacion_bp
+from controllers.planta_visulizador import visualizacion_bp
 from controllers.planta_registro_planta import registro_bp
 from controllers.planta_identificacion import identificacion_bp
 from controllers.planta_detalles import detalles_bp
@@ -17,15 +15,10 @@ CORS(app)
 # Registrar blueprints
 app.register_blueprint(face_bp)
 app.register_blueprint(user_bp)
-#app.register_blueprint(planta_bp)
 app.register_blueprint(visualizacion_bp)
-
-# Registrar rutas de submódulos
-#app.register_blueprint(visualizacion_bp)
 app.register_blueprint(registro_bp)
 app.register_blueprint(identificacion_bp)
 app.register_blueprint(detalles_bp)
-#-------------------------------------
 
 if __name__ == '__main__':
     if verificar_base_datos_rostros():
