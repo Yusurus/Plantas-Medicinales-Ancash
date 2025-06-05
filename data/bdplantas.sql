@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 8.0.42, for Win64 (x86_64)
 --
--- Host: localhost    Database: bdplantasv3
+-- Host: localhost    Database: bdplantas
 -- ------------------------------------------------------
 -- Server version	9.3.0
 
@@ -647,6 +647,72 @@ SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = @saved_cs_client;
 
 --
+-- Dumping events for database 'bdplantas'
+--
+
+--
+-- Dumping routines for database 'bdplantas'
+--
+/*!50003 DROP PROCEDURE IF EXISTS `sp_info_planta_activa` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_info_planta_activa`(IN pidPlanta INT)
+BEGIN
+    SELECT 
+        p.idPlanta,
+        p.nombreCientifico,
+        (
+            SELECT li.linkImagen
+            FROM linksimagenes li
+            WHERE li.fk_plantas = p.idPlanta
+            ORDER BY li.idLinksImagenes
+            LIMIT 1
+        ) AS linkImagen,
+        fp.nomFamilia,
+        GROUP_CONCAT(DISTINCT nc.nombreComun SEPARATOR ', ') AS nombres_comunes,
+        GROUP_CONCAT(DISTINCT eco.ecoregion SEPARATOR ', ') AS ecoregiones,
+        GROUP_CONCAT(DISTINCT CONCAT(u.parte, ': ', u.uso, ' (', u.preparacion, ')') SEPARATOR ' | ') AS usos_medicinales,
+        GROUP_CONCAT(DISTINCT sc.descripcionSaber SEPARATOR ' | ') AS saberes_culturales,
+        GROUP_CONCAT(DISTINCT CONCAT(pe.nombres, ' ', pe.apellido1, ' - ', ta.nombreTipo) SEPARATOR ' | ') AS aportes_expertos,
+        CONCAT(pem.nombres, ' ', pem.apellido1) AS empleado_registro,
+        c.categoria AS cargo_empleado
+    FROM plantas p
+    INNER JOIN familias_plantas fp ON p.fk_familiasplantas = fp.idfamiliaPlanta
+    LEFT JOIN nombres_comunes nc ON p.idPlanta = nc.fk_plantas
+    LEFT JOIN ecoregiones eco ON p.idPlanta = eco.fk_plantas
+    LEFT JOIN usos u ON p.idPlanta = u.fk_plantas 
+        AND u.idUsos NOT IN (SELECT DISTINCT fk_usos FROM archivaciones_usos)
+    LEFT JOIN saberes_culturales sc ON p.idPlanta = sc.fk_plantas 
+        AND sc.idSaberes NOT IN (SELECT DISTINCT fk_saberes_culturales FROM archivaciones_saberes)
+    LEFT JOIN aportes_expertos ae ON p.idPlanta = ae.fk_plantas
+    LEFT JOIN personas pe ON ae.fk_personas = pe.idPersona
+    LEFT JOIN tipos_aportes ta ON ae.fk_tipos_aportes = ta.idTipoAporte
+    LEFT JOIN plantas_registros pr ON p.idPlanta = pr.fk_plantas
+    LEFT JOIN empleados e ON pr.fk_empleados = e.idEmpleado
+    LEFT JOIN personas pem ON e.fk_personas = pem.idPersona
+    LEFT JOIN cargos c ON e.fk_cargos = c.idCargo
+    WHERE p.idPlanta = pidPlanta 
+      AND p.idPlanta NOT IN (
+        SELECT DISTINCT fk_plantas FROM archivacionesplantas
+    )
+    GROUP BY 
+        p.idPlanta, p.nombreCientifico, fp.nomFamilia, 
+        pem.nombres, pem.apellido1, c.categoria;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+
+--
 -- Final view structure for view `vta_plantas_activas`
 --
 
@@ -673,4 +739,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-06-04 23:20:03
+-- Dump completed on 2025-06-05  0:26:07
