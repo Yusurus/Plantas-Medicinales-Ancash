@@ -8,7 +8,7 @@ def get_connection():
         host='localhost',
         user='root',
         password='12admin34',
-        database='bdplantasv2'
+        database='bdplantas'
     )
 
 def verificar_base_datos_rostros():
