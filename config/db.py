@@ -1,7 +1,7 @@
 import mysql.connector
 import os
 
-DIRECTORIO_ROSTROS = "rostros_conocidos"
+DIRECTORIO_ROSTROS = "data/rostros_conocidos"
 
 def get_connection():
     return mysql.connector.connect(
