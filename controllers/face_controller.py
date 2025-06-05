@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, render_template
-from utils.image_utils import procesar_imagen_base64
+from services.image_utils import procesar_imagen_base64
 from services.deepface_service import reconocer_rostro
 
 face_bp = Blueprint('face_bp', __name__)
@@ -10,6 +10,7 @@ USUARIOS_MOCK = {'admin': 'password123', 'usuario': '12345', 'test': 'test'}
 def login():
     return render_template('accesoLogin.html')
 
+#logica para acceso via usuario y contraseña
 @face_bp.route('/api/login', methods=['POST'])
 def login_tradicional():
     data = request.get_json()
@@ -18,6 +19,7 @@ def login_tradicional():
         return jsonify({'success': True, 'message': f'Bienvenido, {username}!', 'user': username})
     return jsonify({'success': False, 'message': 'Usuario o contraseña incorrectos'})
 
+#logica para acceso via reconocimiento facial
 @face_bp.route('/api/verify-face', methods=['POST'])
 def verificar_rostro():
     data = request.get_json()
