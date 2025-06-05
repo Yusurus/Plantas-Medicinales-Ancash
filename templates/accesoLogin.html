@@ -4,63 +4,114 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Reconocimiento Facial</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="../static/css/stylesLogin.css">
 </head>
 <body>
-    <div class="login-container">
-        <div class="logo">
-            <h1>🔐 SecureAccess</h1>
-            <p>Sistema de Autenticación Avanzado</p>
-        </div>
+    <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center p-4">
+        <div class="row w-100 max-width-1200">
+            <!-- Panel de Login -->
+            <div class="col-lg-6 col-md-8 col-12 mx-auto" id="loginPanel">
+                <div class="login-container">
+                    <div class="logo text-center mb-4">
+                        <h1 class="display-4 fw-light">
+                            <i class="fas fa-shield-alt"></i> SecureAccess
+                        </h1>
+                        <p class="lead text-muted">Sistema de Autenticación Avanzado</p>
+                    </div>
 
-        <div id="statusMessage" class="status-message"></div>
+                    <div id="statusMessage" class="status-message"></div>
 
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="username">Usuario</label>
-                <input type="text" id="username" name="username" required placeholder="Ingresa tu usuario">
+                    <form id="loginForm">
+                        <div class="form-group mb-3">
+                            <label for="username" class="form-label">
+                                <i class="fas fa-user me-2"></i>Usuario
+                            </label>
+                            <input type="text" id="username" name="username" class="form-control" required placeholder="Ingresa tu usuario">
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-lock me-2"></i>Contraseña
+                            </label>
+                            <input type="password" id="password" name="password" class="form-control" required placeholder="Ingresa tu contraseña">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 mb-3">
+                            <span id="loginSpinner" class="loading d-none"></span>
+                            <i class="fas fa-sign-in-alt me-2"></i>
+                            Iniciar Sesión
+                        </button>
+                    </form>
+
+                    <div class="divider my-4">
+                        <span class="px-3">O accede con</span>
+                    </div>
+
+                    <button id="faceLoginBtn" class="btn btn-face w-100 mb-3">
+                        <i class="fas fa-camera me-2"></i>
+                        Reconocimiento Facial
+                    </button>
+
+                    <div class="footer text-center mt-4">
+                        <small class="text-muted">
+                            <i class="fas fa-brain me-1"></i>
+                            Tecnología de reconocimiento facial con DeepFace
+                        </small>
+                    </div>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="password">Contraseña</label>
-                <input type="password" id="password" name="password" required placeholder="Ingresa tu contraseña">
+            <!-- Panel de Cámara -->
+            <div class="col-lg-6 col-md-8 col-12 mx-auto d-none" id="cameraPanel">
+                <div class="camera-container">
+                    <div class="camera-header text-center mb-3">
+                        <h4 class="fw-light">
+                            <i class="fas fa-video me-2"></i>
+                            Reconocimiento Facial
+                        </h4>
+                        <p class="text-muted mb-0">Posiciona tu rostro frente a la cámara</p>
+                    </div>
+
+                    <div class="video-container mb-3">
+                        <video id="video" autoplay class="w-100"></video>
+                        <div class="video-overlay">
+                            <div class="face-frame"></div>
+                        </div>
+                    </div>
+
+                    <div class="camera-controls d-flex gap-2 justify-content-center flex-wrap">
+                        <button id="captureBtn" class="btn btn-success">
+                            <span id="captureSpinner" class="loading d-none"></span>
+                            <i class="fas fa-camera-retro me-2"></i>
+                            Capturar y Verificar
+                        </button>
+                        <button id="cancelBtn" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>
+                            Cancelar
+                        </button>
+                    </div>
+
+                    <div class="camera-tips mt-3">
+                        <div class="alert alert-info py-2">
+                            <small>
+                                <i class="fas fa-lightbulb me-1"></i>
+                                Mantén tu rostro bien iluminado y centrado en el marco
+                            </small>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <button type="submit" class="btn btn-primary">
-                <span id="loginSpinner" class="loading" style="display: none;"></span>
-                Iniciar Sesión
-            </button>
-        </form>
-
-        <div class="divider">
-            <span>O accede con</span>
-        </div>
-
-        <button id="faceLoginBtn" class="btn btn-face">
-            <svg class="face-icon" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM8 8c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm4 10c-2.21 0-4-1.79-4-4h8c0 2.21-1.79 4-4 4zm4-6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
-            </svg>
-            Reconocimiento Facial
-        </button>
-
-        <div id="cameraContainer" class="camera-container">
-            <video id="video" autoplay></video>
-            <div class="camera-controls">
-                <button id="captureBtn" class="btn btn-primary">
-                    <span id="captureSpinner" class="loading" style="display: none;"></span>
-                    Capturar y Verificar
-                </button>
-                <button id="cancelBtn" class="btn btn-secondary">
-                    Cancelar
-                </button>
-            </div>
-        </div>
-
-        <div class="footer">
-            <p>Tecnología de reconocimiento facial con DeepFace</p>
         </div>
     </div>
 
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
     <script src="../static/js/scriptLogin.js"></script>
 </body>
 </html>
