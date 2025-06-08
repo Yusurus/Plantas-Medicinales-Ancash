@@ -1,4 +1,4 @@
-class FaceRecognitionLogin {
+class FacialRecognition {
     constructor() {
         this.video = document.getElementById('video');
         this.loginPanel = document.getElementById('loginPanel');
@@ -6,23 +6,19 @@ class FaceRecognitionLogin {
         this.faceLoginBtn = document.getElementById('faceLoginBtn');
         this.captureBtn = document.getElementById('captureBtn');
         this.cancelBtn = document.getElementById('cancelBtn');
-        this.loginForm = document.getElementById('loginForm');
         this.statusMessage = document.getElementById('statusMessage');
-        this.loginSpinner = document.getElementById('loginSpinner');
         this.captureSpinner = document.getElementById('captureSpinner');
         this.stream = null;
         this.isProcessing = false;
         this.faceDetectionInterval = null;
         
         this.initializeEventListeners();
-        this.initializeFormValidation();
     }
 
     initializeEventListeners() {
         this.faceLoginBtn.addEventListener('click', () => this.startFaceRecognition());
         this.captureBtn.addEventListener('click', () => this.captureAndVerify());
         this.cancelBtn.addEventListener('click', () => this.stopCamera());
-        this.loginForm.addEventListener('submit', (e) => this.handleTraditionalLogin(e));
         
         // Eventos de teclado para mejor UX
         document.addEventListener('keydown', (e) => {
@@ -35,34 +31,6 @@ class FaceRecognitionLogin {
                 }
             }
         });
-    }
-
-    initializeFormValidation() {
-        const inputs = this.loginForm.querySelectorAll('input');
-        inputs.forEach(input => {
-            input.addEventListener('input', () => this.validateInput(input));
-            input.addEventListener('blur', () => this.validateInput(input));
-        });
-    }
-
-    validateInput(input) {
-        const value = input.value.trim();
-        
-        if (input.hasAttribute('required') && !value) {
-            input.classList.remove('is-valid');
-            input.classList.add('is-invalid');
-            return false;
-        }
-        
-        if (input.type === 'password' && value.length < 3) {
-            input.classList.remove('is-valid');
-            input.classList.add('is-invalid');
-            return false;
-        }
-        
-        input.classList.remove('is-invalid');
-        input.classList.add('is-valid');
-        return true;
     }
 
     showStatus(message, type = 'info', duration = 5000) {
@@ -276,9 +244,16 @@ class FaceRecognitionLogin {
     }
 
     handleSuccessfulRecognition(result) {
+        // AGREGAR ESTOS LOGS PARA DEBUG
+        console.log('Resultado completo:', result);
+        console.log('Usuario:', result.user);
+        console.log('Mensaje:', result.message);
+        
         const confidence = result.confidence || 'N/A';
+        const message = result.message || `¡Bienvenido, ${result.user}!`;
+        
         this.showStatus(
-            `${result.message} (Confianza: ${confidence}%)`, 
+            `${message} (Confianza: ${confidence}%)`, 
             'success'
         );
         
@@ -290,7 +265,10 @@ class FaceRecognitionLogin {
         
         setTimeout(() => {
             this.stopCamera();
-            this.redirectToDashboard(result.user);
+            // USAR result.user o un valor por defecto
+            const username = result.user || 'Usuario';
+            console.log('Redirigiendo con usuario:', username);
+            this.redirectToSuccess(username, 'facial');
         }, 2000);
     }
 
@@ -377,156 +355,21 @@ class FaceRecognitionLogin {
         }
     }
 
-    async handleTraditionalLogin(e) {
-        e.preventDefault();
+    // MÉTODO CORREGIDO - Este es el cambio principal
+    redirectToSuccess(username, method) {
+        // Crear los parámetros de la URL
+        const params = new URLSearchParams({
+            username: username || 'Usuario',
+            method: method || 'facial'
+        });
         
-        const username = document.getElementById('username').value.trim();
-        const password = document.getElementById('password').value;
+        // Redirigir usando la URL completa
+        const successUrl = `/Acceso?${params.toString()}`;
         
-        // Validar campos
-        const usernameValid = this.validateInput(document.getElementById('username'));
-        const passwordValid = this.validateInput(document.getElementById('password'));
+        console.log('Redirigiendo a:', successUrl); // Para debug
         
-        if (!usernameValid || !passwordValid) {
-            this.showStatus('Por favor, completa todos los campos correctamente.', 'error');
-            return;
-        }
-        
-        this.loginSpinner.classList.remove('d-none');
-        const submitBtn = this.loginForm.querySelector('button[type="submit"]');
-        submitBtn.disabled = true;
-        
-        try {
-            const response = await fetch('/api/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    username: username,
-                    password: password,
-                    timestamp: Date.now()
-                })
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                this.showStatus(result.message, 'success');
-                submitBtn.classList.add('success');
-                submitBtn.innerHTML = '<i class="fas fa-check me-2"></i>Acceso Concedido';
-                
-                setTimeout(() => {
-                    this.redirectToDashboard(result.user);
-                }, 1500);
-            } else {
-                this.showStatus(result.message, 'error');
-                submitBtn.classList.add('error');
-                setTimeout(() => {
-                    submitBtn.classList.remove('error');
-                    submitBtn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión';
-                }, 2000);
-            }
-            
-        } catch (error) {
-            console.error('Error en login:', error);
-            this.showStatus('Error de conexión. Verifica tu conexión a internet.', 'error');
-        } finally {
-            this.loginSpinner.classList.add('d-none');
-            submitBtn.disabled = false;
-        }
-    }
-
-    redirectToDashboard(username) {
-        // Crear página de éxito mejorada con Bootstrap
-        document.body.innerHTML = `
-            <div class="min-vh-100 d-flex align-items-center justify-content-center" style="
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            ">
-                <div class="container">
-                    <div class="row justify-content-center">
-                        <div class="col-md-8 col-lg-6">
-                            <div class="text-center text-white" style="
-                                background: rgba(255, 255, 255, 0.1);
-                                backdrop-filter: blur(15px);
-                                padding: 60px 40px;
-                                border-radius: 20px;
-                                box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
-                                border: 1px solid rgba(255, 255, 255, 0.2);
-                                animation: successEntry 0.8s ease-out;
-                            ">
-                                <div style="font-size: 4em; margin-bottom: 20px; animation: bounce 2s ease-in-out infinite;">🎉</div>
-                                <h2 class="mb-4 fw-light" style="font-size: 2.5em;">¡Acceso Concedido!</h2>
-                                <p class="fs-5 mb-2 opacity-75">Bienvenido de vuelta,</p>
-                                <p class="fs-2 mb-4 fw-bold" style="color: #ffd700;">${username}</p>
-                                <p class="opacity-75 mb-4 fs-6">Has accedido exitosamente al sistema de reconocimiento facial</p>
-                                
-                                <div class="d-flex gap-3 justify-content-center flex-wrap">
-                                    <button onclick="location.reload()" class="btn btn-outline-light btn-lg">
-                                        <i class="fas fa-redo me-2"></i>
-                                        Volver al Login
-                                    </button>
-                                    <a href="/registrar_planta" class="btn btn-success btn-lg">
-                                        <i class="fas fa-tachometer-alt me-2"></i>
-                                        Ir al Dashboard
-                                    </a>
-                                </div>
-                                
-                                <div class="mt-4 pt-4 border-top border-light border-opacity-25">
-                                    <small class="opacity-75">
-                                        <i class="fas fa-shield-alt me-1"></i>
-                                        Sesión autenticada con tecnología de reconocimiento facial
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <style>
-                    @keyframes successEntry {
-                        from {
-                            opacity: 0;
-                            transform: scale(0.9) translateY(20px);
-                        }
-                        to {
-                            opacity: 1;
-                            transform: scale(1) translateY(0);
-                        }
-                    }
-                    
-                    @keyframes bounce {
-                        0%, 20%, 60%, 100% {
-                            transform: translateY(0);
-                        }
-                        40% {
-                            transform: translateY(-15px);
-                        }
-                        80% {
-                            transform: translateY(-8px);
-                        }
-                    }
-                    
-                    @keyframes successPulse {
-                        0% { transform: scale(1); }
-                        50% { transform: scale(1.1); }
-                        100% { transform: scale(1); }
-                    }
-                    
-                    @keyframes errorShake {
-                        0%, 100% { transform: translateX(0); }
-                        25% { transform: translateX(-5px); }
-                        75% { transform: translateX(5px); }
-                    }
-                    
-                    .btn:hover {
-                        transform: translateY(-2px);
-                        transition: all 0.3s ease;
-                    }
-                </style>
-            </div>
-        `;
+        // Usar window.location.href para la redirección
+        window.location.href = successUrl;
     }
 
     // Método para manejar redimensionamiento de ventana
@@ -540,70 +383,3 @@ class FaceRecognitionLogin {
         }
     }
 }
-
-// Inicializar la aplicación cuando se carga la página
-document.addEventListener('DOMContentLoaded', () => {
-    const app = new FaceRecognitionLogin();
-    
-    // Manejar redimensionamiento de ventana
-    window.addEventListener('resize', () => {
-        app.handleResize();
-    });
-    
-    // Agregar animaciones CSS adicionales
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes successPulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        
-        @keyframes errorShake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-        
-        .panel-transition {
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .panel-slide-in {
-            animation: slideInRight 0.6s ease-out;
-        }
-    `;
-    document.head.appendChild(style);
-    
-    // Mostrar información de desarrollo en consola
-    console.log(`
-    ==========================================
-    🚀 SISTEMA DE RECONOCIMIENTO FACIAL v2.0
-    ==========================================
-    
-    ✨ Nuevas características:
-    ✅ Layout responsivo con Bootstrap 5
-    ✅ Transición suave entre paneles
-    ✅ Cámara aparece a la derecha (desktop)
-    ✅ Detección visual de rostro simulada
-    ✅ Validación de formularios en tiempo real
-    ✅ Manejo avanzado de errores
-    ✅ Efectos visuales mejorados
-    ✅ Navegación por teclado (ESC/Enter)
-    
-    🎯 Funcionalidades:
-    • Login tradicional con validación
-    • Reconocimiento facial con DeepFace
-    • Interfaz responsive y moderna
-    • Transiciones suaves entre estados
-    • Manejo robusto de errores de cámara
-    
-    🔧 Controles de teclado:
-    • ESC: Cancelar reconocimiento facial
-    • Enter: Capturar imagen (cuando cámara activa)
-    
-    📱 Responsive:
-    • Desktop: Paneles lado a lado
-    • Mobile: Paneles apilados verticalmente
-    `);
-});
