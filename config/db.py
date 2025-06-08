@@ -5,11 +5,13 @@ DIRECTORIO_ROSTROS = "data/rostros_conocidos"
 
 def get_connection():
     return mysql.connector.connect(
-        host='localhost',
-        user='root',
-        password='12admin34',
-        database='bdplantas'
-    )
+    host="bdplantas.cpikeig8qwsl.us-east-1.rds.amazonaws.com",
+    user="admin",
+    password="cBFAMmuSstyU8Awvzb6k",
+    database="bdplantas",
+    charset='utf8mb4',
+    collation='utf8mb4_general_ci'
+)
 
 def verificar_base_datos_rostros():
     if not os.path.isdir(DIRECTORIO_ROSTROS):
