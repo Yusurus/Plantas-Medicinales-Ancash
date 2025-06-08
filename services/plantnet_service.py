@@ -1,6 +1,10 @@
 import requests
+from dotenv import load_dotenv 
+import os
 
-API_KEY = '2b10Q1pjh95QnKNGhW1eXZLO'
+load_dotenv()
+API_KEY = os.getenv('PLANTNET_API_KEY')
+
 API_URL = f"https://my-api.plantnet.org/v2/identify/all?api-key={API_KEY}&lang=es&include-related-images=true"
 
 def identificar_planta(filepath, organ='leaf'):
