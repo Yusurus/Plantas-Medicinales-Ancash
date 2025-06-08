@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, render_template, current_app
 import os
 from werkzeug.utils import secure_filename
-from utils.image_utils import allowed_file
+from services.image_utils import allowed_file
 from services.plantnet_service import identificar_planta
 
 identificacion_bp = Blueprint('identificacion_bp', __name__)
