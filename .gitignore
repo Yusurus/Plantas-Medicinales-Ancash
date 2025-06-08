@@ -1,4 +1,4 @@
 *.pyc
 *.bat
-.env
+*.env
 /static/uploads/*
