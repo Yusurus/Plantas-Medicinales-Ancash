@@ -1,0 +1,17 @@
+/* ===================== */
+/* Estilos del Navbar    */
+/* ===================== */
+.navbar-brand {
+    font-weight: bold;
+    color: #28a745 !important;
+}
+
+.navbar {
+    border-bottom: 1px solid #dee2e6;
+}
+
+.navbar .nav-link i,
+.navbar-brand i {
+    font-size: 1.2rem;
+    color: #28a745;
+}
