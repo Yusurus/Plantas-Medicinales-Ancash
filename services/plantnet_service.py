@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
+#es necesario tener un archivo .env con las variables de entorno 
 API_KEY = os.getenv('PLANTNET_API_KEY')
 
 API_URL = f"https://my-api.plantnet.org/v2/identify/all?api-key={API_KEY}&lang=es&include-related-images=true"
