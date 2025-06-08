@@ -1,14 +1,18 @@
 import mysql.connector
 import os
+from dotenv import load_dotenv 
 
 DIRECTORIO_ROSTROS = "data/rostros_conocidos"
 
+load_dotenv()
+
 def get_connection():
     return mysql.connector.connect(
-    host="bdplantas.cpikeig8qwsl.us-east-1.rds.amazonaws.com",
-    user="admin",
-    password="cBFAMmuSstyU8Awvzb6k",
-    database="bdplantas",
+    #es necesario tener un archivo .env con las variables de entorno 
+    host=os.environ.get('MYSQL_HOST'),
+    user=os.environ.get('MYSQL_USER'),
+    password=os.environ.get('MYSQL_PASSWORD'),
+    database=os.environ.get('MYSQL_DB'),
     charset='utf8mb4',
     collation='utf8mb4_general_ci'
 )
