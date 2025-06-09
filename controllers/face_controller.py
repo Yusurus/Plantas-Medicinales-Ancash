@@ -1,10 +1,14 @@
-from flask import Blueprint, request, jsonify, render_template, session
+from flask import Blueprint, request, jsonify, render_template, session, redirect
 from services.image_utils import procesar_imagen_base64
 from services.deepface_service import reconocer_rostro
 from config.db import get_connection
 face_bp = Blueprint('face_bp', __name__)
 
 USUARIOS_MOCK = {'admin': 'password123', 'usuario': '12345', 'test': 'test'}
+@face_bp.route('/logout')
+def logout():
+    session.pop('usuario', None)
+    return redirect('/')
 
 @face_bp.route('/login', methods=['GET', 'POST'])
 def login():

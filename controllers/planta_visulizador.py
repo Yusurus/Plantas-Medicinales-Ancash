@@ -19,7 +19,4 @@ def index():
         cursor.close()
         conn.close()
 
-@visualizacion_bp.route('/logout')
-def logout():
-    session.pop('usuario', None)
-    return redirect('/')
+
