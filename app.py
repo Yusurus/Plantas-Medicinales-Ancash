@@ -20,9 +20,9 @@ app.register_blueprint(registro_bp)
 app.register_blueprint(identificacion_bp)
 app.register_blueprint(detalles_bp)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if verificar_base_datos_rostros():
         print("Iniciando servidor Flask...")
-        app.run(debug=True, host='0.0.0.0', port=5000)
+        app.run(debug=True, host="0.0.0.0", port=5000)
     else:
         print("No se puede iniciar el servidor sin la base de datos de rostros.")
