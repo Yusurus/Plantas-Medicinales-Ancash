@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
+from flask import session
 
 from config.db import verificar_base_datos_rostros
 from controllers.face_controller import face_bp
@@ -10,8 +11,11 @@ from controllers.planta_identificacion import identificacion_bp
 from controllers.planta_detalles import detalles_bp
 
 app = Flask(__name__)
+app.secret_key = '1234'
 CORS(app)
-
+@app.context_processor
+def inject_user():
+    return dict(user=session.get('usuario'))
 # Registrar blueprints
 app.register_blueprint(face_bp)
 app.register_blueprint(user_bp)

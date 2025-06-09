@@ -8,11 +8,24 @@
         <i class="bi bi-house-door-fill me-1"></i> Inicio
       </a>
       <a href="/iden" class="nav-link text-dark fw-semibold">
-        <i class="bi bi-person-gear me-1"></i> Identificador de plantas
+        <i class="bi bi-search me-1"></i> Identificador de plantas
       </a>
-      <a href="/login" class="nav-link text-dark fw-semibold">
-        <i class="bi bi-person-gear me-1"></i> Administrar
-      </a>
+
+      {% if user %}
+      <a href="/registrar_planta" class="nav-link fw-semibold">
+          <i class="nav-link text-dark fw-semibold"></i> Registrar Plantas
+        </a>
+        <span class="nav-link text-success fw-semibold">
+          <i class="bi bi-person-circle me-1"></i> {{ user['nombres'] }}
+        </span>
+        <a href="/logout" class="nav-link text-danger fw-semibold">
+          <i class="bi bi-box-arrow-right me-1"></i> Cerrar sesión
+        </a>
+      {% else %}
+        <a href="/login" class="nav-link text-dark fw-semibold">
+          <i class="bi bi-person-gear me-1"></i> Administrar
+        </a>
+      {% endif %}
     </div>
   </div>
 </nav>

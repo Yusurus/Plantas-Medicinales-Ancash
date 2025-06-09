@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, jsonify
+from flask import Blueprint, render_template, jsonify, session,redirect
 from config.db import get_connection
 
 visualizacion_bp = Blueprint('visualizacion_bp', __name__)
@@ -18,3 +18,8 @@ def index():
     finally:
         cursor.close()
         conn.close()
+
+@visualizacion_bp.route('/logout')
+def logout():
+    session.pop('usuario', None)
+    return redirect('/')
