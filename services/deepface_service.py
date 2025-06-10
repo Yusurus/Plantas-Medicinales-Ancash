@@ -3,6 +3,8 @@ import os
 import cv2
 import pandas as pd
 from config.db import DIRECTORIO_ROSTROS
+from config.db import get_connection
+from flask import session
 
 def reconocer_rostro(imagen_cv):
     detector = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
@@ -27,6 +29,43 @@ def reconocer_rostro(imagen_cv):
             ruta_identidad = df.iloc[0]['identity']
             distancia = df.iloc[0]['distance']
             nombre_usuario = os.path.basename(os.path.dirname(ruta_identidad))
+            try:
+                conn = get_connection()
+                cursor = conn.cursor(dictionary=True)
+
+                # Llamada al procedimiento almacenado con solo el nombre de usuario
+                cursor.callproc('obtener_datos_usuario', [nombre_usuario])
+
+                # Recuperar el resultado del procedimiento
+                for result in cursor.stored_results():
+                    usuario = result.fetchone()
+                
+                if usuario:
+                    session['usuario'] = {
+                        'idUsuario': usuario['idUsuario'],
+                        'usuario': usuario['usuario'],
+                        'idEmpleado': usuario['idEmpleado'],
+                        'correo': usuario['correo'],
+                        'idPersona': usuario['idPersona'],
+                        'DNI': usuario['DNI'],
+                        'nombres': usuario['nombres'],
+                        'apellido1': usuario['apellido1'],
+                        'apellido2': usuario['apellido2'],
+                        'telefono': usuario['telefono'],
+                        'direccion': usuario['direccion'],
+                        'categoria': usuario['categoria']
+                    }
+                    
+                else:
+                    return jsonify({
+                        'success': False,
+                        'message': 'Usuario no encontrado'
+                    })
+            except Exception as e:
+                return jsonify({
+                    'success': False,
+                    'message': f'Error al obtener los datos del usuario: {str(e)}'
+                })
             return {
                 'success': True,
                 'user': nombre_usuario,
