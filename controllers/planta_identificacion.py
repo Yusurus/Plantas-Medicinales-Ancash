@@ -20,7 +20,7 @@ def identify():
     file = request.files["image"]
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
-        upload_folder = os.path.join(current_app.root_path, "static/uploads")
+        upload_folder = os.path.join(current_app.root_path, "static\\uploads")
 
         for f in os.listdir(upload_folder):
             file_path = os.path.join(upload_folder, f)
