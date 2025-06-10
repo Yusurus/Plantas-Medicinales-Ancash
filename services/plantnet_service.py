@@ -28,7 +28,7 @@ def identificar_planta(filepath, organ="leaf"):
             images = top.get("images", [])
 
             image_urls = [
-                img.get("url", {}).get("m") for img in images[:1] if img.get("url")
+                img.get("url", {}).get("m") for img in images[:5] if img.get("url")
             ]
             return {
                 "identifiedOrgan": images[0].get("organ") if images else "Desconocido",

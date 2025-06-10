@@ -7,6 +7,7 @@ const form = document.getElementById('plantForm');
         const fileNameDisplay = document.getElementById('file-name-display');
         const resultImagesContainer = document.getElementById('result-images');
         const changeImageBtn = document.getElementById('change-image-btn');
+        const registerPlantBtn = document.getElementById('registerPlantBtn');
 
         dropZone.addEventListener('click', () => {
             imageInput.click();
@@ -94,6 +95,26 @@ const form = document.getElementById('plantForm');
                 if (!res.ok) {
                     throw new Error(data.error || 'No se encontraron coincidencias.');
                 }
+
+                if (data.is_logged_in) {
+                    registerPlantBtn.classList.remove('hidden')
+                } else {
+                    registerPlantBtn.classList.add('hidden');
+                }
+
+                // Guardar datos de la planta en sessionStorage para poder registrarla
+                sessionStorage.setItem('plantDataToRegister', JSON.stringify({
+                    scientificName: data.scientificName || '',
+                    commonNames: (data.commonNames && data.commonNames.length > 0) ? data.commonNames.join(', ') : '',
+                    family: data.family || '',
+                    genus: data.genus || '',
+                    imageUrls: (data.imageUrls && data.imageUrls.length > 0) ? data.imageUrls.join(', ') : ''
+                }));
+
+                registerPlantBtn.onclick = () => {
+                    sessionStorage.setItem('isFromIdentifier', 'true');
+                    window.location.href = '/registrar_planta';
+                };
 
                 document.getElementById('scientificName').textContent = data.scientificName || 'No disponible';
                 document.getElementById('authorship').textContent = data.authorship || 'No disponible';

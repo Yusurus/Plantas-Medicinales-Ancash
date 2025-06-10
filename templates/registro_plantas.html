@@ -257,6 +257,8 @@
       }, false);
     })();
 
+
+// Buscar nombre científico en PlantNet
 const buscarPlantnetBtn = document.getElementById('buscarPlantnetBtn');
 const nombreCientificoInput = document.getElementById('nombreCientifico');
 const loadingPlantnet = document.getElementById('loadingPlantnet');
@@ -315,6 +317,59 @@ buscarPlantnetBtn.addEventListener('click', async () => {
   } finally {
     loadingPlantnet.classList.add('d-none');
   }
+});
+
+// Pre-llenar campos si hay datos en sessionStorage
+document.addEventListener('DOMContentLoaded', () => {
+  const plantDataString = sessionStorage.getItem('plantDataToRegister');
+  const isFromIdentifier = sessionStorage.getItem('isFromIdentifier');
+
+  if (plantDataString && isFromIdentifier === 'true') {
+    try {
+      const plantData = JSON.parse(plantDataString);
+
+      const nombreCientificoInput = document.getElementById('nombreCientifico');
+      if (nombreCientificoInput) {
+        nombreCientificoInput.value = plantData.scientificName || '';
+        nombreCientificoInput.classList.add('is-valid'); 
+      }
+
+      const nomFamiliaSelect = document.getElementById('nomFamilia');
+      if (nomFamiliaSelect && plantData.family) {
+        for (let i = 0; i < nomFamiliaSelect.options.length; i++) {
+          if (nomFamiliaSelect.options[i].value === plantData.family) {
+            nomFamiliaSelect.value = plantData.family;
+            break;
+          }
+        }
+      }
+
+      if (plantData.commonNames) {
+        nombresComunes.length = 0; 
+        plantData.commonNames.split(', ').forEach(name => {
+          if (name.trim() !== '') {
+            nombresComunes.push(name.trim());
+          }
+        });
+        actualizarLista();
+      }
+
+      if (plantData.imageUrls) {
+        imagenes.length = 0;
+        plantData.imageUrls.split(', ').forEach(url => {
+          if (url.trim() !== '') {
+            imagenes.push(url.trim());
+          }
+        });
+        actualizarGaleria();
+      }
+
+    } catch (e) {
+      console.error("Error al parsear o pre-llenar datos de planta desde sessionStorage:", e);
+    }
+  }
+  sessionStorage.removeItem('plantDataToRegister');
+  sessionStorage.removeItem('isFromIdentifier');
 });
 </script>
 </body>
