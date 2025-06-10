@@ -89,7 +89,7 @@ def identificar_por_nombre(scientific_name):
                 plant_data["authorship"] = top_match_project.get(
                     "scientificNameAuthorship", ""
                 )
-                plant_data["commonNames"] = top_match_project.get("commonNames", [])
+                plant_data["commonNames"] = top_match_project.get("commonNames", [])[:5]
                 plant_data["genus"] = top_match_project.get("genus", "")
                 plant_data["family"] = top_match_project.get("family", "")
                 print(f"Datos obtenidos del proyecto de PlantNet: {project_id}.")
@@ -120,7 +120,7 @@ def identificar_por_nombre(scientific_name):
             plant_data["authorship"] = top_match_global.get(
                 "scientificNameAuthorship", ""
             )
-            plant_data["commonNames"] = top_match_global.get("commonNames", [])
+            plant_data["commonNames"] = top_match_global.get("commonNames", [])[:5]
             plant_data["genus"] = top_match_global.get("genus", "")
             plant_data["family"] = top_match_global.get("family", "")
             print("Datos obtenidos de la búsqueda global de PlantNet.")
