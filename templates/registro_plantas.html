@@ -361,11 +361,12 @@
           const plantData = JSON.parse(plantDataString);
 
           const nombreCientificoInput = document.getElementById('nombreCientifico');
+          console.log(plantData);
           if (nombreCientificoInput) {
             nombreCientificoInput.value = plantData.scientificName || '';
             nombreCientificoInput.classList.add('is-valid');
           }
-          buscarPlantnetBtn.click();
+          /// buscarPlantnetBtn.click();
           /*const nomFamiliaSelect = document.getElementById('nomFamilia');
           if (nomFamiliaSelect && plantData.family) {
             for (let i = 0; i < nomFamiliaSelect.options.length; i++) {
@@ -374,10 +375,50 @@
                 break;
               }
             }
+          }*/
+          if (plantData.family) {
+            const familiaSelect = document.getElementById('nomFamilia');
+            let foundFamily = false;
+
+            for (let i = 0; i < familiaSelect.options.length; i++) {
+              if (familiaSelect.options[i].value === plantData.family) {
+                familiaSelect.value = plantData.family;
+                foundFamily = true;
+                break;
+              }
+            }
+
+            if (!foundFamily) {
+              console.log(">> No se encontró la familia, registrando: ", plantData.family); // ✅ Confirmación en consola
+
+              fetch('/registrar_familia', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ nombreFamilia: plantData.family })
+              })
+                .then(response => response.json())
+                .then(result => {
+                  console.log(">> Resultado del registro:", result); // ✅ Ver si la respuesta vino bien
+
+                  if (result.success) {
+                    const option = document.createElement('option');
+                    option.value = plantData.family;
+                    option.textContent = plantData.family;
+                    familiaSelect.appendChild(option);
+                    familiaSelect.value = plantData.family;
+                  } else {
+                    alert('No se pudo registrar la familia: ' + result.message);
+                  }
+                })
+                .catch(error => {
+                  console.error('Error registrando la familia:', error); // ✅ Ver errores de red u otros
+                });
+            }
           }
-    
           if (plantData.commonNames) {
-            nombresComunes.length = 0; 
+            nombresComunes.length = 0;
             plantData.commonNames.split(', ').forEach(name => {
               if (name.trim() !== '') {
                 nombresComunes.push(name.trim());
@@ -385,7 +426,7 @@
             });
             actualizarLista();
           }
-    
+
           if (plantData.imageUrls) {
             imagenes.length = 0;
             plantData.imageUrls.split(', ').forEach(url => {
@@ -394,7 +435,7 @@
               }
             });
             actualizarGaleria();
-          }*/
+          }
         } catch (e) {
           console.error("Error al parsear o pre-llenar datos de planta desde sessionStorage:", e);
         }
