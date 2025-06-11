@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, jsonify
+from flask import Blueprint, render_template, jsonify, session,redirect
 from config.db import get_connection
 
 visualizacion_bp = Blueprint('visualizacion_bp', __name__)
@@ -9,7 +9,7 @@ def index():
         conn = get_connection()
         cursor = conn.cursor()
         # Llamada al procedimiento almacenado para obtener las plantas activas
-        cursor.execute("""select * from vta_plantas_activas""")
+        cursor.execute("""select * from vta_plantas_activas order by nombreCientifico asc""")
         rows = cursor.fetchall()
         resultado = [{'idPlanta': r[0], 'nombreCientifico': r[1], 'linkImagen': r[2], 'nomFamilia': r[3], 'nombres_comunes': r[4] or ''} for r in rows]
         return render_template('visualizar_plantas.html', plantas=resultado)
@@ -18,3 +18,5 @@ def index():
     finally:
         cursor.close()
         conn.close()
+
+
