@@ -212,7 +212,7 @@
                         <h1 class="welcome-title fw-bold">¡Acceso Concedido!</h1>
                         
                         <p class="fs-5 mb-2 opacity-75">Bienvenido de vuelta,</p>
-                        <h2 class="username-display fw-bold" id="usernameDisplay">Usuario</h2>
+                        <h2 class="username-display fw-bold" id="usernameDisplay">{{ user['nombres'] }}</h2>
                         
                         <div class="method-badge" id="methodBadge">
                             <i class="fas fa-sign-in-alt me-2"></i>
@@ -245,7 +245,7 @@
                                 <i class="fas fa-arrow-left me-2"></i>
                                 Volver al Login
                             </button>
-                            <a href="/dashboard" class="btn btn-success btn-lg">
+                            <a href="/" class="btn btn-success btn-lg">
                                 <i class="fas fa-tachometer-alt me-2"></i>
                                 Ir al Dashboard
                             </a>
@@ -265,27 +265,24 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    
     <script>
         class SuccessPage {
+            
             constructor() {
-                this.initializeData();
+                /*const appData = {
+                    username: "{{ session['usuario']['nombres'] if 'usuario' in session else 'XDDD' }}",
+                    method: "traditional"
+                };*/
+                //this.initializeData();
                 this.startSessionTimer();
                 this.addInteractiveEffects();
             }
 
             initializeData() {
-                // Obtener parámetros de la URL
-                const urlParams = new URLSearchParams(window.location.search);
-                const username = urlParams.get('username') || 'Usuario';
-                const method = urlParams.get('method') || 'traditional';
+                
+                document.getElementById('usernameDisplay').textContent = appData.username;
 
-                // Mostrar nombre del usuario
-                document.getElementById('usernameDisplay').textContent = username;
-
-                // Configurar método de autenticación
-                this.setupMethodBadge(method);
-
-                // Mostrar hora de login
                 const now = new Date();
                 document.getElementById('loginTime').textContent = now.toLocaleString('es-ES', {
                     year: 'numeric',
@@ -294,9 +291,6 @@
                     hour: '2-digit',
                     minute: '2-digit'
                 });
-
-                // Personalizar mensaje según el método
-                this.personalizeMessage(method, username);
             }
 
             setupMethodBadge(method) {
