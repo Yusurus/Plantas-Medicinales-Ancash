@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, jsonify, session,redirect
+from flask import Blueprint, render_template, jsonify
 from config.db import get_connection
 
 visualizacion_bp = Blueprint('visualizacion_bp', __name__)
