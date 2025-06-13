@@ -1,10 +1,9 @@
 from deepface import DeepFace
 import os
 import cv2
-import pandas as pd
 from config.db import DIRECTORIO_ROSTROS
 from config.db import get_connection
-from flask import session
+from flask import session, jsonify
 
 
 def reconocer_rostro(imagen_cv):
