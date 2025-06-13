@@ -1,0 +1,151 @@
+/* Colores base */
+:root {
+  --verde-suave: #8ddb9f;
+  --verde-medio: #28a745 ;
+  --verde-oscuro: #1f7f35 ;
+  --gris-claro: #f5f5f5;
+  --gris-medio: #dddddd;
+  --gris-oscuro: #333333;
+  --blanco: #ffffff;
+  --error: #e74c3c;
+  --success: #27ae60;
+}
+
+body {
+  background-color: var(--gris-claro);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--gris-oscuro);
+}
+
+h2 {
+  color: var(--verde-oscuro);
+}
+
+.card {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border: none;
+  border-radius: 12px;
+  background-color: var(--blanco);
+}
+
+.card-title {
+  color: var(--verde-medio);
+  font-weight: 600;
+}
+
+/* Nav Tabs Styling */
+.nav-tabs {
+    border-bottom: 2px solid #a8e6cf; /* Light green border */
+    margin-bottom: 1.5rem;
+}
+
+.nav-tabs .nav-item {
+    margin-bottom: -2px; /* Overlap border for active tab */
+}
+
+.nav-tabs .nav-link {
+    color: #4a4a4a;
+    background-color: #ffffff; /* Very light green tab background */
+    border: 1px solid #ededed; /* Light green border */
+    border-bottom: none;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    padding: 0.75rem 1.25rem;
+    transition: all 0.3s ease-in-out;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Space between icon and text */
+}
+
+.nav-tabs .nav-link i {
+    font-size: 1.1em;
+}
+
+.nav-tabs .nav-link:hover {
+    color: #00796b; /* Darker green on hover */
+    background-color: #c8e6c9; /* Slightly darker green background on hover */
+    border-color: #a8e6cf;
+    transform: translateY(-2px); /* Subtle lift effect */
+}
+
+.nav-tabs .nav-link.active {
+    color: #ffffff;
+    background-color: #388e3c; /* Stronger green for active tab */
+    border-color: #388e3c;
+    border-bottom-color: transparent; /* Hide bottom border for active tab */
+    font-weight: 600;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-outline-primary,
+.btn-outline-secondary {
+  border-radius: 6px;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-secondary:hover {
+  background-color: var(--verde-medio);
+  color: white;
+  border-color: var(--verde-medio);
+}
+
+input:focus,
+select:focus,
+button:focus {
+  box-shadow: 0 0 5px var(--verde-medio);
+  border-color: var(--verde-medio);
+}
+
+#contenedorImagenes img {
+  height: 80px;
+  border-radius: 8px;
+  border: 2px solid var(--verde-suave);
+  object-fit: cover;
+}
+
+#listaNombresComunes li {
+  background-color: var(--verde-suave);
+  color: var(--gris-oscuro);
+  border-radius: 6px;
+}
+
+.spinner-border {
+  width: 2rem;
+  height: 2rem;
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.btn-success {
+  background-color: var(--success);
+  border-color: var(--success);
+}
+
+.btn-success:hover {
+  background-color: #1f8a51;
+  border-color: #1f8a51;
+}
+
+.text-success {
+  color: var(--success) !important;
+}
+
+/* Responsive tweaks */
+@media (max-width: 576px) {
+  .nav-tabs .nav-link {
+    font-size: 14px;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  #contenedorImagenes img {
+    height: 60px;
+  }
+}
