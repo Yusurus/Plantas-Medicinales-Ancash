@@ -1,7 +1,5 @@
-from flask import Flask, request, jsonify, render_template, Blueprint
-import mysql.connector
+from flask import  request, jsonify, Blueprint
 from mysql.connector import Error
-import json
 from config.db import get_connection
 
 registro_zona = Blueprint("registro_zona", __name__)

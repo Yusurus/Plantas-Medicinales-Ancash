@@ -10,6 +10,8 @@ from controllers.gestionPlantas.registro_planta import registro_bp
 from controllers.planta_identificacion import identificacion_bp
 from controllers.planta_detalles import detalles_bp
 from controllers.gestionPlantas.registro_zona import registro_zona
+from controllers.gestionPlantas.registro_saberes import registro_saberes
+from controllers.gestionPlantas.registro_usos import registro_usos
 
 app = Flask(__name__)
 app.secret_key = '1234'
@@ -27,6 +29,8 @@ app.register_blueprint(detalles_bp)
 
 #----
 app.register_blueprint(registro_zona)
+app.register_blueprint(registro_saberes)
+app.register_blueprint(registro_usos)
 #----
 
 if __name__ == '__main__':
