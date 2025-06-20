@@ -1,662 +1,649 @@
-/* Estilos encapsulados para el módulo de plantas medicinales */
+/* Header del módulo */
+.pm-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 25px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(45, 80, 22, 0.2);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(104, 182, 132, 0.3);
+}
+
+.pm-header h1 {
+    font-size: 2.2rem;
+    background: linear-gradient(135deg, #28a745, #66cd7e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+.pm-header p {
+    font-size: 1rem;
+    color: #5d7e5d;
+    font-weight: 400;
+}
+
+/* Sección de búsqueda */
+.pm-search-section {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 25px;
+    border-radius: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 10px 30px rgba(45, 80, 22, 0.15);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(104, 182, 132, 0.2);
+}
+
+.pm-search-container {
+    position: relative;
+}
+
+.pm-search-input {
+    width: 100%;
+    padding: 15px 50px 15px 20px;
+    font-size: 1rem;
+    border: 2px solid #e8f5e8;
+    border-radius: 15px;
+    outline: none;
+    transition: all 0.3s ease;
+    background: #f8fff8;
+    color: #1d8535;
+}
+
+.pm-search-input::placeholder {
+    color: #7fb882;
+}
+
+.pm-search-input:focus {
+    border-color: #4a7c59;
+    box-shadow: 0 0 20px rgba(74, 124, 89, 0.3);
+    transform: translateY(-2px);
+    background: white;
+}
+
+.pm-search-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #4a7c59;
+    font-size: 1.2rem;
+    pointer-events: none;
+}
+
+/* Grid de plantas - 5 por fila */
+.pm-plants-section {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 25px;
+    border-radius: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 10px 30px rgba(45, 80, 22, 0.15);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(104, 182, 132, 0.2);
+}
+
+.pm-plants-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e8f5e8;
+}
+
+.pm-plants-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #1e8f38;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+}
+
+.pm-plants-count {
+    background: linear-gradient(135deg, #28a745, #40c45f);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.pm-plants-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 plantas por fila */
+    gap: 20px;
+    max-height: 500px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.pm-plant-card {
+    background: linear-gradient(135deg, #f8fff8, #f0f8f0);
+    border-radius: 15px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(45, 80, 22, 0.1);
+}
+
+.pm-plant-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #4a7c59, #68b684);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+}
+
+.pm-plant-card:hover::before {
+    opacity: 0.1;
+}
+
+.pm-plant-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(45, 80, 22, 0.2);
+    border-color: #4a7c59;
+}
+
+.pm-plant-card.selected {
+    background: linear-gradient(135deg, #28a745, #55c970);
+    color: white;
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(74, 124, 89, 0.4);
+    border-color: #177d2e;
+}
+
+.pm-plant-card-content {
+    position: relative;
+    z-index: 2;
+}
+
+.pm-plant-scientific-name {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 8px;
+    font-style: italic;
+    color: inherit;
+}
+
+.pm-plant-family {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.pm-plant-common-names {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    line-height: 1.4;
+}
+
+/* Planta seleccionada */
+.pm-plant-details-section {
+    animation: pm-slideInUp 0.5s ease;
+}
+
+.pm-selected-plant-info {
+    background: linear-gradient(135deg, #28a745, #48c565);
+    color: white;
+    padding: 25px;
+    border-radius: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 15px 35px rgba(45, 80, 22, 0.3);
+    border: 1px solid rgba(104, 182, 132, 0.3);
+}
+
+.pm-selected-plant-info h2 {
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pm-plant-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.pm-info-item {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 15px;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.pm-info-label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    opacity: 0.9;
+    display: block;
+}
+
+.pm-info-value {
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+/* Sección de usos */
+.pm-usage-section {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(45, 80, 22, 0.15);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(104, 182, 132, 0.2);
+}
+
+.pm-usage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e8f5e8;
+}
+
+.pm-usage-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.4rem;
+    color: #1a9336;
+    margin: 0;
+}
+
+/* Botones */
+.pm-btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.pm-btn-add-usage {
+    background: linear-gradient(135deg, #51c16b, #28a745);
+    color: white;
+    box-shadow: 0 5px 15px rgba(74, 124, 89, 0.3);
+}
+
+.pm-btn-add-usage:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(74, 124, 89, 0.4);
+}
+
+.pm-btn-edit {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: white;
+    padding: 8px 15px;
+    font-size: 0.8rem;
+}
+
+.pm-btn-edit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(243, 156, 18, 0.4);
+}
+
+.pm-btn-delete {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    padding: 8px 15px;
+    font-size: 0.8rem;
+}
+
+.pm-btn-delete:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+}
+
+.pm-btn-save {
+    background: linear-gradient(135deg, #4a7c59, #68b684);
+    color: white;
+}
+
+.pm-btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(74, 124, 89, 0.4);
+}
+
+.pm-btn-cancel {
+    background: #95a5a6;
+    color: white;
+}
+
+.pm-btn-cancel:hover {
+    background: #7f8c8d;
+    transform: translateY(-2px);
+}
+
+/* Items de uso */
+.pm-usage-item {
+    background: linear-gradient(135deg, #f8fff8, #f0f8f0);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 15px rgba(45, 80, 22, 0.1);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(104, 182, 132, 0.2);
+}
+
+.pm-usage-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(45, 80, 22, 0.2);
+}
+
+.pm-usage-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e8f5e8;
+}
+
+.pm-usage-part {
+    background: linear-gradient(135deg, #28a745, #40cc61);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.pm-usage-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.pm-usage-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.pm-usage-field {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid rgba(104, 182, 132, 0.2);
+}
+
+.pm-usage-field h4 {
+    color: #2d5016;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.pm-usage-field p {
+    color: #4a7c59;
+    line-height: 1.5;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Loading y estados vacíos */
+.pm-loading, .pm-usage-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding: 40px;
+    color: #4a7c59;
+    font-weight: 500;
+}
+
+.pm-spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid #e8f5e8;
+    border-top: 3px solid #4a7c59;
+    border-radius: 50%;
+    animation: pm-spin 1s linear infinite;
+}
+
+.pm-empty-state {
+    text-align: center;
+    padding: 50px 30px;
+    color: #7fb882;
+}
+
+.pm-empty-state h3 {
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+    color: #4a7c59;
+}
+
+.pm-empty-state p {
+    margin: 0;
+}
+
+/* Modal */
+.pm-modal-overlay {
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(45, 80, 22, 0.7);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pm-modal-content {
+    background: white;
+    padding: 0;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 25px 60px rgba(45, 80, 22, 0.4);
+    animation: pm-modalSlideIn 0.4s ease;
+}
+
+.pm-modal-header {
+    background: linear-gradient(135deg, #4a7c59, #68b684);
+    color: white;
+    padding: 20px 25px;
+    border-radius: 20px 20px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pm-modal-title {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.pm-modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 5px 8px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.pm-modal-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.pm-modal-body {
+    padding: 25px;
+}
+
+.pm-form-group {
+    margin-bottom: 20px;
+}
+
+.pm-form-label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #2d5016;
+    font-size: 0.9rem;
+}
+
+.pm-form-input, .pm-form-textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e8f5e8;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    background: #f8fff8;
+    color: #2d5016;
+}
+
+.pm-form-input:focus, .pm-form-textarea:focus {
+    outline: none;
+    border-color: #4a7c59;
+    background: white;
+    box-shadow: 0 0 15px rgba(74, 124, 89, 0.2);
+}
+
+.pm-form-textarea {
+    resize: vertical;
+    min-height: 80px;
+    line-height: 1.5;
+}
+
+.pm-modal-footer {
+    padding: 15px 25px 25px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+/* Animaciones */
+@keyframes pm-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes pm-modalSlideIn {
+    from {
+        transform: scale(0.8) translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes pm-slideInUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* ScrollBar personalizado */
+.pm-plants-grid::-webkit-scrollbar {
+    width: 8px;
+}
+
+.pm-plants-grid::-webkit-scrollbar-track {
+    background: #f0f8f0;
+    border-radius: 10px;
+}
+
+.pm-plants-grid::-webkit-scrollbar-thumb {
+    background: #4a7c59;
+    border-radius: 10px;
+}
+
+.pm-plants-grid::-webkit-scrollbar-thumb:hover {
+    background: #188a32;
+}
+
+/* Responsive */
+@media (max-width: 1400px) {
+    .pm-plants-grid {
+        grid-template-columns: repeat(4, 1fr); /* 4 por fila en pantallas medianas */
+    }
+}
+
+@media (max-width: 1024px) {
+    .pm-plants-grid {
+        grid-template-columns: repeat(3, 1fr); /* 3 por fila en tablets */
+    }
+}
+
+@media (max-width: 768px) {
     .plantas-medicinales-module {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(135deg, #f8fff8, #e8f5e8);
-        min-height: 100vh;
-        padding: 20px;
-        box-sizing: border-box;
-    }
-
-    .plantas-medicinales-module * {
-        box-sizing: border-box;
-    }
-
-    /* Header del módulo */
-    .pm-header {
-        text-align: center;
-        margin-bottom: 30px;
-        padding: 25px;
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 20px;
-        box-shadow: 0 15px 35px rgba(45, 80, 22, 0.2);
-        backdrop-filter: blur(15px);
-        border: 1px solid rgba(104, 182, 132, 0.3);
+        padding: 15px;
     }
 
     .pm-header h1 {
-        font-size: 2.2rem;
-        background: linear-gradient(135deg, #28a745, #66cd7e);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        margin-bottom: 8px;
-        font-weight: 700;
-    }
-
-    .pm-header p {
-        font-size: 1rem;
-        color: #5d7e5d;
-        font-weight: 400;
-    }
-
-    /* Sección de búsqueda */
-    .pm-search-section {
-        background: rgba(255, 255, 255, 0.95);
-        padding: 25px;
-        border-radius: 20px;
-        margin-bottom: 25px;
-        box-shadow: 0 10px 30px rgba(45, 80, 22, 0.15);
-        backdrop-filter: blur(15px);
-        border: 1px solid rgba(104, 182, 132, 0.2);
-    }
-
-    .pm-search-container {
-        position: relative;
-    }
-
-    .pm-search-input {
-        width: 100%;
-        padding: 15px 50px 15px 20px;
-        font-size: 1rem;
-        border: 2px solid #e8f5e8;
-        border-radius: 15px;
-        outline: none;
-        transition: all 0.3s ease;
-        background: #f8fff8;
-        color: #1d8535;
-    }
-
-    .pm-search-input::placeholder {
-        color: #7fb882;
-    }
-
-    .pm-search-input:focus {
-        border-color: #4a7c59;
-        box-shadow: 0 0 20px rgba(74, 124, 89, 0.3);
-        transform: translateY(-2px);
-        background: white;
-    }
-
-    .pm-search-icon {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #4a7c59;
-        font-size: 1.2rem;
-        pointer-events: none;
-    }
-
-    /* Grid de plantas - 5 por fila */
-    .pm-plants-section {
-        background: rgba(255, 255, 255, 0.95);
-        padding: 25px;
-        border-radius: 20px;
-        margin-bottom: 25px;
-        box-shadow: 0 10px 30px rgba(45, 80, 22, 0.15);
-        backdrop-filter: blur(15px);
-        border: 1px solid rgba(104, 182, 132, 0.2);
-    }
-
-    .pm-plants-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 2px solid #e8f5e8;
-    }
-
-    .pm-plants-title {
-        font-size: 1.4rem;
-        font-weight: 600;
-        color: #1e8f38;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin: 0;
-    }
-
-    .pm-plants-count {
-        background: linear-gradient(135deg, #28a745, #40c45f);
-        color: white;
-        padding: 5px 12px;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 500;
+        font-size: 1.8rem;
     }
 
     .pm-plants-grid {
-        display: grid;
-        grid-template-columns: repeat(5, 1fr); /* 5 plantas por fila */
-        gap: 20px;
-        max-height: 500px;
-        overflow-y: auto;
-        padding: 10px;
-    }
-
-    .pm-plant-card {
-        background: linear-gradient(135deg, #f8fff8, #f0f8f0);
-        border-radius: 15px;
-        padding: 20px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        border: 2px solid transparent;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 5px 15px rgba(45, 80, 22, 0.1);
-    }
-
-    .pm-plant-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, #4a7c59, #68b684);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        z-index: 1;
-    }
-
-    .pm-plant-card:hover::before {
-        opacity: 0.1;
-    }
-
-    .pm-plant-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 20px 40px rgba(45, 80, 22, 0.2);
-        border-color: #4a7c59;
-    }
-
-    .pm-plant-card.selected {
-        background: linear-gradient(135deg, #28a745, #55c970);
-        color: white;
-        transform: translateY(-8px);
-        box-shadow: 0 20px 40px rgba(74, 124, 89, 0.4);
-        border-color: #177d2e;
-    }
-
-    .pm-plant-card-content {
-        position: relative;
-        z-index: 2;
-    }
-
-    .pm-plant-scientific-name {
-        font-weight: 700;
-        font-size: 1rem;
-        margin-bottom: 8px;
-        font-style: italic;
-        color: inherit;
-    }
-
-    .pm-plant-family {
-        font-size: 0.85rem;
-        opacity: 0.8;
-        margin-bottom: 6px;
-        font-weight: 500;
-    }
-
-    .pm-plant-common-names {
-        font-size: 0.8rem;
-        opacity: 0.7;
-        line-height: 1.4;
-    }
-
-    /* Planta seleccionada */
-    .pm-plant-details-section {
-        animation: pm-slideInUp 0.5s ease;
-    }
-
-    .pm-selected-plant-info {
-        background: linear-gradient(135deg, #28a745, #48c565);
-        color: white;
-        padding: 25px;
-        border-radius: 20px;
-        margin-bottom: 25px;
-        box-shadow: 0 15px 35px rgba(45, 80, 22, 0.3);
-        border: 1px solid rgba(104, 182, 132, 0.3);
-    }
-
-    .pm-selected-plant-info h2 {
-        font-size: 1.4rem;
-        margin-bottom: 15px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .pm-plant-info-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        grid-template-columns: repeat(2, 1fr); /* 2 por fila en móviles */
         gap: 15px;
-    }
-
-    .pm-info-item {
-        background: rgba(255, 255, 255, 0.15);
-        padding: 15px;
-        border-radius: 12px;
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .pm-info-label {
-        font-weight: 600;
-        margin-bottom: 5px;
-        font-size: 0.9rem;
-        opacity: 0.9;
-        display: block;
-    }
-
-    .pm-info-value {
-        font-size: 1rem;
-        font-weight: 400;
-    }
-
-    /* Sección de usos */
-    .pm-usage-section {
-        background: rgba(255, 255, 255, 0.95);
-        padding: 25px;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(45, 80, 22, 0.15);
-        backdrop-filter: blur(15px);
-        border: 1px solid rgba(104, 182, 132, 0.2);
-    }
-
-    .pm-usage-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 2px solid #e8f5e8;
-    }
-
-    .pm-usage-header h3 {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 1.4rem;
-        color: #1a9336;
-        margin: 0;
-    }
-
-    /* Botones */
-    .pm-btn {
-        padding: 12px 20px;
-        border: none;
-        border-radius: 12px;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 0.9rem;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .pm-btn-add-usage {
-        background: linear-gradient(135deg, #51c16b, #28a745);
-        color: white;
-        box-shadow: 0 5px 15px rgba(74, 124, 89, 0.3);
-    }
-
-    .pm-btn-add-usage:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(74, 124, 89, 0.4);
-    }
-
-    .pm-btn-edit {
-        background: linear-gradient(135deg, #f39c12, #e67e22);
-        color: white;
-        padding: 8px 15px;
-        font-size: 0.8rem;
-    }
-
-    .pm-btn-edit:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(243, 156, 18, 0.4);
-    }
-
-    .pm-btn-delete {
-        background: linear-gradient(135deg, #e74c3c, #c0392b);
-        color: white;
-        padding: 8px 15px;
-        font-size: 0.8rem;
-    }
-
-    .pm-btn-delete:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
-    }
-
-    .pm-btn-save {
-        background: linear-gradient(135deg, #4a7c59, #68b684);
-        color: white;
-    }
-
-    .pm-btn-save:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(74, 124, 89, 0.4);
-    }
-
-    .pm-btn-cancel {
-        background: #95a5a6;
-        color: white;
-    }
-
-    .pm-btn-cancel:hover {
-        background: #7f8c8d;
-        transform: translateY(-2px);
-    }
-
-    /* Items de uso */
-    .pm-usage-item {
-        background: linear-gradient(135deg, #f8fff8, #f0f8f0);
-        border-radius: 15px;
-        padding: 20px;
-        margin-bottom: 20px;
-        box-shadow: 0 5px 15px rgba(45, 80, 22, 0.1);
-        transition: all 0.3s ease;
-        border: 1px solid rgba(104, 182, 132, 0.2);
-    }
-
-    .pm-usage-item:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 30px rgba(45, 80, 22, 0.2);
-    }
-
-    .pm-usage-item-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-        padding-bottom: 10px;
-        border-bottom: 2px solid #e8f5e8;
-    }
-
-    .pm-usage-part {
-        background: linear-gradient(135deg, #28a745, #40cc61);
-        color: white;
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        margin: 0;
-    }
-
-    .pm-usage-actions {
-        display: flex;
-        gap: 8px;
     }
 
     .pm-usage-content {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 15px;
+        grid-template-columns: 1fr;
     }
 
-    .pm-usage-field {
-        background: rgba(255, 255, 255, 0.8);
-        padding: 15px;
-        border-radius: 12px;
-        border: 1px solid rgba(104, 182, 132, 0.2);
-    }
-
-    .pm-usage-field h4 {
-        color: #2d5016;
-        margin-bottom: 8px;
-        font-size: 0.95rem;
-        font-weight: 600;
-    }
-
-    .pm-usage-field p {
-        color: #4a7c59;
-        line-height: 1.5;
-        font-size: 0.9rem;
-        margin: 0;
-    }
-
-    /* Loading y estados vacíos */
-    .pm-loading, .pm-usage-loading {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 15px;
-        padding: 40px;
-        color: #4a7c59;
-        font-weight: 500;
-    }
-
-    .pm-spinner {
-        width: 24px;
-        height: 24px;
-        border: 3px solid #e8f5e8;
-        border-top: 3px solid #4a7c59;
-        border-radius: 50%;
-        animation: pm-spin 1s linear infinite;
-    }
-
-    .pm-empty-state {
-        text-align: center;
-        padding: 50px 30px;
-        color: #7fb882;
-    }
-
-    .pm-empty-state h3 {
-        margin-bottom: 10px;
-        font-size: 1.2rem;
-        color: #4a7c59;
-    }
-
-    .pm-empty-state p {
-        margin: 0;
-    }
-
-    /* Modal */
-    .pm-modal-overlay {
-        position: fixed;
-        z-index: 2000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(45, 80, 22, 0.7);
-        backdrop-filter: blur(8px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    .pm-plant-info-grid {
+        grid-template-columns: 1fr;
     }
 
     .pm-modal-content {
-        background: white;
-        padding: 0;
-        border-radius: 20px;
-        width: 90%;
-        max-width: 600px;
-        box-shadow: 0 25px 60px rgba(45, 80, 22, 0.4);
-        animation: pm-modalSlideIn 0.4s ease;
+        width: 95%;
+        margin: 20px;
     }
 
-    .pm-modal-header {
-        background: linear-gradient(135deg, #4a7c59, #68b684);
-        color: white;
-        padding: 20px 25px;
-        border-radius: 20px 20px 0 0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+    .pm-plants-header,
+    .pm-usage-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
     }
+}
 
-    .pm-modal-title {
-        margin: 0;
-        font-size: 1.2rem;
-        font-weight: 600;
+@media (max-width: 480px) {
+    .pm-plants-grid {
+        grid-template-columns: 1fr; /* 1 por fila en móviles pequeños */
     }
-
-    .pm-modal-close {
-        background: none;
-        border: none;
-        color: white;
-        font-size: 1.5rem;
-        cursor: pointer;
-        padding: 5px 8px;
-        border-radius: 8px;
-        transition: background-color 0.3s ease;
-    }
-
-    .pm-modal-close:hover {
-        background-color: rgba(255, 255, 255, 0.2);
-    }
-
-    .pm-modal-body {
-        padding: 25px;
-    }
-
-    .pm-form-group {
-        margin-bottom: 20px;
-    }
-
-    .pm-form-label {
-        display: block;
-        margin-bottom: 6px;
-        font-weight: 600;
-        color: #2d5016;
-        font-size: 0.9rem;
-    }
-
-    .pm-form-input, .pm-form-textarea {
-        width: 100%;
-        padding: 12px 15px;
-        border: 2px solid #e8f5e8;
-        border-radius: 12px;
-        font-size: 0.9rem;
-        transition: all 0.3s ease;
-        background: #f8fff8;
-        color: #2d5016;
-    }
-
-    .pm-form-input:focus, .pm-form-textarea:focus {
-        outline: none;
-        border-color: #4a7c59;
-        background: white;
-        box-shadow: 0 0 15px rgba(74, 124, 89, 0.2);
-    }
-
-    .pm-form-textarea {
-        resize: vertical;
-        min-height: 80px;
-        line-height: 1.5;
-    }
-
-    .pm-modal-footer {
-        padding: 15px 25px 25px;
-        display: flex;
-        gap: 12px;
-        justify-content: flex-end;
-    }
-
-    /* Animaciones */
-    @keyframes pm-spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    @keyframes pm-modalSlideIn {
-        from {
-            transform: scale(0.8) translateY(-50px);
-            opacity: 0;
-        }
-        to {
-            transform: scale(1) translateY(0);
-            opacity: 1;
-        }
-    }
-
-    @keyframes pm-slideInUp {
-        from {
-            transform: translateY(30px);
-            opacity: 0;
-        }
-        to {
-            transform: translateY(0);
-            opacity: 1;
-        }
-    }
-
-    /* ScrollBar personalizado */
-    .pm-plants-grid::-webkit-scrollbar {
-        width: 8px;
-    }
-
-    .pm-plants-grid::-webkit-scrollbar-track {
-        background: #f0f8f0;
-        border-radius: 10px;
-    }
-
-    .pm-plants-grid::-webkit-scrollbar-thumb {
-        background: #4a7c59;
-        border-radius: 10px;
-    }
-
-    .pm-plants-grid::-webkit-scrollbar-thumb:hover {
-        background: #188a32;
-    }
-
-    /* Responsive */
-    @media (max-width: 1400px) {
-        .pm-plants-grid {
-            grid-template-columns: repeat(4, 1fr); /* 4 por fila en pantallas medianas */
-        }
-    }
-
-    @media (max-width: 1024px) {
-        .pm-plants-grid {
-            grid-template-columns: repeat(3, 1fr); /* 3 por fila en tablets */
-        }
-    }
-
-    @media (max-width: 768px) {
-        .plantas-medicinales-module {
-            padding: 15px;
-        }
-
-        .pm-header h1 {
-            font-size: 1.8rem;
-        }
-
-        .pm-plants-grid {
-            grid-template-columns: repeat(2, 1fr); /* 2 por fila en móviles */
-            gap: 15px;
-        }
-
-        .pm-usage-content {
-            grid-template-columns: 1fr;
-        }
-
-        .pm-plant-info-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .pm-modal-content {
-            width: 95%;
-            margin: 20px;
-        }
-
-        .pm-plants-header,
-        .pm-usage-header {
-            flex-direction: column;
-            gap: 15px;
-            text-align: center;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .pm-plants-grid {
-            grid-template-columns: 1fr; /* 1 por fila en móviles pequeños */
-        }
-    }
+}

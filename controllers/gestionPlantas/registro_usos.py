@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, Blueprint
+from flask import request, jsonify, Blueprint
 from config.db import get_connection
 import mysql.connector
 

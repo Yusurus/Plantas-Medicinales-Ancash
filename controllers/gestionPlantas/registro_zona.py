@@ -4,22 +4,13 @@ from config.db import get_connection
 
 registro_zona = Blueprint("registro_zona", __name__)
 
-def get_db_connection():
-    """Obtiene una conexión a la base de datos"""
-    try:
-        connection = get_connection()
-        return connection
-    except Error as e:
-        print(f"Error connecting to MySQL: {e}")
-        return None
-
 @registro_zona.route('/buscar_plantas')
 def buscar_plantas():
     """Busca plantas por nombre científico o común"""
     try:
         search_term = request.args.get('q', '').strip()
         
-        connection = get_db_connection()
+        connection = get_connection()
         if not connection:
             return jsonify({'error': 'Error de conexión a la base de datos'}), 500
             
@@ -85,7 +76,7 @@ def buscar_plantas():
 def obtener_regiones():
     """Obtiene todas las regiones disponibles"""
     try:
-        connection = get_db_connection()
+        connection = get_connection()
         if not connection:
             return jsonify({'error': 'Error de conexión a la base de datos'}), 500
             
@@ -112,7 +103,7 @@ def obtener_regiones():
 def obtener_info_planta(planta_id):
     """Obtiene información detallada de una planta específica"""
     try:
-        connection = get_db_connection()
+        connection = get_connection()
         if not connection:
             return jsonify({'error': 'Error de conexión a la base de datos'}), 500
             
@@ -184,7 +175,7 @@ def guardar_zona():
         if not planta_id or not region_id or not ecoregion:
             return jsonify({'error': 'Faltan datos obligatorios'}), 400
         
-        connection = get_db_connection()
+        connection = get_connection()
         if not connection:
             return jsonify({'error': 'Error de conexión a la base de datos'}), 500
         
