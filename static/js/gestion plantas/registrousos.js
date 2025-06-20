@@ -54,7 +54,7 @@ class PlantasMedicinalesApp {
 
     async loadPlantas() {
         // Mostrar loading
-        document.getElementById('pmPlantsLoading').style.display = 'block';
+        document.getElementById('pmPlantsLoading').style.display = 'flex';
         this.plantsGrid.style.display = 'none';
         
         try {
