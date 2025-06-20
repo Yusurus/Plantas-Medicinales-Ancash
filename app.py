@@ -10,6 +10,10 @@ from controllers.planta_registro_planta import registro_bp
 from controllers.planta_identificacion import identificacion_bp
 from controllers.planta_detalles import detalles_bp
 
+#---------
+from controllers.registrar_zona import registro_zona
+#----------
+
 app = Flask(__name__)
 app.secret_key = '1234'
 CORS(app)
@@ -23,6 +27,10 @@ app.register_blueprint(visualizacion_bp)
 app.register_blueprint(registro_bp)
 app.register_blueprint(identificacion_bp)
 app.register_blueprint(detalles_bp)
+
+#----
+app.register_blueprint(registro_zona)
+#----
 
 if __name__ == '__main__':
     if verificar_base_datos_rostros():
