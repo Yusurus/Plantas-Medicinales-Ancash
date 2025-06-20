@@ -17,7 +17,7 @@ def acceso_exitoso():
 
 @registro_bp.route("/modoadmin")
 def home():
-    return render_template("registro_plantas.html")
+    return render_template("gestion_plantas.html")
 
 
 @registro_bp.route("/registrar_planta", methods=["GET", "POST"])
@@ -65,7 +65,7 @@ def registrar_planta():
             cursor.close()
             conn.close()
 
-    return render_template("registro_plantas.html", mensaje=mensaje, familias=familias)
+    return render_template("gestion_plantas.html", mensaje=mensaje, familias=familias)
 
 
 @registro_bp.route("/buscar_nombre", methods=["GET"])
