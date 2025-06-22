@@ -13,6 +13,11 @@ from controllers.gestionPlantas.registro_zona import registro_zona
 from controllers.gestionPlantas.registro_saberes import registro_saberes
 from controllers.gestionPlantas.registro_usos import registro_usos
 
+#--
+from controllers.reportes.reportes_controller_preliminar import reporte_bp
+from controllers.reportes.reporte2 import reportes_bp2
+#--
+
 app = Flask(__name__)
 app.secret_key = '1234'
 CORS(app)
@@ -32,6 +37,8 @@ app.register_blueprint(registro_zona)
 app.register_blueprint(registro_saberes)
 app.register_blueprint(registro_usos)
 #----
+app.register_blueprint(reporte_bp)
+app.register_blueprint(reportes_bp2)
 
 if __name__ == '__main__':
     if verificar_base_datos_rostros():
