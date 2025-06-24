@@ -1,0 +1,352 @@
+.registro-saberes-container * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+.registro-saberes-container .container {
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.registro-saberes-container .search-container {
+    padding: 30px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.registro-saberes-container .search-box {
+    position: relative;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.registro-saberes-container .search-input {
+    width: 100%;
+    padding: 15px 50px 15px 20px;
+    border: 2px solid #ddd;
+    border-radius: 50px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.registro-saberes-container .search-input:focus {
+    outline: none;
+    border-color: #4e7c3c;
+    box-shadow: 0 0 20px rgba(78, 124, 60, 0.2);
+}
+
+.registro-saberes-container .search-icon {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+}
+
+.registro-saberes-container .main-content {
+    display: flex;
+    min-height: 600px;
+}
+
+.registro-saberes-container .plantas-section {
+    flex: 1;
+    padding: 30px;
+    border-right: 1px solid #e9ecef;
+    overflow-y: auto;
+    max-height: 600px;
+}
+
+.registro-saberes-container .plantas-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.registro-saberes-container .planta-card {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 15px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    position: relative;
+    overflow: hidden;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.registro-saberes-container .planta-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #28a745, #81cb92);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.registro-saberes-container .planta-card:hover::before {
+    transform: scaleX(1);
+}
+
+.registro-saberes-container .planta-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    border-color: #28a745;
+}
+
+.registro-saberes-container .planta-card.selected {
+    border-color: #28a745;
+    background: linear-gradient(135deg, #f8fff8 0%, #e8f5e8 100%);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(78, 124, 60, 0.2);
+}
+
+.registro-saberes-container .planta-card.selected::before {
+    transform: scaleX(1);
+}
+
+.registro-saberes-container .planta-nombre-cientifico {
+    font-weight: bold;
+    color: #1a8a34;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+    font-style: italic;
+}
+
+.registro-saberes-container .planta-familia {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+
+.registro-saberes-container .planta-nombres-comunes {
+    color: #703c0bad;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.registro-saberes-container .saberes-section {
+    flex: 1;
+    padding: 30px;
+    background: #f8f9fa;
+}
+
+.registro-saberes-container .saberes-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.registro-saberes-container .saberes-title {
+    color: #28a745;
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.registro-saberes-container .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.registro-saberes-container .btn-primary {
+    background: linear-gradient(135deg, #5cd578 0%, #41b65c 100%);
+    color: white;
+}
+
+.registro-saberes-container .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(78, 124, 60, 0.3);
+}
+
+.registro-saberes-container .btn-edit {
+    background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%);
+    color: white;
+    padding: 5px 15px;
+    font-size: 12px;
+}
+
+.registro-saberes-container .btn-delete {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+    padding: 5px 15px;
+    font-size: 12px;
+}
+
+.registro-saberes-container .saberes-list {
+    space-y: 15px;
+}
+
+.registro-saberes-container .saber-item {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    margin-bottom: 15px;
+}
+
+.registro-saberes-container .saber-description {
+    margin-bottom: 15px;
+    line-height: 1.6;
+    color: #333;
+}
+
+.registro-saberes-container .saber-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.registro-saberes-container .empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: #666;
+}
+
+.registro-saberes-container .empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.registro-saberes-container .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    backdrop-filter: blur(5px);
+}
+
+.registro-saberes-container .modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 30px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(-50px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.registro-saberes-container .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.registro-saberes-container .modal-title {
+    color: #2d5016;
+    margin: 0;
+}
+
+.registro-saberes-container .close {
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #999;
+    transition: color 0.3s ease;
+}
+
+.registro-saberes-container .close:hover {
+    color: #333;
+}
+
+.registro-saberes-container .form-group {
+    margin-bottom: 20px;
+}
+
+.registro-saberes-container .form-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 600;
+}
+
+.registro-saberes-container .form-textarea {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 120px;
+    transition: border-color 0.3s ease;
+}
+
+.registro-saberes-container .form-textarea:focus {
+    outline: none;
+    border-color: #4e7c3c;
+}
+
+.registro-saberes-container .modal-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+}
+
+.registro-saberes-container .btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.registro-saberes-container .loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.registro-saberes-container .no-results {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+@media (max-width: 768px) {
+    .registro-saberes-container .main-content {
+        flex-direction: column;
+    }
+    
+    .registro-saberes-container .plantas-section {
+        border-right: none;
+        border-bottom: 1px solid #e9ecef;
+        max-height: 400px;
+    }
+    
+    .registro-saberes-container .plantas-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .registro-saberes-container .plantas-grid {
+        grid-template-columns: 1fr;
+    }
+}

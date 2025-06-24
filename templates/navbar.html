@@ -1,3 +1,5 @@
+<link href="../static/css/stylesNavbar.css" rel="stylesheet" />
+
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
   <div class="container">
     <a class="navbar-brand d-flex align-items-center" href="/">
@@ -12,8 +14,27 @@
       </a>
       {% if user %}
       <a href="/registrar_planta" class="nav-link fw-semibold">
-        <i class="bi bi-journal-plus me-2"></i> Registrar Plantas
+        <i class="bi bi-journal-plus me-2"></i> Gestión de Plantas
       </a>
+
+      <div class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle fw-semibold" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-receipt-cutoff"></i> Reportes
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+          <li>
+            <a class="dropdown-item" href="/reporte_plantas">
+              <i class="bi bi-file-earmark-richtext text-success"></i> Reportes Detallados
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item" href="/reportes">
+              <i class="bi bi-graph-up me-1 text-success"></i> Gráficos
+            </a>
+          </li>
+          </ul>
+      </div>
+
       <div class="nav-item dropdown">
         <a class="nav-link dropdown-toggle text-success fw-semibold" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
           <i class="bi bi-person-circle me-1"></i> {{ user['nombres'] }}

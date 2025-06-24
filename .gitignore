@@ -1,5 +1,6 @@
 *.pyc
 *.bat
 *.env
+/venv/*
 /static/uploads/*
 data/rostros_conocidos/ds_model_vggface_detector_opencv_aligned_normalization_base_expand_0.pkl
