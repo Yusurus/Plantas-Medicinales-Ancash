@@ -39,6 +39,7 @@ def registrar_planta():
         nomFamilia = request.form["nomFamilia"]
         nombresComunes = request.form["nombresComunes"]
         imagenes = request.form["imagenes"]
+        descMorfologica = request.form["descMorfologica"]
         idEmpleado = session["usuario"]["idEmpleado"]
 
         try:
@@ -54,6 +55,7 @@ def registrar_planta():
                     nombresComunes,
                     imagenes,
                     idEmpleado,
+                    descMorfologica,
                 ],
             )
             for result in cursor.stored_results():
