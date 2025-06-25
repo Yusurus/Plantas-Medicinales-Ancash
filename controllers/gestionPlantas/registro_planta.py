@@ -24,17 +24,26 @@ def home():
 
 
 @registro_bp.route("/registrar_planta", methods=["GET", "POST"])
-def registrar_planta():
+@registro_bp.route("/editar_planta/<id_planta>", methods=["GET", "POST"])
+def registrar_planta(id_planta=None):
     familias = []
     mensaje = None
+    planta = None
 
     try:
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
+
         cursor.execute(
-            "SELECT nomFamilia FROM familias_plantas order by nomFamilia asc"
+            "SELECT nomFamilia FROM familias_plantas ORDER BY nomFamilia ASC"
         )
         familias = [row["nomFamilia"] for row in cursor.fetchall()]
+
+        if id_planta:
+            cursor.execute(
+                "select * from vta_plantas2 where idPlanta = %s", (id_planta,)
+            )
+            planta = cursor.fetchone()
     finally:
         cursor.close()
         conn.close()
@@ -49,11 +58,13 @@ def registrar_planta():
         try:
             conn = get_connection()
             cursor = conn.cursor(dictionary=True)
+
+            ev = 2 if id_planta else 1
             cursor.callproc(
                 "gestionar_plantas",
                 [
-                    1,
-                    None,
+                    ev,
+                    id_planta,
                     nombreCientifico,
                     nomFamilia,
                     nombresComunes,
@@ -72,7 +83,13 @@ def registrar_planta():
             cursor.close()
             conn.close()
 
-    return render_template("gestion_plantas.html", mensaje=mensaje, familias=familias)
+    return render_template(
+        "gestion_plantas.html",
+        mensaje=mensaje,
+        familias=familias,
+        planta=planta,
+        id_planta=id_planta,
+    )
 
 
 @registro_bp.route("/buscar_nombre", methods=["GET"])

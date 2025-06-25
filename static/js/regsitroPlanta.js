@@ -238,7 +238,6 @@ const nombresComunes = [];
       }
     });
 
-    // Pre-llenar campos si hay datos en sessionStorage
     document.addEventListener('DOMContentLoaded', () => {
       const plantDataString = sessionStorage.getItem('plantDataToRegister');
       const isFromIdentifier = sessionStorage.getItem('isFromIdentifier');
@@ -327,6 +326,79 @@ const nombresComunes = [];
           console.error("Error al parsear o pre-llenar datos de planta desde sessionStorage:", e);
         }
       }
+
+      
       sessionStorage.removeItem('plantDataToRegister');
       sessionStorage.removeItem('isFromIdentifier');
     });
+
+// --- SEGUNDO DOMContentLoaded: Para el pre-llenado desde el SERVIDOR (Edición) ---
+document.addEventListener('DOMContentLoaded', () => {
+    // Solo si window.datosPlantaDesdeServidor existe Y el campo de nombre científico está vacío.
+    // Esto asegura que la lógica de edición solo se ejecute si el identificador no ya llenó el formulario.
+    const nombreCientificoInput = document.getElementById('nombreCientifico');
+    if (window.datosPlantaDesdeServidor && (!nombreCientificoInput || !nombreCientificoInput.value)) {
+        const plantData = window.datosPlantaDesdeServidor;
+        console.log("Datos de planta obtenidos de window.datosPlantaDesdeServidor (Edición):", plantData);
+
+        // 1. Pre-llenar Nombre Científico
+        if (nombreCientificoInput) {
+            nombreCientificoInput.value = plantData.nombreCientifico || ''; // De vta_plantas2
+            nombreCientificoInput.classList.add('is-valid');
+        }
+
+        // 2. Pre-llenar Familia
+        const familiaSelect = document.getElementById('nomFamilia');
+        if (familiaSelect && plantData.nomFamilia) { // De vta_plantas2
+            const familiaValue = plantData.nomFamilia;
+            let foundFamily = false;
+            for (let i = 0; i < familiaSelect.options.length; i++) {
+                if (familiaSelect.options[i].value === familiaValue) {
+                    familiaSelect.value = familiaValue;
+                    foundFamily = true;
+                    break;
+                }
+            }
+            if (!foundFamily) {
+                // Esto es un caso poco probable en edición, pero se añade para robustez:
+                // si la familia de la planta editada no estuviera en el dropdown inicial.
+                console.warn("La familia de la planta editada no se encontró en las opciones existentes:", familiaValue);
+                const option = document.createElement('option');
+                option.value = familiaValue;
+                option.textContent = familiaValue;
+                familiaSelect.appendChild(option);
+                familiaSelect.value = familiaValue;
+            }
+        }
+
+        // 3. Pre-llenar Nombres Comunes
+        // Usar plantData.nombres_comunes (viene como string separado por comas de vta_plantas2)
+        if (plantData.nombres_comunes) {
+            // Limpiar el array global 'nombresComunes' antes de añadir los nuevos
+            window.nombresComunes.length = 0; 
+            plantData.nombres_comunes.split(', ').forEach(name => {
+                const trimmedName = name.trim();
+                if (trimmedName) {
+                    window.nombresComunes.push(trimmedName);
+                }
+            });
+            // ¡Importante! Llama a la función para actualizar la UI
+            actualizarLista(); 
+        }
+
+        // 4. Pre-llenar Imágenes
+        // Usar plantData.Imagenes (viene como string separado por comas de vta_plantas2, con 'I' mayúscula)
+        if (plantData.Imagenes) {
+            // Limpiar el array global 'imagenes' antes de añadir las nuevas
+            window.imagenes.length = 0; 
+            plantData.Imagenes.split(', ').forEach(url => {
+                const trimmedUrl = url.trim();
+                if (trimmedUrl) {
+                    window.imagenes.push(trimmedUrl);
+                }
+            });
+            // ¡Importante! Llama a la función para actualizar la UI
+            actualizarGaleria(); 
+        }
+    }
+});
