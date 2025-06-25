@@ -68,6 +68,15 @@
       <!-- Campo oculto para enviar los nombres comunes -->
       <input type="hidden" id="nombresComunesInput" name="nombresComunes" />
 
+      <!-- Descripcion Morfologica -->
+      <div class="mb-3">
+        <label for="descMorfologica" class="form-label">Descripción Morfológica:</label>
+        <textarea class="form-control" id="descMorfologica" name="descMorfologica" rows="3" required></textarea>
+        <div class="invalid-feedback">
+          Por favor, ingrese una descripción morfológica.
+        </div>
+      </div>
+
       <div class="d-grid">
         <button type="submit" class="btn btn-success btn-lg">Registrar</button>
       </div>
