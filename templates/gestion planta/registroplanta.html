@@ -73,6 +73,6 @@
       </div>
     </form>
 
-    <p id="mensaje" class="mt-3 text-center text-success">{{ mensaje if mensaje }}</p>
+    <p id="mensaje" class="mt-3 text-center {{ 'text-primary' if mensaje and mensaje.startswith('La planta ya existe') else 'text-success' }}">{{ mensaje if mensaje }}</p>
   </div>
 </div>
