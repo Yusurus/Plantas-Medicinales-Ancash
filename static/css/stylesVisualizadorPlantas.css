@@ -136,6 +136,20 @@ body {
   transition: background-color 0.2s ease;
 }
 
+.btn-ver-editar {
+  background: linear-gradient(135deg, #f1c40f   0%, #cea810   100%);;
+  color: white;
+  font-weight: 500;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
 .btn-ver-detalles:hover {
   background-color: #2f855a;
   color: white;
