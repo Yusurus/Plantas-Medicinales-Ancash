@@ -80,7 +80,19 @@
       <input type="hidden" id="nombresComunesInput" name="nombresComunes" />
       <input type="hidden" id="imagenesInput" name="imagenes" />
 
+<<<<<<< HEAD
       <!-- Botón de acción -->
+=======
+      <!-- Descripcion Morfologica -->
+      <div class="mb-3">
+        <label for="descMorfologica" class="form-label">Descripción Morfológica:</label>
+        <textarea class="form-control" id="descMorfologica" name="descMorfologica" rows="3" required></textarea>
+        <div class="invalid-feedback">
+          Por favor, ingrese una descripción morfológica.
+        </div>
+      </div>
+
+>>>>>>> 3c7812271fb57ca550588f14f874bed5b1e4531e
       <div class="d-grid">
         <button type="submit" class="btn btn-success btn-lg">{{ 'Actualizar' if id_planta else 'Registrar' }}</button>
       </div>

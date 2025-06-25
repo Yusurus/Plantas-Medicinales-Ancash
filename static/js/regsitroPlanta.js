@@ -152,6 +152,7 @@ const nombresComunes = [];
     const nombreCientificoInput = document.getElementById('nombreCientifico');
     const loadingPlantnet = document.getElementById('loadingPlantnet');
     const errorPlantnet = document.getElementById('errorPlantnet');
+    const descMorfologica = document.getElementById('descripcionMorfologica');
 
     buscarPlantnetBtn.addEventListener('click', async () => {
       const scientificName = nombreCientificoInput.value.trim();

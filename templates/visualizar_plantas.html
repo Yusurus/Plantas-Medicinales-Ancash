@@ -44,9 +44,15 @@
           <a href="/detalles/{{ planta.idPlanta }}" class="btn-ver-detalles mt-2">
             <i class="bi bi-eye"></i> Ver detalles
           </a>
+<<<<<<< HEAD
           <a href="/editar_planta/{{ planta.idPlanta }}" class="btn-ver-editar mt-2">
+=======
+          {% if user %}
+          <a href="/-----nombreEnFlask----/{{ planta.idPlanta }}" class="btn-ver-editar mt-2">
+>>>>>>> 3c7812271fb57ca550588f14f874bed5b1e4531e
             <i class="bi bi-pencil"></i>
           </a>
+          {% endif %}
         </div>
       </div>
     </div>
