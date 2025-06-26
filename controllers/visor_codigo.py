@@ -11,6 +11,8 @@ from pygments.util import ClassNotFound
 
 visorcodigo_bp = Blueprint('visorcodigo_bp', __name__)
 
+#comentario de prueba
+
 class FileSystemController:
     def __init__(self):
         self.ignored_files = {'.pyc', '.pyo', '__pycache__', '.git', '.gitignore', 
