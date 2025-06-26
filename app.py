@@ -17,7 +17,7 @@ from controllers.gestionPlantas.registro_usos import registro_usos
 from controllers.reportes.reportes_controller_preliminar import reporte_bp
 from controllers.reportes.reporte2 import reportes_bp2
 #--
-from controllers.Code_coment_controller import comendt_bd
+from controllers.visulizador_html import comendt_bd
 from controllers.visor_codigo import visorcodigo_bp
 
 app = Flask(__name__)
