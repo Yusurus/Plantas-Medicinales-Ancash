@@ -1,10 +1,10 @@
-
-        // Sistema de gestión de archivos para Flask
+// Sistema de gestión de archivos para Flask
 class FileSystemManager {
     constructor() {
         this.currentPath = '.';
         this.selectedFile = null;
         this.currentFileContent = null;
+        this.treeData = null;
         this.treeContainer = document.getElementById('treeContainer');
         this.contentBody = document.getElementById('contentBody');
         this.contentHeader = document.getElementById('contentHeader');
@@ -44,11 +44,169 @@ class FileSystemManager {
                 return;
             }
             
+            // Guardar los datos del árbol
+            this.treeData = data;
+            console.log('Datos del árbol cargados:', this.treeData);
+            
             this.renderTree(data);
+
+            // Expandir automáticamente la carpeta raíz y cargar README
+            setTimeout(() => {
+                this.expandRootFolder();
+                this.autoLoadReadme();
+            }, 100); // Reducir el timeout
+            
         } catch (error) {
             this.showError(this.treeContainer, 'Error al cargar el árbol de archivos');
             console.error('Error:', error);
         }
+    }
+
+    // Función mejorada para expandir la carpeta raíz
+    expandRootFolder() {
+        console.log('Intentando expandir carpeta raíz...');
+        
+        // Buscar el primer directorio en el árbol
+        const rootDirectory = document.querySelector('.tree-item .tree-node.directory');
+        if (rootDirectory) {
+            console.log('Carpeta raíz encontrada:', rootDirectory);
+            rootDirectory.click();
+            console.log('Carpeta raíz expandida automáticamente');
+        } else {
+            console.log('No se encontró carpeta raíz para expandir');
+        }
+    }
+
+    // Función mejorada para buscar README.md en los datos del árbol
+    findReadmeInTree(node, currentPath = '') {
+        console.log('Buscando README en nodo:', node);
+        
+        if (!node) return null;
+        
+        // Si es un array (raíz del árbol), buscar en cada elemento
+        if (Array.isArray(node)) {
+            console.log('Procesando array de nodos, cantidad:', node.length);
+            for (const child of node) {
+                const result = this.findReadmeInTree(child, currentPath);
+                if (result) return result;
+            }
+            return null;
+        }
+        
+        // Si es un archivo, verificar si es README
+        if (node.type === 'file') {
+            const fileName = node.name.toLowerCase();
+            console.log('Verificando archivo:', fileName);
+            
+            if (fileName === 'readme.md' || 
+                fileName === 'readme.markdown' || 
+                fileName === 'readme.txt' ||
+                fileName === 'readme.rst' ||
+                fileName === 'readme') {
+                console.log('README encontrado:', node.path);
+                return node.path;
+            }
+        }
+        
+        // Si es un directorio, buscar en sus hijos
+        if (node.type === 'directory' && node.children && node.children.length > 0) {
+            console.log('Procesando directorio:', node.name, 'con', node.children.length, 'hijos');
+            for (const child of node.children) {
+                const result = this.findReadmeInTree(child, node.path);
+                if (result) return result;
+            }
+        }
+        
+        return null;
+    }
+
+    // Función mejorada para cargar README automáticamente
+    async autoLoadReadme() {
+        console.log('Iniciando búsqueda automática de README...');
+        console.log('Datos del árbol disponibles:', this.treeData);
+        
+        if (!this.treeData) {
+            console.log('No hay datos del árbol disponibles para buscar README');
+            return;
+        }
+        
+        // Buscar README.md en el árbol
+        const readmePath = this.findReadmeInTree(this.treeData);
+        
+        if (readmePath) {
+            console.log('README encontrado en path:', readmePath);
+            
+            // Intentar múltiples estrategias para encontrar y hacer clic en el elemento
+            this.loadReadmeFile(readmePath);
+        } else {
+            console.log('No se encontró README en el proyecto');
+            // Mostrar mensaje de bienvenida por defecto
+            this.showWelcomeMessage();
+        }
+    }
+
+    // Nueva función para cargar el archivo README
+    async loadReadmeFile(readmePath) {
+        console.log('Cargando README desde:', readmePath);
+        
+        try {
+            // Estrategia 1: Buscar el elemento en el DOM y hacer clic
+            const readmeElement = document.querySelector(`[data-path="${readmePath}"]`);
+            if (readmeElement) {
+                console.log('Elemento README encontrado en DOM, haciendo clic...');
+                readmeElement.click();
+                return;
+            }
+            
+            // Estrategia 2: Cargar directamente usando la API
+            console.log('Elemento no encontrado en DOM, cargando directamente...');
+            
+            // Extraer información del archivo
+            const fileName = readmePath.split('/').pop();
+            const extension = '.' + fileName.split('.').pop();
+            
+            // Cargar el archivo directamente
+            await this.selectFile(readmePath, fileName, extension);
+            
+            // Buscar y marcar el elemento como seleccionado si existe
+            setTimeout(() => {
+                const readmeElement = document.querySelector(`[data-path="${readmePath}"]`);
+                if (readmeElement) {
+                    this.highlightSelectedFile(readmeElement);
+                }
+            }, 200);
+            
+            console.log('README cargado exitosamente');
+            
+        } catch (error) {
+            console.error('Error al cargar README automáticamente:', error);
+            this.showWelcomeMessage();
+        }
+    }
+
+    // Función para mostrar mensaje de bienvenida
+    showWelcomeMessage() {
+        this.contentHeader.innerHTML = `
+            <i class="bi bi-house-fill me-2"></i>Bienvenido al explorador de archivos
+        `;
+        
+        this.contentBody.innerHTML = `
+            <div class="welcome-message text-center py-5">
+                <i class="bi bi-folder2-open display-4 text-white mb-3"></i>
+                <h3 class="text-white">Explorador de Archivos</h3>
+                <p class="text-white">Selecciona un archivo del árbol de navegación para ver su contenido</p>
+                <small class="text-white">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Los archivos README.md se cargan automáticamente si están disponibles
+                </small>
+            </div>
+        `;
+        
+        this.functionsList.innerHTML = `
+            <div class="welcome-message">
+                <p><i class="bi bi-info-circle text-info me-2"></i>Las funciones aparecerán aquí cuando selecciones un archivo de código</p>
+            </div>
+        `;
     }
     
     renderTree(node, container = this.treeContainer) {
@@ -118,11 +276,15 @@ class FileSystemManager {
     
     getFileIcon(extension) {
         const icons = {
-            '.py': 'bi bi-file-code-fill text-success',
-            '.html': 'bi bi-file-code-fill text-info',
+            '.py': 'bi bi-file-code-fill text-primary',
+            '.css': 'bi bi-file-code-fill text-info',
+            '.js': 'bi bi-file-code-fill text-warning',
+            '.html': 'bi bi-file-code-fill text-danger',
             '.htm': 'bi bi-file-code-fill text-info',
             '.md': 'bi bi-file-text-fill text-primary',
-            '.markdown': 'bi bi-file-text-fill text-primary'
+            '.markdown': 'bi bi-file-text-fill text-primary',
+            '.txt': 'bi bi-file-text-fill text-secondary',
+            '.rst': 'bi bi-file-text-fill text-info'
         };
         
         return icons[extension] || 'bi bi-file-fill';
@@ -139,6 +301,8 @@ class FileSystemManager {
     }
     
     async selectFile(filePath, fileName, extension) {
+        console.log('Seleccionando archivo:', filePath);
+        
         this.selectedFile = { path: filePath, name: fileName, extension: extension };
         
         // Actualizar header
@@ -149,8 +313,22 @@ class FileSystemManager {
         // Cargar contenido del archivo
         await this.loadFileContent(filePath);
         
-        // Cargar funciones del archivo
-        await this.loadFileFunctions(filePath);
+        // Cargar funciones del archivo (solo para archivos de código)
+        if (this.isCodeFile(extension)) {
+            await this.loadFileFunctions(filePath);
+        } else {
+            this.functionsList.innerHTML = `
+                <div class="welcome-message">
+                    <p><i class="bi bi-info-circle text-info me-2"></i>Este tipo de archivo no contiene funciones analizables</p>
+                </div>
+            `;
+        }
+    }
+    
+    // Nueva función para verificar si es un archivo de código
+    isCodeFile(extension) {
+        const codeExtensions = ['.py', '.js', '.ts', '.java', '.cpp', '.c', '.cs', '.php', '.rb', '.go'];
+        return codeExtensions.includes(extension);
     }
     
     async loadFileContent(filePath) {
@@ -186,6 +364,13 @@ class FileSystemManager {
                 <style>${data.css}</style>
                 <div class="code-content">
                     ${data.content}
+                </div>
+            `;
+        } else {
+            // Para otros tipos de archivos, mostrar como texto plano
+            this.contentBody.innerHTML = `
+                <div class="text-content">
+                    <pre><code>${data.content}</code></pre>
                 </div>
             `;
         }

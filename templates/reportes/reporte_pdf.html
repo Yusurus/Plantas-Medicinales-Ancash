@@ -6,41 +6,7 @@
     <title>Reporte de Plantas Medicinales</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        @media print {
-            .no-print { display: none !important; }
-            .container { max-width: none !important; }
-            .card { break-inside: avoid; }
-            .page-break { page-break-before: always; }
-        }
-        
-        .plant-card {
-            transition: transform 0.2s;
-            border-left: 4px solid #28a745;
-        }
-        
-        .plant-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        
-        .stats-card {
-            background: linear-gradient(135deg, #28a745, #20c997);
-            color: white;
-        }
-        
-        .section-title {
-            border-bottom: 2px solid #28a745;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .info-badge {
-            background-color: #e9ecef;
-            color: #495057;
-            font-size: 0.85em;
-        }
-    </style>
+    <link rel="stylesheet" href="/static/css/reportes/reporte_pdf.css">
 </head>
 <body>
     {% include 'navbar.html' %}

@@ -1,58 +1,58 @@
 /* Asegurar que las tarjetas mantengan altura uniforme */
-    .plant-card {
-        height: 100%;
-        min-height: 200px;
-    }
+.plant-card {
+    height: 100%;
+    min-height: 200px;
+}
 
-    @media (max-width: 576px) {
-        .plants-grid .col-plant {
-            flex: 0 0 100%;
-        }
+@media (max-width: 576px) {
+    .plants-grid .col-plant {
+        flex: 0 0 100%;
     }
+}
 
-    @media (min-width: 577px) and (max-width: 768px) {
-        .plants-grid .col-plant {
-            flex: 0 0 50%;
-        }
+@media (min-width: 577px) and (max-width: 768px) {
+    .plants-grid .col-plant {
+        flex: 0 0 50%;
     }
+}
 
-    @media (min-width: 769px) {
-        .plants-grid .col-plant {
-            flex: 0 0 16.6667%;
-        }
+@media (min-width: 769px) {
+    .plants-grid .col-plant {
+        flex: 0 0 16.6667%;
     }
+}
 
-    .plant-card {
-        cursor: pointer;
-        transition: all 0.3s ease;
-        border: 2px solid transparent;
-    }
-    .plant-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        border-color: #198754;
-    }
-    .plant-card.selected {
-        border-color: #198754;
-        background-color: #f8fff9;
-    }
-    .search-container {
-        position: relative;
-    }
-    .loading-spinner {
-        display: none;
-    }
-    .zone-form {
-        display: none;
-        animation: fadeIn 0.5s ease-in;
-    }
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    .plant-info {
-        background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
-        border-radius: 10px;
-        padding: 15px;
-        margin-bottom: 20px;
-    }
+.plant-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+.plant-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-color: #198754;
+}
+.plant-card.selected {
+    border-color: #198754;
+    background-color: #f8fff9;
+}
+.search-container {
+    position: relative;
+}
+.loading-spinner {
+    display: none;
+}
+.zone-form {
+    display: none;
+    animation: fadeIn 0.5s ease-in;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.plant-info {
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+}

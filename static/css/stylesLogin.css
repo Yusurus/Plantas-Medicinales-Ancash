@@ -1,6 +1,6 @@
 /* Variables CSS */
 :root {
-    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --primary-gradient: linear-gradient(135deg, #24643d 0%, #14793a 100%);
     --secondary-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
     --face-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     --success-color: #28a745;
