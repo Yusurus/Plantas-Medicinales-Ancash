@@ -36,7 +36,24 @@
         data-nombres_comunes="{{ planta.nombres_comunes | lower }}"
         data-nomfamilia="{{ planta.nomFamilia | lower }}">
       <div class="card h-100 shadow-sm">
-        <img src="{{ planta.linkImagen }}" class="card-img-top" alt="{{ planta.nombreCientifico }}" style="height: 180px; object-fit: cover;">
+        <div id="carouselExample{{ planta.idPlanta }}" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner">
+            {% set imagenes = planta.linkImagen.split(',') %}
+            {% for imagen in imagenes %}
+            <div class="carousel-item {% if loop.index0 == 0 %}active{% endif %}">
+              <img src="{{ imagen }}" class="d-block w-100" alt="{{ planta.nombreCientifico }}" style="height: 180px; object-fit: cover;">
+            </div>
+            {% endfor %}
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample{{ planta.idPlanta }}" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#carouselExample{{ planta.idPlanta }}" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
         <div class="card-body text-center">
           <h5 class="card-title fst-italic">{{ planta.nombreCientifico }}</h5>
           <p class="card-text text-black-50">{{ planta.nomFamilia }}</p>
@@ -44,12 +61,8 @@
           <a href="/detalles/{{ planta.idPlanta }}" class="btn-ver-detalles mt-2">
             <i class="bi bi-eye"></i> Ver detalles
           </a>
-<<<<<<< HEAD
-          <a href="/editar_planta/{{ planta.idPlanta }}" class="btn-ver-editar mt-2">
-=======
           {% if user %}
-          <a href="/-----nombreEnFlask----/{{ planta.idPlanta }}" class="btn-ver-editar mt-2">
->>>>>>> 3c7812271fb57ca550588f14f874bed5b1e4531e
+          <a href="/editar_planta/{{ planta.idPlanta }}" class="btn-ver-editar mt-2">
             <i class="bi bi-pencil"></i>
           </a>
           {% endif %}

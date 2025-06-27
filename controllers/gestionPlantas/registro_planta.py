@@ -78,6 +78,9 @@ def registrar_planta(id_planta=None):
                 mensaje = result.fetchall()[0]["respuesta"]
                 if mensaje.startswith("Error: Duplicate entry"):
                     mensaje = "La planta ya existe en la base de datos"
+                # if mensaje == "Planta actualizada correctamente":
+                #     flash(mensaje)
+                #     return redirect(url_for("registro_planta.registro_planta"))
             conn.commit()
         except Exception as e:
             mensaje = f"Error en el servidor: {str(e)}"
