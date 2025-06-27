@@ -268,7 +268,8 @@ class FacialRecognition {
             // USAR result.user o un valor por defecto
             const username = result.user || 'Usuario';
             console.log('Redirigiendo con usuario:', username);
-            this.redirectToSuccess(username, 'facial');
+            //this.redirectToSuccess(username, 'facial');
+            window.location.href = `/`;
         }, 2000);
     }
 
@@ -355,6 +356,8 @@ class FacialRecognition {
         }
     }
 
+    /*
+    antes para llevar al desboard
     // MÉTODO CORREGIDO - Este es el cambio principal
     redirectToSuccess(username, method) {
         // Crear los parámetros de la URL
@@ -371,6 +374,7 @@ class FacialRecognition {
         // Usar window.location.href para la redirección
         window.location.href = successUrl;
     }
+    */
 
     // Método para manejar redimensionamiento de ventana
     handleResize() {
