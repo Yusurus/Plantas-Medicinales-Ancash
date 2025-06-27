@@ -91,7 +91,6 @@
     <script>
         window.datosPlantaDesdeServidor = {{ planta | tojson }};
         window.idPlantaParaEditar = {{ id_planta | tojson }};
-        console.log("DEBUG HTML: Datos de planta inyectados por el servidor para edición:", window.datosPlantaDesdeServidor);
     </script>
     <script src="{{ url_for('static', filename='js/edicionPlanta.js') }}"></script>
 {% endif %}
