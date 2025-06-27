@@ -152,6 +152,12 @@ const buscarPlantnetBtn = document.getElementById('buscarPlantnetBtn');
 const nombreCientificoInput = document.getElementById('nombreCientifico');
 const loadingPlantnet = document.getElementById('loadingPlantnet');
 const errorPlantnet = document.getElementById('errorPlantnet');
+    // Buscar nombre científico en PlantNet
+    const buscarPlantnetBtn = document.getElementById('buscarPlantnetBtn');
+    const nombreCientificoInput = document.getElementById('nombreCientifico');
+    const loadingPlantnet = document.getElementById('loadingPlantnet');
+    const errorPlantnet = document.getElementById('errorPlantnet');
+    const descMorfologica = document.getElementById('descripcionMorfologica');
 
 buscarPlantnetBtn.addEventListener('click', async () => {
   const scientificName = nombreCientificoInput.value.trim();
@@ -242,6 +248,9 @@ buscarPlantnetBtn.addEventListener('click', async () => {
 document.addEventListener('DOMContentLoaded', () => {
   const plantDataString = sessionStorage.getItem('plantDataToRegister');
   const isFromIdentifier = sessionStorage.getItem('isFromIdentifier');
+    document.addEventListener('DOMContentLoaded', () => {
+      const plantDataString = sessionStorage.getItem('plantDataToRegister');
+      const isFromIdentifier = sessionStorage.getItem('isFromIdentifier');
 
   if (plantDataString && isFromIdentifier === 'true') {
     try {
@@ -330,3 +339,23 @@ document.addEventListener('DOMContentLoaded', () => {
   sessionStorage.removeItem('plantDataToRegister');
   sessionStorage.removeItem('isFromIdentifier');
 });
+          if (plantData.imageUrls) {
+            imagenes.length = 0;
+            plantData.imageUrls.split(', ').forEach(url => {
+              if (url.trim() !== '') {
+                imagenes.push(url.trim());
+              }
+            });
+            actualizarGaleria();
+          }
+        } catch (e) {
+          console.error("Error al parsear o pre-llenar datos de planta desde sessionStorage:", e);
+        }
+      }
+
+      
+      sessionStorage.removeItem('plantDataToRegister');
+      sessionStorage.removeItem('isFromIdentifier');
+    });
+
+

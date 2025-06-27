@@ -132,6 +132,8 @@ class TraditionalLogin {
             username: username,
             method: method
         });
-        window.location.href = `/Acceso?${params.toString()}`;
+        // window.location.href = `/Acceso?${params.toString()}`;
+                window.location.href = `/`;
+
     }
 }
