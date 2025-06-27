@@ -239,7 +239,6 @@ const nombresComunes = [];
       }
     });
 
-    // Pre-llenar campos si hay datos en sessionStorage
     document.addEventListener('DOMContentLoaded', () => {
       const plantDataString = sessionStorage.getItem('plantDataToRegister');
       const isFromIdentifier = sessionStorage.getItem('isFromIdentifier');
@@ -328,6 +327,10 @@ const nombresComunes = [];
           console.error("Error al parsear o pre-llenar datos de planta desde sessionStorage:", e);
         }
       }
+
+      
       sessionStorage.removeItem('plantDataToRegister');
       sessionStorage.removeItem('isFromIdentifier');
     });
+
+

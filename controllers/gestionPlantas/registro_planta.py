@@ -1,7 +1,10 @@
 from flask import Blueprint, jsonify, render_template, request, session
 from config.db import get_connection
 from services.plantnet_service import identificar_por_nombre
-from services.wikipedia_service import get_wikipedia_plant_image,get_wikipedia_plant_images
+from services.wikipedia_service import (
+    get_wikipedia_plant_image,
+    get_wikipedia_plant_images,
+)
 
 registro_bp = Blueprint("registro_bp", __name__)
 
@@ -21,15 +24,26 @@ def home():
 
 
 @registro_bp.route("/registrar_planta", methods=["GET", "POST"])
-def registrar_planta():
+@registro_bp.route("/editar_planta/<id_planta>", methods=["GET", "POST"])
+def registrar_planta(id_planta=None):
     familias = []
     mensaje = None
+    planta = None
 
     try:
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT nomFamilia FROM familias_plantas order by nomFamilia asc")
+
+        cursor.execute(
+            "SELECT nomFamilia FROM familias_plantas ORDER BY nomFamilia ASC"
+        )
         familias = [row["nomFamilia"] for row in cursor.fetchall()]
+
+        if id_planta:
+            cursor.execute(
+                "select * from vta_plantas2 where idPlanta = %s", (id_planta,)
+            )
+            planta = cursor.fetchone()
     finally:
         cursor.close()
         conn.close()
@@ -45,11 +59,13 @@ def registrar_planta():
         try:
             conn = get_connection()
             cursor = conn.cursor(dictionary=True)
+
+            ev = 2 if id_planta else 1
             cursor.callproc(
                 "gestionar_plantas",
                 [
-                    1,
-                    None,
+                    ev,
+                    id_planta,
                     nombreCientifico,
                     nomFamilia,
                     nombresComunes,
@@ -60,6 +76,11 @@ def registrar_planta():
             )
             for result in cursor.stored_results():
                 mensaje = result.fetchall()[0]["respuesta"]
+                if mensaje.startswith("Error: Duplicate entry"):
+                    mensaje = "La planta ya existe en la base de datos"
+                # if mensaje == "Planta actualizada correctamente":
+                #     flash(mensaje)
+                #     return redirect(url_for("registro_planta.registro_planta"))
             conn.commit()
         except Exception as e:
             mensaje = f"Error en el servidor: {str(e)}"
@@ -67,7 +88,13 @@ def registrar_planta():
             cursor.close()
             conn.close()
 
-    return render_template("gestion_plantas.html", mensaje=mensaje, familias=familias)
+    return render_template(
+        "gestion_plantas.html",
+        mensaje=mensaje,
+        familias=familias,
+        planta=planta,
+        id_planta=id_planta,
+    )
 
 
 @registro_bp.route("/buscar_nombre", methods=["GET"])
@@ -129,33 +156,38 @@ def lookup_plant_by_scientific_name():
         return jsonify(final_data)
 
 
-@registro_bp.route('/registrar_familia', methods=['POST'])
+@registro_bp.route("/registrar_familia", methods=["POST"])
 def registrar_familia():
     print(">> Se llamó a /registrar_familia")
     print(">> Headers:", request.headers)
     print(">> Body:", request.get_data(as_text=True))
 
     data = request.get_json()
-    nombre = data.get('nombreFamilia') if data else None
+    nombre = data.get("nombreFamilia") if data else None
     print(">> nombreFamilia:", nombre)
     if not nombre:
-        return jsonify(success=False, message='Nombre de familia requerido'), 400
+        return jsonify(success=False, message="Nombre de familia requerido"), 400
 
     try:
         conn = get_connection()
         cursor = conn.cursor()
 
         # Verifica si ya existe
-        cursor.execute("SELECT idfamiliaPlanta FROM familias_plantas WHERE nomFamilia = %s", (nombre,))
+        cursor.execute(
+            "SELECT idfamiliaPlanta FROM familias_plantas WHERE nomFamilia = %s",
+            (nombre,),
+        )
         if cursor.fetchone():
-            return jsonify(success=True, message='Ya existe')
+            return jsonify(success=True, message="Ya existe")
 
         # Inserta la nueva familia
         print(nombre)
-        cursor.execute("INSERT INTO familias_plantas (nomFamilia) VALUES (%s)", (nombre,))
+        cursor.execute(
+            "INSERT INTO familias_plantas (nomFamilia) VALUES (%s)", (nombre,)
+        )
         conn.commit()
         print(nombre)
-        return jsonify(success=True, message='Familia registrada')
+        return jsonify(success=True, message="Familia registrada")
     except Exception as e:
         print(e)
         return jsonify(success=False, message=str(e))

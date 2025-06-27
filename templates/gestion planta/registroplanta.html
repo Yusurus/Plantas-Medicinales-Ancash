@@ -1,13 +1,15 @@
 <div class="card">
   <div class="card-body">
-    <h5 class="card-title">Registrar Nueva Planta</h5>
-    
+    <h5 class="card-title">{{ 'Editar Planta' if id_planta else 'Registrar Nueva Planta' }}</h5>
+
     <form id="plantaForm" enctype="multipart/form-data" method="POST" class="needs-validation" novalidate>
 
+      <!-- Nombre científico -->
       <div class="mb-3">
         <label for="nombreCientifico" class="form-label">Nombre Científico:</label>
         <div class="input-group">
-          <input type="text" class="form-control" id="nombreCientifico" name="nombreCientifico" required />
+          <input type="text" class="form-control" id="nombreCientifico" name="nombreCientifico"
+                value="{{ planta.nombreCientifico if planta else '' }}" required />
           <button class="btn btn-outline-secondary" type="button" id="buscarPlantnetBtn" title="Buscar en PlantNet">
             <i class="bi bi-search"></i>
           </button>
@@ -25,12 +27,13 @@
       </div>
       <div id="errorPlantnet" class="hidden alert alert-danger mt-3 d-none" role="alert"></div>
 
+      <!-- Familia -->
       <div class="mb-3">
         <label for="nomFamilia" class="form-label">Familia:</label>
         <select class="form-select" id="nomFamilia" name="nomFamilia" required>
-          <option value="" disabled selected>Seleccione una familia</option>
+          <option value="" disabled {% if not planta %}selected{% endif %}>Seleccione una familia</option>
           {% for familia in familias %}
-          <option value="{{ familia }}">{{ familia }}</option>
+          <option value="{{ familia }}" {% if planta and familia == planta.fk_familiasplantas %}selected{% endif %}>{{ familia }}</option>
           {% endfor %}
         </select>
         <div class="invalid-feedback">
@@ -38,6 +41,7 @@
         </div>
       </div>
 
+      <!-- Imagen -->
       <div class="mb-3">
         <label for="imagen" class="form-label">Imagen (URL)</label>
         <div class="input-group">
@@ -48,10 +52,10 @@
           Debe subir una imagen en formato JPG, PNG, etc.
         </div>
         <input type="hidden" id="imagenesInput" name="imagenes" />
-        <!-- Contenedor de las miniaturas -->
         <div id="contenedorImagenes" class="d-flex flex-wrap gap-2 mt-3"></div>
       </div>
 
+      <!-- Nombre común -->
       <div class="mb-3">
         <label for="nombreComunInput" class="form-label">Nombre Común:</label>
         <div class="input-group">
@@ -65,8 +69,9 @@
         <ul id="listaNombresComunes" class="list-group mt-2"></ul>
       </div>
 
-      <!-- Campo oculto para enviar los nombres comunes -->
+      <!-- Inputs ocultos -->
       <input type="hidden" id="nombresComunesInput" name="nombresComunes" />
+      <input type="hidden" id="imagenesInput" name="imagenes" />
 
       <!-- Descripcion Morfologica -->
       <div class="mb-3">
@@ -78,10 +83,14 @@
       </div>
 
       <div class="d-grid">
-        <button type="submit" class="btn btn-success btn-lg">Registrar</button>
+        <button type="submit" class="btn btn-success btn-lg">{{ 'Actualizar' if id_planta else 'Registrar' }}</button>
       </div>
     </form>
 
-    <p id="mensaje" class="mt-3 text-center text-success">{{ mensaje if mensaje }}</p>
+    <!-- Mensaje -->
+    <p id="mensaje"
+      class="mt-3 text-center {{ 'text-primary' if mensaje and mensaje.startswith('La planta ya existe') else 'text-success' }}">
+      {{ mensaje if mensaje }}
+    </p>
   </div>
 </div>
