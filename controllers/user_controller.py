@@ -6,7 +6,7 @@ user_bp = Blueprint('user_bp', __name__)
 @user_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
-        return render_template('accesoLogin.html')
+        return render_template('login.html')
 
     elif request.method == 'POST':
         print('post de acceso login')
