@@ -14,10 +14,9 @@ from controllers.gestionPlantas.registro_saberes import registro_saberes
 from controllers.gestionPlantas.registro_usos import registro_usos
 
 #--
-from controllers.reportes.reportes_controller_preliminar import reporte_bp
-from controllers.reportes.reporte2 import reportes_bp2
-#--
-from controllers.Code_coment_controller import comendt_bd
+from controllers.reportes.reportes_pdf import reporte_bp
+from controllers.reportes.reporte_grafico import reportes_bp2
+from controllers.visor_codigo import visorcodigo_bp
 
 app = Flask(__name__)
 app.secret_key = '1234'
@@ -40,8 +39,7 @@ app.register_blueprint(registro_usos)
 #----
 app.register_blueprint(reporte_bp)
 app.register_blueprint(reportes_bp2)
-
-app.register_blueprint(comendt_bd)
+app.register_blueprint(visorcodigo_bp)
 
 if __name__ == '__main__':
     if verificar_base_datos_rostros():

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes - Plantas Medicinales</title>
+    <link rel="icon" type="image/ico" href="/static/img/faviconuwu.ico">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/static/css/reportes/reporte_grafico.css">
+</head>
+<body class="bg-light">
+    {% include 'navbar.html' %}
+    
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="text-center mb-4">
+                    <i class="bi bi-graph-up text-primary"></i>
+                    Reportes de Plantas Medicinales
+                </h1>
+            </div>
+        </div>
+
+        <!-- Resumen General -->
+        <div class="report-section">
+            <h2 class="section-title">
+                <i class="bi bi-speedometer2"></i> Resumen General
+            </h2>
+            <div class="row" id="resumenGeneral">
+                <div class="col-md-2 col-sm-4 col-6 mb-3">
+                    <div class="stats-card">
+                        <div class="stats-number" id="totalPlantas">-</div>
+                        <div class="stats-label">Plantas</div>
+                    </div>
+                </div>
+                <div class="col-md-2 col-sm-4 col-6 mb-3">
+                    <div class="stats-card">
+                        <div class="stats-number" id="totalFamilias">-</div>
+                        <div class="stats-label">Familias</div>
+                    </div>
+                </div>
+                <div class="col-md-2 col-sm-4 col-6 mb-3">
+                    <div class="stats-card">
+                        <div class="stats-number" id="totalSaberes">-</div>
+                        <div class="stats-label">Saberes</div>
+                    </div>
+                </div>
+                <div class="col-md-2 col-sm-4 col-6 mb-3">
+                    <div class="stats-card">
+                        <div class="stats-number" id="totalUsos">-</div>
+                        <div class="stats-label">Usos</div>
+                    </div>
+                </div>
+                <div class="col-md-2 col-sm-4 col-6 mb-3">
+                    <div class="stats-card">
+                        <div class="stats-number" id="totalRegiones">-</div>
+                        <div class="stats-label">Regiones</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="row">
+            <div class="col-lg-6 mb-4">
+                <div class="report-section">
+                    <h3 class="section-title">
+                        <i class="bi bi-pie-chart"></i> Plantas por Familia
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="chartFamilias"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-4">
+                <div class="report-section">
+                    <h3 class="section-title">
+                        <i class="bi bi-bar-chart"></i> Plantas por Región
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="chartRegiones"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de Plantas Más Completas -->
+        {% if reportes and reportes.plantas_completas %}
+        <div class="report-section">
+            <h3 class="section-title">
+                <i class="bi bi-award"></i> Plantas con Más Información Registrada
+            </h3>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Nombre Científico</th>
+                            <th>Familia</th>
+                            <th>Nombres Comunes</th>
+                            <th>Saberes Culturales</th>
+                            <th>Usos Registrados</th>
+                            <th>Datos Morfológicos</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for planta in reportes.plantas_completas %}
+                        <tr>
+                            <td class="fst-italic">{{ planta.nombreCientifico }}</td>
+                            <td>{{ planta.nomFamilia }}</td>
+                            <td><span class="badge bg-primary">{{ planta.nombres_comunes }}</span></td>
+                            <td><span class="badge bg-success">{{ planta.saberes_culturales }}</span></td>
+                            <td><span class="badge bg-warning">{{ planta.usos_registrados }}</span></td>
+                            <td><span class="badge bg-info">{{ planta.datos_morfologicos }}</span></td>
+                            <td><strong>{{ planta.nombres_comunes + planta.saberes_culturales + planta.usos_registrados + planta.datos_morfologicos }}</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if error %}
+        <div class="alert alert-danger" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> {{ error }}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="modal fade" id="plantasModal" tabindex="-1" aria-labelledby="plantasModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="plantasModalLabel">Detalles de Plantas</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="modalLoading" class="text-center text-muted">Cargando plantas...</p>
+                    <div id="plantasGrid" class="plant-grid"> </div>
+                    <p id="modalNoResults" class="text-center text-muted d-none">No se encontraron plantas para esta categoría.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/reportes/reporte_grafico.js"></script>
+</body>
+</html>

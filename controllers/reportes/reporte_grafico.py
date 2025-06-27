@@ -5,13 +5,13 @@ import mysql.connector
 reportes_bp2 = Blueprint("reportes_bp2", __name__)
 
 
-@reportes_bp2.route("/reportes")
+@reportes_bp2.route("/reportes_grafico")
 def mostrar_reportes():
     """Renderizar la página principal de reportes"""
     try:
         # Obtener datos para los reportes
         reportes_data = obtener_datos_reportes()
-        return render_template("reportes/reporte2.html", reportes=reportes_data)
+        return render_template("reportes/reporte_grafico.html", reportes=reportes_data)
     except Exception as e:
         print(f"Error al mostrar reportes: {e}")
         return render_template(

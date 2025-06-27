@@ -71,7 +71,7 @@ def obtener_datos_completos_plantas():
         cursor.close()
         connection.close()
 
-@reporte_bp.route('/reporte_plantas')
+@reporte_bp.route('/plantas_pdf')
 def reporte_plantas():
     """Muestra el reporte de plantas en HTML"""
     if 'usuario' not in session:
@@ -79,7 +79,7 @@ def reporte_plantas():
     
     plantas, estadisticas = obtener_datos_completos_plantas()
     
-    return render_template('reportes/reporte_plantas_preliminar.html', 
+    return render_template('reportes/reporte_pdf.html', 
                          plantas=plantas, 
                          estadisticas=estadisticas,
                          fecha_generacion=datetime.now().strftime("%d/%m/%Y %H:%M"))
