@@ -38,7 +38,7 @@
       <div class="card h-100 shadow-sm">
         <div id="carouselExample{{ planta.idPlanta }}" class="carousel slide" data-bs-ride="carousel">
           <div class="carousel-inner">
-            {% set imagenes = planta.linkImagen.split(',') %}
+            {% set imagenes = planta.linkImagen.split(', ') %}
             {% for imagen in imagenes %}
             <div class="carousel-item {% if loop.index0 == 0 %}active{% endif %}">
               <img src="{{ imagen }}" class="d-block w-100" alt="{{ planta.nombreCientifico }}" style="height: 180px; object-fit: cover;">
