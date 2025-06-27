@@ -24,6 +24,11 @@ def index():
         ]
         return render_template("visualizar_plantas.html", plantas=resultado)
     except Exception as e:
+        print("Asegurece de tner todas las librerias intaladas y que tenga el archivo .env," \
+                               " en caso de no tner el arvhivo .env solicitelo a un miembro desarollador del equipo o cree uno usted" \
+                               "en el .env principalmente ban datos de la conexion a la Base de datos y una clave secreta para la" \
+                               "conexion a la API Pl@nNet de reococimiento IA de las plantas, puede ir al archivo bd.py para ver" \
+                               "que deberia ir en el archivo .env")
         return jsonify({"error": str(e)}), 500
     finally:
         cursor.close()
