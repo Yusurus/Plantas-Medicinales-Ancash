@@ -52,8 +52,8 @@ if __name__ == '__main__':
 '''
 # ESTE CODIGO COMENTE SIRVE PARA INICIAR EL SERVIDOR DE FLASK EN HTTPS PARA QUE SI OTROS DISPOSITVOS A LA MISMA RED
 # PUEDAN CONECTARSE Y PODER PRENDER LA CAMARA PARA EL RECONOCIMIENTO FACIAL
-# LIBRERIA NECEARIA: cryptography, pyOpenSSL; 
-# SOLO METER EN CONSOLA: pip install cryptography pyOpenSSL
+# LIBRERIA NECEARIA: cryptography y si quieres intalar todo lo relcionado a ttps es el arterior y pyOpenSSL; 
+# ESTO ES LO MINIMO NECESARIO: pip install cryptography
 if __name__ == '__main__':
     if verificar_base_datos_rostros():
         print("Iniciando servidor Flask con HTTPS...")
