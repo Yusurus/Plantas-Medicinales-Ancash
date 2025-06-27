@@ -48,11 +48,12 @@ if __name__ == '__main__':
         app.run(debug=True, host='0.0.0.0', port=5000)
     else:
         print("No se puede iniciar el servidor sin la base de datos de rostros.")
-        
+
 '''
-### ESTE CODIGO COMENTE SIRVE PARA INICIAR EL SERVIDOR DE FLASK EN HTTPS PARA QUE SI OTROS DISPOSITVOS A LA MISMA RED
-### PUEDAN CONECTARSE Y PODER PRENDER LA CAMARA PARA EL RECONOCIMIENTO FACIAL
-### LIBRERIA NECEARIA: cryptography, pyOpenSSL; SOLO METER EN CONSOLA: pip install cryptography pyOpenSSL
+# ESTE CODIGO COMENTE SIRVE PARA INICIAR EL SERVIDOR DE FLASK EN HTTPS PARA QUE SI OTROS DISPOSITVOS A LA MISMA RED
+# PUEDAN CONECTARSE Y PODER PRENDER LA CAMARA PARA EL RECONOCIMIENTO FACIAL
+# LIBRERIA NECEARIA: cryptography, pyOpenSSL; 
+# SOLO METER EN CONSOLA: pip install cryptography pyOpenSSL
 if __name__ == '__main__':
     if verificar_base_datos_rostros():
         print("Iniciando servidor Flask con HTTPS...")
