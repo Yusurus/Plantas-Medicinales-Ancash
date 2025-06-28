@@ -86,7 +86,7 @@ def reporte_plantas():
 
 @reporte_bp.route('/reporte_plantas_pdf')
 def generar_pdf():
-    """Genera y descarga el reporte en formato PDF"""
+    """Genera y muestra el reporte en formato PDF (vista previa en navegador)"""
     if 'usuario' not in session:
         return redirect(url_for('user.login'))
     
@@ -94,7 +94,14 @@ def generar_pdf():
     
     # Crear el PDF en memoria
     buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=0.5*inch)
+    doc = SimpleDocTemplate(
+        buffer, 
+        pagesize=A4, 
+        topMargin=0.5*inch,
+        title="Reporte de Plantas Medicinales",
+        author="Sistema de Plantas Medicinales",
+        subject="Reporte completo de plantas medicinales registradas"
+    )
     
     # Estilos
     styles = getSampleStyleSheet()
@@ -210,12 +217,13 @@ def generar_pdf():
     # Construir el PDF
     doc.build(story)
     
-    # Preparar la respuesta
+    # Preparar la respuesta para mostrar en el navegador
     buffer.seek(0)
     response = make_response(buffer.getvalue())
     buffer.close()
     
+    # Configurar headers para vista previa en navegador
     response.headers['Content-Type'] = 'application/pdf'
-    response.headers['Content-Disposition'] = f'attachment; filename=reporte_plantas_{datetime.now().strftime("%Y%m%d_%H%M")}.pdf'
+    response.headers['Content-Disposition'] = f'inline; filename="Reporte_Plantas_Medicinales_{datetime.now().strftime("%Y%m%d_%H%M")}.pdf"'
     
     return response
