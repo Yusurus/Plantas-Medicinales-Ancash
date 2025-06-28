@@ -150,18 +150,21 @@ La aplicación estará disponible en `http://localhost:5000`
 
 ```
 plantas-medicinales-ancash/
-├── app.py                 # Aplicación principal Flask
-├── requirements.txt       # Dependencias Python
-├── .env                  # Variables de entorno
-├── README.md             # Este archivo
+├── app.py                  # Aplicación principal Flask
+├── requirements.txt        # Dependencias Python
+├── .env                    # Variables de entorno
+├── README.md               # Este archivo
 ├── static/
-│   ├── css/             # Estilos CSS
-│   ├── js/              # Scripts JavaScript
-│   └── images/          # Imágenes del proyecto
-├── templates/           # Templates HTML
-├── models/             # Modelos de IA entrenados
-├── database/           # Scripts SQL
-└── uploads/            # Imágenes subidas por usuarios
+│   ├── css/                # Estilos CSS
+│   ├── js/                 # Scripts JavaScript
+│   ├── img/                # Imágenes del proyecto
+│   └── uploads/            # Imágen puesta y eliminada para el pl@Net
+├── templates/              # Templates HTML
+├── services/               # Otros contraladores que usa los controllers
+├── controllers/            # Controladores del sistema
+├── data/                   # Scripts SQL junto con la base de datos de reostros
+├── config/                 # Configurador de la base de datos
+└── uploads/                # Imágenes subidas por usuarios
 ```
 
 ## 🤝 Contribución
