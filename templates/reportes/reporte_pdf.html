@@ -20,12 +20,9 @@
                         <h1 class="text-success"><i class="bi bi-file-earmark-text"></i> Reporte de Plantas Medicinales</h1>
                         <p class="text-muted">Generado el {{ fecha_generacion }}</p>
                     </div>
-                    <div class="btn-group">
-                        <button onclick="window.print()" class="btn btn-outline-primary">
-                            <i class="bi bi-printer"></i> Imprimir
-                        </button>
-                        <a href="/reporte_plantas_pdf" class="btn btn-success">
-                            <i class="bi bi-file-pdf"></i> Descargar PDF
+                    <div>
+                        <a href="/reporte_plantas_pdf" target="_blank" class="btn btn-success">
+                            <i class="bi bi-file-pdf"></i> Descargar Reporte PDF
                         </a>
                     </div>
                 </div>
@@ -40,7 +37,7 @@
             <div class="col-md-2 mb-3">
                 <div class="card stats-card text-center">
                     <div class="card-body">
-                        <i class="bi bi-flower1 fs-1"></i>
+                        <i class="bi bi-flower1 fs-1 text-success"></i>
                         <h4 class="mt-2">{{ estadisticas.total_plantas }}</h4>
                         <small>Plantas</small>
                     </div>
@@ -49,7 +46,7 @@
             <div class="col-md-2 mb-3">
                 <div class="card stats-card text-center">
                     <div class="card-body">
-                        <i class="bi bi-collection fs-1"></i>
+                        <i class="bi bi-collection fs-1 text-info"></i>
                         <h4 class="mt-2">{{ estadisticas.total_familias }}</h4>
                         <small>Familias</small>
                     </div>
@@ -58,7 +55,7 @@
             <div class="col-md-2 mb-3">
                 <div class="card stats-card text-center">
                     <div class="card-body">
-                        <i class="bi bi-tag fs-1"></i>
+                        <i class="bi bi-tag fs-1 text-warning"></i>
                         <h4 class="mt-2">{{ estadisticas.total_nombres_comunes }}</h4>
                         <small>Nombres Comunes</small>
                     </div>
@@ -67,7 +64,7 @@
             <div class="col-md-2 mb-3">
                 <div class="card stats-card text-center">
                     <div class="card-body">
-                        <i class="bi bi-heart-pulse fs-1"></i>
+                        <i class="bi bi-heart-pulse fs-1 text-danger"></i>
                         <h4 class="mt-2">{{ estadisticas.total_usos }}</h4>
                         <small>Usos Medicinales</small>
                     </div>
@@ -76,7 +73,7 @@
             <div class="col-md-2 mb-3">
                 <div class="card stats-card text-center">
                     <div class="card-body">
-                        <i class="bi bi-book fs-1"></i>
+                        <i class="bi bi-book fs-1 text-primary"></i>
                         <h4 class="mt-2">{{ estadisticas.total_saberes }}</h4>
                         <small>Saberes Culturales</small>
                     </div>
@@ -85,7 +82,7 @@
             <div class="col-md-2 mb-3">
                 <div class="card stats-card text-center">
                     <div class="card-body">
-                        <i class="bi bi-geo-alt fs-1"></i>
+                        <i class="bi bi-geo-alt fs-1 text-secondary"></i>
                         <h4 class="mt-2">{{ estadisticas.total_regiones }}</h4>
                         <small>Regiones</small>
                     </div>
@@ -105,6 +102,7 @@
             <div class="col-12">
                 <div class="card plant-card">
                     <div class="card-header bg-light">
+                        <span class="badge badge-pill badge-success stats-card float-end">ID: {{ planta.idPlanta }}</span>
                         <div class="row align-items-center">
                             <div class="col-md-8">
                                 <h5 class="mb-1 text-success">
@@ -112,7 +110,6 @@
                                 </h5>
                                 <small class="text-muted">Familia: {{ planta.nomFamilia or 'No especificada' }}</small>
                             </div>
-
                         </div>
                     </div>
                     <div class="card-body">
