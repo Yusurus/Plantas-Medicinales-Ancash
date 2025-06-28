@@ -5,7 +5,7 @@ detalles_bp = Blueprint('detalles_bp', __name__)
 
 @detalles_bp.route('/detalles/<int:plant_id>')
 def detalles_planta(plant_id):
-    return render_template('detalleplanta.html', plant_idg=plant_id)
+    return render_template('detalle_planta.html', plant_idg=plant_id)
 
 @detalles_bp.route('/api/planta/<int:plant_id>')
 def obtener_detalles_planta(plant_id):
