@@ -1,4 +1,3 @@
-from deepface import DeepFace
 import os
 import cv2
 from config.db import DIRECTORIO_ROSTROS
@@ -7,6 +6,8 @@ from flask import session, jsonify
 
 
 def reconocer_rostro(imagen_cv):
+    from deepface import DeepFace
+
     detector = cv2.CascadeClassifier(
         cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
     )

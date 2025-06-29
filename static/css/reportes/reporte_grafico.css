@@ -111,7 +111,7 @@ padding: 10px;
     color: white;
     font-weight: 100;
     border: none;
-    padding: 0.1rem 0.6rem;
+    padding: 0.1rem 0.4rem;
     border-radius: 10px;
     display: inline-flex;
     align-items: center;
@@ -119,6 +119,20 @@ padding: 10px;
     text-decoration: none;
     transition: background-color 0.2s ease;
     }
+
+.btn-ver-editar {
+    background: linear-gradient(135deg, #f1c40f   0%, #cea810   100%);;
+    color: white;
+    font-weight: 95;
+    border: none;
+    padding: 0.1rem 0.4rem;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
 
     .btn-ver-detalles:hover {
     background-color: #2f855a;
