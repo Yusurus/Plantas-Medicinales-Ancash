@@ -158,9 +158,14 @@ async function mostrarPlantasEnModal(tipo, valor) {
                         <h6 class="scientific-name">${planta.nombreCientifico}</h6>
                         ${commonNamesHtml}
                     </div>
-                    <a href="/detalles/${planta.idPlanta}" class="btn-ver-detalles mt-2">
-                    <i class="bi bi-eye"></i>
-                    </a>
+                    <div class="btn-group" style="gap: 0.5em;">
+                        <a href="/detalles/${planta.idPlanta}" class="btn-ver-detalles">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="/editar_planta/${planta.idPlanta}" class="btn-ver-editar">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                    </div>
                     <div style="height: 0.8em;"></div>
                 </div>
                 `;
