@@ -26,6 +26,10 @@ function displayPlantData(data) {
         plantImage.alt = 'Imagen no disponible';
     }
 
+    // datos morfológicos
+    document.getElementById('datos_morfo').textContent =
+        data.datos_morfologicos || 'No se han registrado datos morfologicos para esta planta.';
+
     // Ecoregiones
     document.getElementById('ecoregions').textContent =
         data.ecoregiones || 'No se han registrado ecoregiones para esta planta.';
@@ -42,7 +46,7 @@ function displayPlantData(data) {
     }
 
     // Saberes culturales
-    const culturalContainer = document.getElementById('culturalKnowledge');
+    const culturalContainer = document.getElementById('saberes_culturales');
     if (data.saberes_culturales) {
         const knowledge = data.saberes_culturales.split(' | ');
         culturalContainer.innerHTML = knowledge.map(item =>

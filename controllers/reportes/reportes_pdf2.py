@@ -1,16 +1,27 @@
-from flask import Blueprint, render_template, session, redirect, url_for, request, jsonify
+from flask import Blueprint, render_template, session, redirect, url_for, make_response, jsonify, request
 from config.db import get_connection
 import mysql.connector
+from reportlab.lib.pagesizes import letter, A4
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak, Image
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+from io import BytesIO
 from datetime import datetime
+import logging
+
+# Configurar logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 reporte_bp = Blueprint('reporte', __name__)
 
 class PlantasController:
-    """Controlador para manejar reportes de plantas medicinales"""
+    """Controlador para manejar operaciones relacionadas con plantas medicinales"""
     
     @staticmethod
     def obtener_informacion_basica_planta(id_planta):
-        """Obtiene información básica de la planta: nombre científico, familia, nombres comunes"""
+        """Obtiene información básica de una planta específica"""
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
         
@@ -27,18 +38,20 @@ class PlantasController:
             WHERE p.idPlanta = %s
             GROUP BY p.idPlanta, p.nombreCientifico, fp.nomFamilia
             """
+            
             cursor.execute(query, (id_planta,))
             return cursor.fetchone()
+            
         except mysql.connector.Error as e:
-            print(f"Error al obtener información básica: {e}")
+            logger.error(f"Error al obtener información básica: {e}")
             return None
         finally:
             cursor.close()
             connection.close()
-
+    
     @staticmethod
     def obtener_datos_morfologicos(id_planta):
-        """Obtiene datos morfológicos de la planta"""
+        """Obtiene datos morfológicos de una planta"""
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
         
@@ -51,18 +64,20 @@ class PlantasController:
             WHERE dm.fk_plantas = %s
             ORDER BY dm.idDatomorfologico
             """
+            
             cursor.execute(query, (id_planta,))
             return cursor.fetchall()
+            
         except mysql.connector.Error as e:
-            print(f"Error al obtener datos morfológicos: {e}")
+            logger.error(f"Error al obtener datos morfológicos: {e}")
             return []
         finally:
             cursor.close()
             connection.close()
-
+    
     @staticmethod
-    def obtener_imagenes(id_planta):
-        """Obtiene enlaces de imágenes de la planta"""
+    def obtener_imagenes_planta(id_planta):
+        """Obtiene todas las imágenes de una planta"""
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
         
@@ -75,18 +90,20 @@ class PlantasController:
             WHERE li.fk_plantas = %s
             ORDER BY li.idLinksImagenes
             """
+            
             cursor.execute(query, (id_planta,))
             return cursor.fetchall()
+            
         except mysql.connector.Error as e:
-            print(f"Error al obtener imágenes: {e}")
+            logger.error(f"Error al obtener imágenes: {e}")
             return []
         finally:
             cursor.close()
             connection.close()
-
+    
     @staticmethod
     def obtener_ubicaciones_geograficas(id_planta):
-        """Obtiene información de ubicaciones geográficas"""
+        """Obtiene ubicaciones geográficas de una planta"""
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
         
@@ -104,18 +121,20 @@ class PlantasController:
             WHERE ep.fk_plantas = %s
             ORDER BY reg.region, prov.nombreProvincia, eco.ecoregion
             """
+            
             cursor.execute(query, (id_planta,))
             return cursor.fetchall()
+            
         except mysql.connector.Error as e:
-            print(f"Error al obtener ubicaciones: {e}")
+            logger.error(f"Error al obtener ubicaciones: {e}")
             return []
         finally:
             cursor.close()
             connection.close()
-
+    
     @staticmethod
     def obtener_usos_medicinales(id_planta):
-        """Obtiene información de usos medicinales"""
+        """Obtiene usos medicinales de una planta"""
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
         
@@ -131,18 +150,20 @@ class PlantasController:
             WHERE u.fk_plantas = %s
             ORDER BY u.parte, u.uso
             """
+            
             cursor.execute(query, (id_planta,))
             return cursor.fetchall()
+            
         except mysql.connector.Error as e:
-            print(f"Error al obtener usos medicinales: {e}")
+            logger.error(f"Error al obtener usos medicinales: {e}")
             return []
         finally:
             cursor.close()
             connection.close()
-
+    
     @staticmethod
     def obtener_saberes_culturales(id_planta):
-        """Obtiene saberes culturales de la planta"""
+        """Obtiene saberes culturales de una planta"""
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
         
@@ -155,18 +176,20 @@ class PlantasController:
             WHERE sc.fk_plantas = %s
             ORDER BY sc.idSaberes
             """
+            
             cursor.execute(query, (id_planta,))
             return cursor.fetchall()
+            
         except mysql.connector.Error as e:
-            print(f"Error al obtener saberes culturales: {e}")
+            logger.error(f"Error al obtener saberes culturales: {e}")
             return []
         finally:
             cursor.close()
             connection.close()
-
+    
     @staticmethod
     def obtener_aportes_expertos(id_planta):
-        """Obtiene aportes de expertos"""
+        """Obtiene aportes de expertos para una planta"""
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
         
@@ -186,18 +209,20 @@ class PlantasController:
             WHERE ae.fk_plantas = %s
             ORDER BY ae.fecha DESC, ae.idAporteExperto
             """
+            
             cursor.execute(query, (id_planta,))
             return cursor.fetchall()
+            
         except mysql.connector.Error as e:
-            print(f"Error al obtener aportes de expertos: {e}")
+            logger.error(f"Error al obtener aportes de expertos: {e}")
             return []
         finally:
             cursor.close()
             connection.close()
-
+    
     @staticmethod
     def obtener_empleados_registro(id_planta):
-        """Obtiene información de empleados que registraron la planta"""
+        """Obtiene empleados que registraron la planta"""
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
         
@@ -214,131 +239,129 @@ class PlantasController:
             INNER JOIN cargos c ON e.fk_cargos = c.idCargo
             WHERE pr.fk_plantas = %s
             """
+            
             cursor.execute(query, (id_planta,))
             return cursor.fetchall()
+            
         except mysql.connector.Error as e:
-            print(f"Error al obtener empleados de registro: {e}")
+            logger.error(f"Error al obtener empleados de registro: {e}")
             return []
         finally:
             cursor.close()
             connection.close()
-
+    
     @staticmethod
-    def obtener_historial_archivaciones(id_planta):
-        """Obtiene historial de archivaciones de la planta"""
+    def obtener_resumen_consolidado(id_planta):
+        """Obtiene un resumen consolidado de toda la información de una planta"""
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
         
         try:
-            # Archivaciones de la planta
-            query_planta = """
+            query = """
             SELECT 
-                ap.idArchivaPlanta,
-                ap.fecha,
-                ap.motivo,
-                CONCAT(p.nombres, ' ', p.apellido1, ' ', p.apellido2) AS empleado_archivo,
-                e.correo,
-                c.categoria AS cargo_empleado,
-                'PLANTA' as tipo_archivacion
-            FROM archivacionesplantas ap
-            INNER JOIN empleados e ON ap.fk_empleados = e.idEmpleado
-            INNER JOIN personas p ON e.fk_personas = p.idPersona
-            INNER JOIN cargos c ON e.fk_cargos = c.idCargo
-            WHERE ap.fk_plantas = %s
-            ORDER BY ap.fecha DESC
+                -- Información básica
+                p.idPlanta,
+                p.nombreCientifico,
+                fp.nomFamilia,
+                
+                -- Nombres comunes
+                (SELECT GROUP_CONCAT(DISTINCT nc.nombreComun SEPARATOR ', ')
+                 FROM nombres_comunes nc 
+                 WHERE nc.fk_plantas = p.idPlanta) AS nombres_comunes,
+                
+                -- Datos morfológicos
+                (SELECT GROUP_CONCAT(DISTINCT dm.datoMorfologico SEPARATOR ' | ')
+                 FROM datos_morfologicos dm 
+                 WHERE dm.fk_plantas = p.idPlanta) AS datos_morfologicos,
+                
+                -- Primera imagen
+                (SELECT li.linkImagen 
+                 FROM linksimagenes li 
+                 WHERE li.fk_plantas = p.idPlanta 
+                 LIMIT 1) AS imagen_principal,
+                
+                -- Total de imágenes
+                (SELECT COUNT(*) 
+                 FROM linksimagenes li 
+                 WHERE li.fk_plantas = p.idPlanta) AS total_imagenes,
+                
+                -- Ecoregiones
+                (SELECT GROUP_CONCAT(DISTINCT eco.ecoregion SEPARATOR ', ')
+                 FROM ecoregion_planta ep
+                 INNER JOIN ecoregiones eco ON ep.fk_ecoregiones = eco.idecoregion
+                 WHERE ep.fk_plantas = p.idPlanta) AS ecoregiones,
+                
+                -- Total de usos
+                (SELECT COUNT(*) 
+                 FROM usos u 
+                 WHERE u.fk_plantas = p.idPlanta) AS total_usos,
+                
+                -- Total de saberes culturales
+                (SELECT COUNT(*) 
+                 FROM saberes_culturales sc 
+                 WHERE sc.fk_plantas = p.idPlanta) AS total_saberes,
+                
+                -- Total de aportes de expertos
+                (SELECT COUNT(*) 
+                 FROM aportes_expertos ae 
+                 WHERE ae.fk_plantas = p.idPlanta) AS total_aportes,
+                
+                -- Estado de archivación
+                CASE 
+                    WHEN EXISTS(SELECT 1 FROM archivacionesplantas ap WHERE ap.fk_plantas = p.idPlanta)
+                    THEN 'ARCHIVADA'
+                    ELSE 'ACTIVA'
+                END AS estado_planta
+                
+            FROM plantas p
+            INNER JOIN familias_plantas fp ON p.fk_familiasplantas = fp.idfamiliaPlanta
+            WHERE p.idPlanta = %s
             """
             
-            # Archivaciones de usos
-            query_usos = """
-            SELECT 
-                au.idArchivaUso as id_archivacion,
-                au.fecha,
-                au.motivo,
-                CONCAT(p.nombres, ' ', p.apellido1, ' ', p.apellido2) AS empleado_archivo,
-                CONCAT('Uso: ', u.parte, ' - ', u.uso) as detalle_archivado,
-                'USO' as tipo_archivacion
-            FROM archivaciones_usos au
-            INNER JOIN usos u ON au.fk_usos = u.idUsos
-            INNER JOIN empleados e ON au.fk_empleados = e.idEmpleado
-            INNER JOIN personas p ON e.fk_personas = p.idPersona
-            WHERE u.fk_plantas = %s
-            ORDER BY au.fecha DESC
-            """
-            
-            # Archivaciones de saberes
-            query_saberes = """
-            SELECT 
-                asab.idArchivaSaber as id_archivacion,
-                asab.fechaArchivaSaber as fecha,
-                asab.motivoArchivaSaber as motivo,
-                CONCAT(p.nombres, ' ', p.apellido1, ' ', p.apellido2) AS empleado_archivo,
-                CONCAT('Saber: ', LEFT(sc.descripcionSaber, 50), '...') as detalle_archivado,
-                'SABER' as tipo_archivacion
-            FROM archivaciones_saberes asab
-            INNER JOIN saberes_culturales sc ON asab.fk_saberes_culturales = sc.idSaberes
-            INNER JOIN empleados e ON asab.fk_empleados = e.idEmpleado
-            INNER JOIN personas p ON e.fk_personas = p.idPersona
-            WHERE sc.fk_plantas = %s
-            ORDER BY asab.fechaArchivaSaber DESC
-            """
-            
-            cursor = connection.cursor(dictionary=True)
-            
-            # Ejecutar todas las consultas
-            cursor.execute(query_planta, (id_planta,))
-            archivaciones_planta = cursor.fetchall()
-            
-            cursor.execute(query_usos, (id_planta,))
-            archivaciones_usos = cursor.fetchall()
-            
-            cursor.execute(query_saberes, (id_planta,))
-            archivaciones_saberes = cursor.fetchall()
-            
-            # Combinar todos los resultados
-            todas_archivaciones = archivaciones_planta + archivaciones_usos + archivaciones_saberes
-            
-            # Ordenar por fecha
-            todas_archivaciones.sort(key=lambda x: x['fecha'], reverse=True)
-            
-            return todas_archivaciones
+            cursor.execute(query, (id_planta,))
+            return cursor.fetchone()
             
         except mysql.connector.Error as e:
-            print(f"Error al obtener historial de archivaciones: {e}")
-            return []
+            logger.error(f"Error al obtener resumen consolidado: {e}")
+            return None
         finally:
             cursor.close()
             connection.close()
-
+    
     @staticmethod
     def obtener_reporte_completo_planta(id_planta):
-        """Obtiene toda la información de una planta específica"""
+        """Obtiene toda la información de una planta para reporte completo"""
         try:
-            # Obtener todos los datos
-            info_basica = PlantasController.obtener_informacion_basica_planta(id_planta)
-            if not info_basica:
-                return None
-                
-            datos = {
-                'info_basica': info_basica,
-                'datos_morfologicos': PlantasController.obtener_datos_morfologicos(id_planta),
-                'imagenes': PlantasController.obtener_imagenes(id_planta),
-                'ubicaciones': PlantasController.obtener_ubicaciones_geograficas(id_planta),
-                'usos_medicinales': PlantasController.obtener_usos_medicinales(id_planta),
-                'saberes_culturales': PlantasController.obtener_saberes_culturales(id_planta),
-                'aportes_expertos': PlantasController.obtener_aportes_expertos(id_planta),
-                'empleados_registro': PlantasController.obtener_empleados_registro(id_planta),
-                'historial_archivaciones': PlantasController.obtener_historial_archivaciones(id_planta)
+            # Obtener todos los datos por separado
+            informacion_basica = PlantasController.obtener_informacion_basica_planta(id_planta)
+            datos_morfologicos = PlantasController.obtener_datos_morfologicos(id_planta)
+            imagenes = PlantasController.obtener_imagenes_planta(id_planta)
+            ubicaciones = PlantasController.obtener_ubicaciones_geograficas(id_planta)
+            usos = PlantasController.obtener_usos_medicinales(id_planta)
+            saberes = PlantasController.obtener_saberes_culturales(id_planta)
+            aportes = PlantasController.obtener_aportes_expertos(id_planta)
+            empleados = PlantasController.obtener_empleados_registro(id_planta)
+            resumen = PlantasController.obtener_resumen_consolidado(id_planta)
+            
+            return {
+                'informacion_basica': informacion_basica,
+                'datos_morfologicos': datos_morfologicos,
+                'imagenes': imagenes,
+                'ubicaciones': ubicaciones,
+                'usos_medicinales': usos,
+                'saberes_culturales': saberes,
+                'aportes_expertos': aportes,
+                'empleados_registro': empleados,
+                'resumen': resumen
             }
             
-            return datos
-            
         except Exception as e:
-            print(f"Error al obtener reporte completo: {e}")
+            logger.error(f"Error al obtener reporte completo: {e}")
             return None
-
+    
     @staticmethod
-    def obtener_lista_plantas():
-        """Obtiene lista resumida de todas las plantas para selección"""
+    def obtener_todas_las_plantas():
+        """Obtiene un listado de todas las plantas para reportes generales"""
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
         
@@ -348,7 +371,7 @@ class PlantasController:
                 p.idPlanta,
                 p.nombreCientifico,
                 fp.nomFamilia,
-                GROUP_CONCAT(DISTINCT nc.nombreComun SEPARATOR ', ') AS nombres_comunes,
+                GROUP_CONCAT(DISTINCT nc.nombreComun SEPARATOR ', ') as nombres_comunes,
                 COUNT(DISTINCT u.idUsos) as total_usos,
                 COUNT(DISTINCT sc.idSaberes) as total_saberes,
                 CASE 
@@ -357,50 +380,436 @@ class PlantasController:
                     ELSE 'ACTIVA'
                 END AS estado
             FROM plantas p
-            INNER JOIN familias_plantas fp ON p.fk_familiasplantas = fp.idfamiliaPlanta
+            LEFT JOIN familias_plantas fp ON p.fk_familiasplantas = fp.idfamiliaPlanta
             LEFT JOIN nombres_comunes nc ON p.idPlanta = nc.fk_plantas
             LEFT JOIN usos u ON p.idPlanta = u.fk_plantas
             LEFT JOIN saberes_culturales sc ON p.idPlanta = sc.fk_plantas
             GROUP BY p.idPlanta, p.nombreCientifico, fp.nomFamilia
             ORDER BY p.nombreCientifico
             """
+            
             cursor.execute(query)
             return cursor.fetchall()
+            
         except mysql.connector.Error as e:
-            print(f"Error al obtener lista de plantas: {e}")
+            logger.error(f"Error al obtener todas las plantas: {e}")
             return []
         finally:
             cursor.close()
             connection.close()
+    
+    @staticmethod
+    def obtener_estadisticas_generales():
+        """Obtiene estadísticas generales del sistema"""
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+        
+        try:
+            query = """
+            SELECT 
+                (SELECT COUNT(*) FROM plantas) as total_plantas,
+                (SELECT COUNT(*) FROM plantas WHERE NOT EXISTS(
+                    SELECT 1 FROM archivacionesplantas ap WHERE ap.fk_plantas = plantas.idPlanta
+                )) as plantas_activas,
+                (SELECT COUNT(*) FROM archivacionesplantas) as plantas_archivadas,
+                (SELECT COUNT(*) FROM familias_plantas) as total_familias,
+                (SELECT COUNT(*) FROM nombres_comunes) as total_nombres_comunes,
+                (SELECT COUNT(*) FROM usos) as total_usos,
+                (SELECT COUNT(*) FROM saberes_culturales) as total_saberes,
+                (SELECT COUNT(*) FROM aportes_expertos) as total_aportes,
+                (SELECT COUNT(*) FROM ecoregiones) as total_ecoregiones,
+                (SELECT COUNT(*) FROM regiones) as total_regiones
+            """
+            
+            cursor.execute(query)
+            return cursor.fetchone()
+            
+        except mysql.connector.Error as e:
+            logger.error(f"Error al obtener estadísticas: {e}")
+            return {}
+        finally:
+            cursor.close()
+            connection.close()
 
-# Rutas del Blueprint
+# RUTAS DEL BLUEPRINT
+
 @reporte_bp.route('/plantas')
-def lista_plantas():
-    """Muestra la lista de plantas disponibles"""
+def listar_plantas():
+    """Lista todas las plantas disponibles"""
     if 'usuario' not in session:
         return redirect(url_for('user.login'))
     
-    plantas = PlantasController.obtener_lista_plantas()
-    return render_template('reportes/lista_plantas.html', plantas=plantas)
+    plantas = PlantasController.obtener_todas_las_plantas()
+    estadisticas = PlantasController.obtener_estadisticas_generales()
+    
+    return render_template('reportes/lista_plantas.html', 
+                         plantas=plantas, 
+                         estadisticas=estadisticas)
 
 @reporte_bp.route('/planta/<int:id_planta>')
 def detalle_planta(id_planta):
-    """Muestra el reporte completo de una planta específica"""
+    """Muestra el detalle completo de una planta"""
     if 'usuario' not in session:
         return redirect(url_for('user.login'))
     
     datos_planta = PlantasController.obtener_reporte_completo_planta(id_planta)
     
     if not datos_planta:
-        return render_template('error.html', mensaje="Planta no encontrada"), 404
+        return render_template('error.html', 
+                             mensaje="Planta no encontrada"), 404
     
     return render_template('reportes/detalle_planta.html', 
                          datos=datos_planta,
+                         fecha_consulta=datetime.now().strftime("%d/%m/%Y %H:%M"))
+
+@reporte_bp.route('/planta/<int:id_planta>/pdf')
+def generar_pdf_planta(id_planta):
+    """Genera PDF para una planta específica"""
+    if 'usuario' not in session:
+        return redirect(url_for('user.login'))
+    
+    datos_planta = PlantasController.obtener_reporte_completo_planta(id_planta)
+    
+    if not datos_planta:
+        return jsonify({'error': 'Planta no encontrada'}), 404
+    
+    # Crear el PDF
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(
+        buffer, 
+        pagesize=A4,
+        topMargin=0.5*inch,
+        bottomMargin=0.5*inch,
+        leftMargin=0.5*inch,
+        rightMargin=0.5*inch,
+        title=f"Reporte de {datos_planta['informacion_basica']['nombreCientifico']}",
+        author="Sistema de Plantas Medicinales"
+    )
+    
+    # Estilos para el PDF
+    styles = getSampleStyleSheet()
+    
+    # Estilos personalizados
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=20,
+        spaceAfter=30,
+        alignment=1,  # Centrado
+        textColor=colors.darkgreen,
+        fontName='Helvetica-Bold'
+    )
+    
+    subtitle_style = ParagraphStyle(
+        'CustomSubtitle',
+        parent=styles['Heading2'],
+        fontSize=16,
+        spaceAfter=20,
+        alignment=1,
+        textColor=colors.darkblue,
+        fontName='Helvetica-Bold'
+    )
+    
+    heading_style = ParagraphStyle(
+        'CustomHeading',
+        parent=styles['Heading2'],
+        fontSize=14,
+        spaceAfter=12,
+        spaceBefore=20,
+        textColor=colors.darkblue,
+        fontName='Helvetica-Bold'
+    )
+    
+    subheading_style = ParagraphStyle(
+        'CustomSubheading',
+        parent=styles['Heading3'],
+        fontSize=12,
+        spaceAfter=8,
+        spaceBefore=12,
+        textColor=colors.darkgreen,
+        fontName='Helvetica-Bold'
+    )
+    
+    normal_style = ParagraphStyle(
+        'CustomNormal',
+        parent=styles['Normal'],
+        fontSize=10,
+        spaceAfter=6,
+        fontName='Helvetica'
+    )
+    
+    bold_style = ParagraphStyle(
+        'CustomBold',
+        parent=styles['Normal'],
+        fontSize=10,
+        spaceAfter=6,
+        fontName='Helvetica-Bold'
+    )
+    
+    # Contenido del PDF
+    story = []
+    
+    # === ENCABEZADO ===
+    story.append(Paragraph("REPORTE DE PLANTA MEDICINAL", title_style))
+    story.append(Paragraph(f"<i>{datos_planta['informacion_basica']['nombreCientifico']}</i>", subtitle_style))
+    story.append(Paragraph(f"Generado el: {datetime.now().strftime('%d/%m/%Y a las %H:%M')}", normal_style))
+    story.append(Spacer(1, 20))
+    
+    # === INFORMACIÓN BÁSICA ===
+    story.append(Paragraph("1. INFORMACIÓN BÁSICA", heading_style))
+    
+    info_basica = datos_planta['informacion_basica']
+    basic_data = [
+        ['<b>Nombre Científico</b>', f"<i>{info_basica['nombreCientifico']}</i>"],
+        ['<b>Familia</b>', info_basica['nomFamilia'] or 'No especificada'],
+        ['<b>Nombres Comunes</b>', info_basica['nombres_comunes'] or 'No registrados'],
+        ['<b>ID de la Planta</b>', str(info_basica['idPlanta'])]
+    ]
+    
+    basic_table = Table(basic_data, colWidths=[2*inch, 4*inch])
+    basic_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 8),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 8),
+    ]))
+    
+    story.append(basic_table)
+    story.append(Spacer(1, 20))
+    
+    # === DATOS MORFOLÓGICOS ===
+    if datos_planta['datos_morfologicos']:
+        story.append(Paragraph("2. CARACTERÍSTICAS MORFOLÓGICAS", heading_style))
+        
+        for i, dato in enumerate(datos_planta['datos_morfologicos'], 1):
+            story.append(Paragraph(f"<b>Descripción {i}:</b>", bold_style))
+            # Dividir texto largo en párrafos más manejables
+            texto_morfologico = dato['datoMorfologico']
+            if len(texto_morfologico) > 500:
+                # Dividir en párrafos de máximo 500 caracteres
+                palabras = texto_morfologico.split(' ')
+                parrafo_actual = []
+                longitud_actual = 0
+                
+                for palabra in palabras:
+                    if longitud_actual + len(palabra) + 1 <= 500:
+                        parrafo_actual.append(palabra)
+                        longitud_actual += len(palabra) + 1
+                    else:
+                        if parrafo_actual:
+                            story.append(Paragraph(' '.join(parrafo_actual), normal_style))
+                        parrafo_actual = [palabra]
+                        longitud_actual = len(palabra)
+                
+                if parrafo_actual:
+                    story.append(Paragraph(' '.join(parrafo_actual), normal_style))
+            else:
+                story.append(Paragraph(texto_morfologico, normal_style))
+            
+            story.append(Spacer(1, 8))
+        
+        story.append(Spacer(1, 15))
+    
+    # === UBICACIONES GEOGRÁFICAS ===
+    if datos_planta['ubicaciones']:
+        story.append(Paragraph("3. DISTRIBUCIÓN GEOGRÁFICA", heading_style))
+        
+        ubicaciones_data = [['<b>Región</b>', '<b>Provincia</b>', '<b>Ecoregión</b>']]
+        
+        for ubicacion in datos_planta['ubicaciones']:
+            ubicaciones_data.append([
+                ubicacion['region'] or 'No especificada',
+                ubicacion['nombreProvincia'] or 'No especificada',
+                ubicacion['ecoregion'] or 'No especificada'
+            ])
+        
+        ubicaciones_table = Table(ubicaciones_data, colWidths=[2*inch, 2*inch, 2*inch])
+        ubicaciones_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.darkgreen),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTSIZE', (0, 0), (-1, -1), 9),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.lightgrey),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ]))
+        
+        story.append(ubicaciones_table)
+        story.append(Spacer(1, 20))
+    
+    # === USOS MEDICINALES ===
+    if datos_planta['usos_medicinales']:
+        story.append(Paragraph("4. USOS MEDICINALES", heading_style))
+        
+        for i, uso in enumerate(datos_planta['usos_medicinales'], 1):
+            story.append(Paragraph(f"<b>Uso {i}:</b>", subheading_style))
+            
+            uso_data = [
+                ['<b>Parte utilizada</b>', uso['parte'] or 'No especificada'],
+                ['<b>Uso medicinal</b>', uso['uso'] or 'No especificado'],
+                ['<b>Preparación</b>', uso['preparacion'] or 'No especificada'],
+                ['<b>Contraindicaciones</b>', uso['contraIndicaciones'] or 'No especificadas']
+            ]
+            
+            uso_table = Table(uso_data, colWidths=[1.5*inch, 4.5*inch])
+            uso_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (0, -1), colors.lightblue),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('FONTSIZE', (0, 0), (-1, -1), 9),
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                ('LEFTPADDING', (0, 0), (-1, -1), 6),
+                ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+            ]))
+            
+            story.append(uso_table)
+            story.append(Spacer(1, 12))
+        
+        story.append(Spacer(1, 15))
+    
+    # === SABERES CULTURALES ===
+    if datos_planta['saberes_culturales']:
+        story.append(Paragraph("5. SABERES CULTURALES", heading_style))
+        
+        for i, saber in enumerate(datos_planta['saberes_culturales'], 1):
+            story.append(Paragraph(f"<b>Conocimiento tradicional {i}:</b>", subheading_style))
+            story.append(Paragraph(saber['descripcionSaber'], normal_style))
+            story.append(Spacer(1, 10))
+        
+        story.append(Spacer(1, 15))
+    
+    # === APORTES DE EXPERTOS ===
+    if datos_planta['aportes_expertos']:
+        story.append(Paragraph("6. APORTES DE EXPERTOS", heading_style))
+        
+        for i, aporte in enumerate(datos_planta['aportes_expertos'], 1):
+            story.append(Paragraph(f"<b>Aporte {i}:</b>", subheading_style))
+            
+            aporte_data = [
+                ['<b>Experto</b>', aporte['nombre_experto']],
+                ['<b>Tipo de aporte</b>', aporte['tipo_aporte']],
+                ['<b>Fecha</b>', aporte['fecha'].strftime('%d/%m/%Y') if aporte['fecha'] else 'No especificada'],
+                ['<b>Descripción</b>', aporte['descripcion'] or 'No especificada'],
+                ['<b>Contacto</b>', f"DNI: {aporte['DNI']}, Tel: {aporte['telefono'] or 'No especificado'}"]
+            ]
+            
+            aporte_table = Table(aporte_data, colWidths=[1.5*inch, 4.5*inch])
+            aporte_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (0, -1), colors.lightyellow),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('FONTSIZE', (0, 0), (-1, -1), 9),
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                ('LEFTPADDING', (0, 0), (-1, -1), 6),
+                ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+            ]))
+            
+            story.append(aporte_table)
+            story.append(Spacer(1, 12))
+        
+        story.append(Spacer(1, 15))
+    
+    # === INFORMACIÓN DE REGISTRO ===
+    if datos_planta['empleados_registro']:
+        story.append(Paragraph("7. INFORMACIÓN DE REGISTRO", heading_style))
+        
+        registro_data = [['<b>Empleado</b>', '<b>DNI</b>', '<b>Correo</b>', '<b>Cargo</b>']]
+        
+        for empleado in datos_planta['empleados_registro']:
+            registro_data.append([
+                empleado['nombre_empleado'],
+                empleado['DNI'],
+                empleado['correo'],
+                empleado['cargo']
+            ])
+        
+        registro_table = Table(registro_data, colWidths=[2*inch, 1*inch, 2*inch, 1*inch])
+        registro_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.darkblue),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.lightgrey),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ]))
+        
+        story.append(registro_table)
+        story.append(Spacer(1, 20))
+    
+    # === RESUMEN ESTADÍSTICO ===
+    if datos_planta['resumen']:
+        story.append(Paragraph("8. RESUMEN ESTADÍSTICO", heading_style))
+        
+        resumen = datos_planta['resumen']
+        stats_data = [
+            ['<b>Concepto</b>', '<b>Cantidad</b>'],
+            ['Total de imágenes', str(resumen['total_imagenes'])],
+            ['Total de usos medicinales', str(resumen['total_usos'])],
+            ['Total de saberes culturales', str(resumen['total_saberes'])],
+            ['Total de aportes de expertos', str(resumen['total_aportes'])],
+            ['Estado de la planta', resumen['estado_planta']]
+        ]
+        
+        stats_table = Table(stats_data, colWidths=[3*inch, 1.5*inch])
+        stats_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.darkgreen),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.lightgrey),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ]))
+        
+        story.append(stats_table)
+        story.append(Spacer(1, 20))
+    
+    # === PIE DE PÁGINA ===
+    story.append(Spacer(1, 30))
+    story.append(Paragraph("_" * 80, normal_style))
+    story.append(Spacer(1, 10))
+    story.append(Paragraph(
+        f"Reporte generado por el Sistema de Plantas Medicinales - {datetime.now().strftime('%d de %B de %Y')}",
+        ParagraphStyle('Footer', parent=styles['Normal'], fontSize=8, alignment=1, textColor=colors.grey)
+    ))
+    
+    # Construir el PDF
+    try:
+        doc.build(story)
+        buffer.seek(0)
+        pdf_data = buffer.getvalue()
+        buffer.close()
+        
+        response = make_response(pdf_data)
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = f'inline; filename="Planta_{datos_planta["informacion_basica"]["nombreCientifico"].replace(" ", "_")}_{datetime.now().strftime("%Y%m%d")}.pdf"'
+        
+        return response
+        
+    except Exception as e:
+        logger.error(f"Error al generar PDF: {e}")
+        buffer.close()
+        return jsonify({'error': 'Error al generar el PDF'}), 500
+
+@reporte_bp.route('/estadisticas')
+def mostrar_estadisticas():
+    """Muestra estadísticas generales del sistema"""
+    if 'usuario' not in session:
+        return redirect(url_for('user.login'))
+    
+    estadisticas = PlantasController.obtener_estadisticas_generales()
+    
+    return render_template('reportes/estadisticas.html', 
+                         estadisticas=estadisticas,
                          fecha_generacion=datetime.now().strftime("%d/%m/%Y %H:%M"))
 
 @reporte_bp.route('/api/planta/<int:id_planta>')
-def api_detalle_planta(id_planta):
-    """API para obtener datos de una planta en formato JSON"""
+def api_datos_planta(id_planta):
+    """API endpoint para obtener datos de una planta en formato JSON"""
     if 'usuario' not in session:
         return jsonify({'error': 'No autorizado'}), 401
     
@@ -409,58 +818,9 @@ def api_detalle_planta(id_planta):
     if not datos_planta:
         return jsonify({'error': 'Planta no encontrada'}), 404
     
-    # Convertir datetime a string para JSON
-    for aporte in datos_planta.get('aportes_expertos', []):
-        if aporte.get('fecha'):
-            aporte['fecha'] = aporte['fecha'].strftime("%d/%m/%Y")
-    
-    for archivacion in datos_planta.get('historial_archivaciones', []):
-        if archivacion.get('fecha'):
-            archivacion['fecha'] = archivacion['fecha'].strftime("%d/%m/%Y")
-    
     return jsonify(datos_planta)
 
-@reporte_bp.route('/buscar_plantas')
-def buscar_plantas():
-    """Busca plantas por nombre científico o común"""
-    if 'usuario' not in session:
-        return redirect(url_for('user.login'))
-    
-    termino_busqueda = request.args.get('q', '').strip()
-    
-    if not termino_busqueda:
-        return jsonify([])
-    
-    connection = get_connection()
-    cursor = connection.cursor(dictionary=True)
-    
-    try:
-        query = """
-        SELECT DISTINCT
-            p.idPlanta,
-            p.nombreCientifico,
-            fp.nomFamilia,
-            GROUP_CONCAT(DISTINCT nc.nombreComun SEPARATOR ', ') AS nombres_comunes
-        FROM plantas p
-        INNER JOIN familias_plantas fp ON p.fk_familiasplantas = fp.idfamiliaPlanta
-        LEFT JOIN nombres_comunes nc ON p.idPlanta = nc.fk_plantas
-        WHERE p.nombreCientifico LIKE %s 
-           OR nc.nombreComun LIKE %s
-           OR fp.nomFamilia LIKE %s
-        GROUP BY p.idPlanta, p.nombreCientifico, fp.nomFamilia
-        ORDER BY p.nombreCientifico
-        LIMIT 10
-        """
-        
-        termino_like = f"%{termino_busqueda}%"
-        cursor.execute(query, (termino_like, termino_like, termino_like))
-        resultados = cursor.fetchall()
-        
-        return jsonify(resultados)
-        
-    except mysql.connector.Error as e:
-        print(f"Error en búsqueda: {e}")
-        return jsonify([])
-    finally:
-        cursor.close()
-        connection.close()
+# Función auxiliar para verificar sesión
+def verificar_sesion():
+    """Verifica si el usuario tiene sesión activa"""
+    return 'usuario' in session
