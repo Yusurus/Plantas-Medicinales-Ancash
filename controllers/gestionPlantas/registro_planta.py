@@ -62,7 +62,7 @@ def registrar_planta(id_planta=None):
 
             ev = 2 if id_planta else 1
             cursor.callproc(
-                "gestionar_plantas",
+                "gestionar_plantas2",
                 [
                     ev,
                     id_planta,
