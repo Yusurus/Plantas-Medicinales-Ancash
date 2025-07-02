@@ -105,6 +105,7 @@ def registrar_planta(id_planta=None):
             # conn.commit()
         except Exception as e:
             mensaje = f"Error en el servidor: {str(e)}"
+            flash(mensaje, "danger")
 
         finally:
             cursor.close()
