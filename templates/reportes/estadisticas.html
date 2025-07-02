@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Plantas Medicinales</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c5530 0%, #4a7c59 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .scientific-name {
+            font-style: italic;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: #b8e6c1;
+        }
+
+        .generation-date {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            color: #2c5530;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #4a7c59;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon {
+            font-size: 1.3rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #4a7c59;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #2c5530;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            color: #555;
+            font-size: 1rem;
+        }
+
+        .morphological-description {
+            background: #f0f8f0;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 5px solid #4a7c59;
+            margin: 1rem 0;
+        }
+
+        .usage-item {
+            background: #fff8f0;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            border-left: 5px solid #ff8c00;
+        }
+
+        .usage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .usage-detail {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .knowledge-item {
+            background: #f0f0ff;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            border-left: 5px solid #6b46c1;
+        }
+
+        .expert-contribution {
+            background: #fff5f5;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            border-left: 5px solid #dc2626;
+        }
+
+        .expert-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .expert-name {
+            font-weight: 600;
+            color: #dc2626;
+        }
+
+        .expert-date {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .location-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        .location-table th,
+        .location-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .location-table th {
+            background: #4a7c59;
+            color: white;
+            font-weight: 600;
+        }
+
+        .location-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4a7c59 0%, #2c5530 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-archived {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .image-placeholder {
+            background: #f0f0f0;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            color: #666;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .scientific-name {
+                font-size: 1.4rem;
+            }
+            
+            .card {
+                padding: 1rem;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .expert-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4a7c59;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>🌿 Sistema de Plantas Medicinales</h1>
+                <div class="scientific-name" id="scientificName">Cargando...</div>
+                <div class="generation-date" id="generationDate">Generado el: --</div>
+            </div>
+        </header>
+
+        <!-- Loading indicator -->
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Cargando información de la planta...</p>
+        </div>
+
+        <!-- Main content (initially hidden) -->
+        <div id="mainContent" style="display: none;">
+            <!-- Basic Information -->
+            <div class="card">
+                <h2 class="card-title">
+                    <span class="icon">📋</span>
+                    Información Básica
+                </h2>
+                <div class="info-grid" id="basicInfo">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Morphological Data -->
+            <div class="card" id="morphologicalCard" style="display: none;">
+                <h2 class="card-title">
+                    <span class="icon">🔬</span>
+                    Características Morfológicas
+                </h2>
+                <div id="morphologicalData">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Geographic Distribution -->
+            <div class="card" id="locationCard" style="display: none;">
+                <h2 class="card-title">
+                    <span class="icon">🗺️</span>
+                    Distribución Geográfica
+                </h2>
+                <table class="location-table" id="locationTable">
+                    <thead>
+                        <tr>
+                            <th>Región</th>
+                            <th>Provincia</th>
+                            <th>Ecoregión</th>
+                        </tr>
+                    </thead>
+                    <tbody id="locationTableBody">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Medicinal Uses -->
+            <div class="card" id="usesCard" style="display: none;">
+                <h2 class="card-title">
+                    <span class="icon">💊</span>
+                    Usos Medicinales
+                </h2>
+                <div id="medicalUses">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Cultural Knowledge -->
+            <div class="card" id="knowledgeCard" style="display: none;">
+                <h2 class="card-title">
+                    <span class="icon">📚</span>
+                    Saberes Culturales
+                </h2>
+                <div id="culturalKnowledge">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Expert Contributions -->
+            <div class="card" id="expertCard" style="display: none;">
+                <h2 class="card-title">
+                    <span class="icon">👨‍🔬</span>
+                    Aportes de Expertos
+                </h2>
+                <div id="expertContributions">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Images -->
+            <div class="card" id="imagesCard">
+                <h2 class="card-title">
+                    <span class="icon">📸</span>
+                    Galería de Imágenes
+                </h2>
+                <div class="image-gallery" id="imageGallery">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Statistical Summary -->
+            <div class="card">
+                <h2 class="card-title">
+                    <span class="icon">📊</span>
+                    Resumen Estadístico
+                </h2>
+                <div class="stats-grid" id="statisticalSummary">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="card">
+                <h2 class="card-title">
+                    <span class="icon">⚡</span>
+                    Acciones
+                </h2>
+                <button class="btn" onclick="generatePDF()">📄 Generar PDF</button>
+                <button class="btn" onclick="goBack()">⬅️ Volver al Listado</button>
+                <button class="btn" onclick="refreshData()">🔄 Actualizar Datos</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data - in a real application, this would come from your API
+        const samplePlantData = {
+            informacion_basica: {
+                idPlanta: 1,
+                nombreCientifico: "Matricaria chamomilla",
+                nomFamilia: "Asteraceae",
+                nombres_comunes: "Manzanilla, Camomila, Manzanilla alemana"
+            },
+            datos_morfologicos: [
+                {
+                    idDatomorfologico: 1,
+                    datoMorfologico: "Planta herbácea anual de 20-50 cm de altura. Hojas alternas, muy divididas en segmentos filiformes. Flores en capítulos solitarios terminales, con pétalos blancos y centro amarillo. Fruto aquenio pequeño y estriado."
+                }
+            ],
+            ubicaciones: [
+                {
+                    region: "Ancash",
+                    nombreProvincia: "Huaraz",
+                    ecoregion: "Serranía Esteparia"
+                },
+                {
+                    region: "Lima",
+                    nombreProvincia: "Lima",
+                    ecoregion: "Desierto Costero"
+                }
+            ],
+            usos_medicinales: [
+                {
+                    idUsos: 1,
+                    parte: "Flores",
+                    uso: "Digestivo y sedante",
+                    preparacion: "Infusión de 1 cucharada de flores secas en una taza de agua caliente",
+                    contraIndicaciones: "No usar durante el embarazo"
+                },
+                {
+                    idUsos: 2,
+                    parte: "Hojas",
+                    uso: "Antiinflamatorio tópico",
+                    preparacion: "Cataplasma de hojas frescas machacadas",
+                    contraIndicaciones: "Evitar en personas alérgicas a las asteráceas"
+                }
+            ],
+            saberes_culturales: [
+                {
+                    idSaberes: 1,
+                    descripcionSaber: "En la medicina tradicional andina, la manzanilla es conocida como una planta sagrada utilizada en ceremonias de limpia espiritual y para calmar los nervios."
+                }
+            ],
+            aportes_expertos: [
+                {
+                    idAporteExperto: 1,
+                    fecha: "2024-01-15",
+                    descripcion: "Estudios recientes confirman las propiedades antiinflamatorias de los flavonoides presentes en la manzanilla.",
+                    nombre_experto: "Dr. Juan Pérez García",
+                    DNI: "12345678",
+                    telefono: "987654321",
+                    tipo_aporte: "Investigación científica"
+                }
+            ],
+            imagenes: [
+                {
+                    idLinksImagenes: 1,
+                    linkImagen: "https://example.com/manzanilla1.jpg"
+                }
+            ],
+            resumen: {
+                total_imagenes: 3,
+                total_usos: 2,
+                total_saberes: 1,
+                total_aportes: 1,
+                estado_planta: "ACTIVA"
+            }
+        };
+
+        // Initialize the page
+        function initializePage() {
+            // Simulate loading delay
+            setTimeout(() => {
+                loadPlantData(samplePlantData);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+            }, 1500);
+        }
+
+        function loadPlantData(data) {
+            // Update header
+            const scientificName = document.getElementById('scientificName');
+            const generationDate = document.getElementById('generationDate');
+            
+            scientificName.textContent = data.informacion_basica.nombreCientifico;
+            generationDate.textContent = `Generado el: ${new Date().toLocaleDateString('es-ES')} a las ${new Date().toLocaleTimeString('es-ES')}`;
+
+            // Load basic information
+            loadBasicInfo(data.informacion_basica);
+
+            // Load morphological data
+            if (data.datos_morfologicos && data.datos_morfologicos.length > 0) {
+                loadMorphologicalData(data.datos_morfologicos);
+                document.getElementById('morphologicalCard').style.display = 'block';
+            }
+
+            // Load geographic distribution
+            if (data.ubicaciones && data.ubicaciones.length > 0) {
+                loadLocationData(data.ubicaciones);
+                document.getElementById('locationCard').style.display = 'block';
+            }
+
+            // Load medicinal uses
+            if (data.usos_medicinales && data.usos_medicinales.length > 0) {
+                loadMedicalUses(data.usos_medicinales);
+                document.getElementById('usesCard').style.display = 'block';
+            }
+
+            // Load cultural knowledge
+            if (data.saberes_culturales && data.saberes_culturales.length > 0) {
+                loadCulturalKnowledge(data.saberes_culturales);
+                document.getElementById('knowledgeCard').style.display = 'block';
+            }
+
+            // Load expert contributions
+            if (data.aportes_expertos && data.aportes_expertos.length > 0) {
+                loadExpertContributions(data.aportes_expertos);
+                document.getElementById('expertCard').style.display = 'block';
+            }
+
+            // Load images
+            loadImages(data.imagenes);
+
+            // Load statistical summary
+            loadStatistics(data.resumen);
+        }
+
+        function loadBasicInfo(info) {
+            const basicInfoDiv = document.getElementById('basicInfo');
+            basicInfoDiv.innerHTML = `
+                <div class="info-item">
+                    <div class="info-label">ID de la Planta</div>
+                    <div class="info-value">${info.idPlanta}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Nombre Científico</div>
+                    <div class="info-value"><em>${info.nombreCientifico}</em></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Familia</div>
+                    <div class="info-value">${info.nomFamilia || 'No especificada'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Nombres Comunes</div>
+                    <div class="info-value">${info.nombres_comunes || 'No registrados'}</div>
+                </div>
+            `;
+        }
+
+        function loadMorphologicalData(data) {
+            const morphDiv = document.getElementById('morphologicalData');
+            let html = '';
+            
+            data.forEach((item, index) => {
+                html += `
+                    <div class="morphological-description">
+                        <h4>Descripción ${index + 1}:</h4>
+                        <p>${item.datoMorfologico}</p>
+                    </div>
+                `;
+            });
+            
+            morphDiv.innerHTML = html;
+        }
+
+        function loadLocationData(data) {
+            const tbody = document.getElementById('locationTableBody');
+            let html = '';
+            
+            data.forEach(location => {
+                html += `
+                    <tr>
+                        <td>${location.region || 'No especificada'}</td>
+                        <td>${location.nombreProvincia || 'No especificada'}</td>
+                        <td>${location.ecoregion || 'No especificada'}</td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+
+        function loadMedicalUses(data) {
+            const usesDiv = document.getElementById('medicalUses');
+            let html = '';
+            
+            data.forEach((use, index) => {
+                html += `
+                    <div class="usage-item">
+                        <h4>Uso ${index + 1}</h4>
+                        <div class="usage-grid">
+                            <div class="usage-detail">
+                                <div class="info-label">Parte utilizada</div>
+                                <div class="info-value">${use.parte || 'No especificada'}</div>
+                            </div>
+                            <div class="usage-detail">
+                                <div class="info-label">Uso medicinal</div>
+                                <div class="info-value">${use.uso || 'No especificado'}</div>
+                            </div>
+                            <div class="usage-detail">
+                                <div class="info-label">Preparación</div>
+                                <div class="info-value">${use.preparacion || 'No especificada'}</div>
+                            </div>
+                            <div class="usage-detail">
+                                <div class="info-label">Contraindicaciones</div>
+                                <div class="info-value">${use.contraIndicaciones || 'No especificadas'}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            usesDiv.innerHTML = html;
+        }
+
+        function loadCulturalKnowledge(data) {
+            const knowledgeDiv = document.getElementById('culturalKnowledge');
+            let html = '';
+            
+            data.forEach((knowledge, index) => {
+                html += `
+                    <div class="knowledge-item">
+                        <h4>Conocimiento tradicional ${index + 1}</h4>
+                        <p>${knowledge.descripcionSaber}</p>
+                    </div>
+                `;
+            });
+            
+            knowledgeDiv.innerHTML = html;
+        }
+
+        function loadExpertContributions(data) {
+            const expertDiv = document.getElementById('expertContributions');
+            let html = '';
+            
+            data.forEach((contribution, index) => {
+                const date = new Date(contribution.fecha).toLocaleDateString('es-ES');
+                html += `
+                    <div class="expert-contribution">
+                        <div class="expert-info">
+                            <div class="expert-name">${contribution.nombre_experto}</div>
+                            <div class="expert-date">${date}</div>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">Tipo de aporte</div>
+                                <div class="info-value">${contribution.tipo_aporte}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Contacto</div>
+                                <div class="info-value">DNI: ${contribution.DNI}, Tel: ${contribution.telefono || 'No especificado'}</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Descripción</div>
+                            <div class="info-value">${contribution.descripcion || 'No especificada'}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            expertDiv.innerHTML = html;
+        }
+
+        function loadImages(data) {
+            const imageDiv = document.getElementById('imageGallery');
+            
+            if (!data || data.length === 0) {
+                imageDiv.innerHTML = '<div class="image-placeholder">📷 No hay imágenes disponibles</div>';
+                return;
+            }
+            
+            let html = '';
+            data.forEach((image, index) => {
+                html += `
+                    <div class="image-placeholder">
+                        🖼️ Imagen ${index + 1}
+                        <br><small>URL: ${image.linkImagen}</small>
+                    </div>
+                `;
+            });
+            
+            imageDiv.innerHTML = html;
+        }
+
+        function loadStatistics(data) {
+            const statsDiv = document.getElementById('statisticalSummary');
+            const statusClass = data.estado_planta === 'ACTIVA' ? 'status-active' : 'status-archived';
+            
+            statsDiv.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${data.total_imagenes}</div>
+                    <div class="stat-label">Imágenes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${data.total_usos}</div>
+                    <div class="stat-label">Usos Medicinales</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${data.total_saberes}</div>
+                    <div class="stat-label">Saberes Culturales</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${data.total_aportes}</div>
+                    <div class="stat-label">Aportes de Expertos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="status-badge ${statusClass}">${data.estado_planta}</div>
+                    <div class="stat-label">Estado</div>
+                </div>
+            `;
+        }
+
+        // Action functions
+        function generatePDF() {
+            alert('Generando PDF... Esta funcionalidad se conectaría con tu endpoint /planta/<id>/pdf');
+        }
+
+        function goBack() {
+            alert('Volviendo al listado... Esta funcionalidad navegaría a /plantas');
+        }
+
+        function refreshData() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('mainContent').style.display = 'none';
+            
+            setTimeout(() => {
+                initializePage();
+            }, 1000);
+        }
+
+        // Initialize the page when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>
