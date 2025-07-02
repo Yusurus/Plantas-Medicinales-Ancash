@@ -26,6 +26,9 @@ function displayPlantData(data) {
         plantImage.alt = 'Imagen no disponible';
     }
 
+    document.getElementById('morphoDesc').textContent =
+        data.desc_morfologica || 'No existe descripción morfológica para esta planta.';
+
     // Ecoregiones
     document.getElementById('ecoregions').textContent =
         data.ecoregiones || 'No se han registrado ecoregiones para esta planta.';
