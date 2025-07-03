@@ -7,212 +7,182 @@
     <link rel="icon" type="image/ico" href="/static/img/faviconuwu.ico">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/reportes/reporte_pdf.css">
+    <link rel="stylesheet" href="../../static/css/reportes/reporte_pdf.css">
 </head>
 <body>
     {% include 'navbar.html' %}
-    
-    <div class="container mt-4">
-        <!-- Header del reporte -->
-        <div class="row mb-4 no-print">
-            <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h1 class="text-success"><i class="bi bi-file-earmark-text"></i> Reporte de Plantas Medicinales</h1>
-                        <p class="text-muted">Generado el {{ fecha_generacion }}</p>
-                    </div>
-                    <div>
-                        <a href="/reporte_plantas_pdf" target="_blank" class="btn btn-success">
-                            <i class="bi bi-file-pdf"></i> Descargar Reporte PDF
-                        </a>
-                    </div>
-                </div>
-            </div>
+    <div class="container">
+        <div class="header">
+            <h1>🌿 Reporte de Plantas Medicinales</h1>
+            <div class="date">Generado el: {{ fecha_generacion }}</div>
         </div>
 
-        <!-- Estadísticas generales -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <h2 class="section-title">Estadísticas Generales</h2>
-            </div>
-            <div class="col-md-2 mb-3">
-                <div class="card stats-card text-center">
-                    <div class="card-body">
-                        <i class="bi bi-flower1 fs-1 text-success"></i>
-                        <h4 class="mt-2">{{ estadisticas.total_plantas }}</h4>
-                        <small>Plantas</small>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-2 mb-3">
-                <div class="card stats-card text-center">
-                    <div class="card-body">
-                        <i class="bi bi-collection fs-1 text-info"></i>
-                        <h4 class="mt-2">{{ estadisticas.total_familias }}</h4>
-                        <small>Familias</small>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-2 mb-3">
-                <div class="card stats-card text-center">
-                    <div class="card-body">
-                        <i class="bi bi-tag fs-1 text-warning"></i>
-                        <h4 class="mt-2">{{ estadisticas.total_nombres_comunes }}</h4>
-                        <small>Nombres Comunes</small>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-2 mb-3">
-                <div class="card stats-card text-center">
-                    <div class="card-body">
-                        <i class="bi bi-heart-pulse fs-1 text-danger"></i>
-                        <h4 class="mt-2">{{ estadisticas.total_usos }}</h4>
-                        <small>Usos Medicinales</small>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-2 mb-3">
-                <div class="card stats-card text-center">
-                    <div class="card-body">
-                        <i class="bi bi-book fs-1 text-primary"></i>
-                        <h4 class="mt-2">{{ estadisticas.total_saberes }}</h4>
-                        <small>Saberes Culturales</small>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-2 mb-3">
-                <div class="card stats-card text-center">
-                    <div class="card-body">
-                        <i class="bi bi-geo-alt fs-1 text-secondary"></i>
-                        <h4 class="mt-2">{{ estadisticas.total_regiones }}</h4>
-                        <small>Regiones</small>
-                    </div>
-                </div>
-            </div>
+        <div class="actions">
+            <a href="{{ url_for('reporte.generar_pdf') }}" class="btn btn-primary" target="_blank">
+                📄 Descargar PDF Completo
+            </a>
         </div>
 
-        <!-- Detalle de plantas -->
-        <div class="row">
-            <div class="col-12">
-                <h2 class="section-title">Detalle de Plantas Registradas</h2>
-            </div>
-        </div>
-
-        {% for planta in plantas %}
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card plant-card">
-                    <div class="card-header bg-light">
-                        <span class="badge badge-pill badge-success stats-card float-end">ID: {{ planta.idPlanta }}</span>
-                        <div class="row align-items-center">
-                            <div class="col-md-8">
-                                <h5 class="mb-1 text-success">
-                                    <i class="bi bi-flower2"></i> {{ planta.nombreCientifico }}
-                                </h5>
-                                <small class="text-muted">Familia: {{ planta.nomFamilia or 'No especificada' }}</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <!-- Información básica -->
-                            <div class="col-md-6 mb-3">
-                                <h6><i class="bi bi-info-circle text-primary"></i> Información Básica</h6>
-                                
-                                {% if planta.nombres_comunes %}
-                                <p><strong>Nombres Comunes:</strong><br>
-                                {% for nombre in planta.nombres_comunes.split(', ') %}
-                                    <span class="badge info-badge me-1">{{ nombre }}</span>
-                                {% endfor %}
-                                </p>
-                                {% endif %}
-                                
-                                {% if planta.regiones %}
-                                <p><strong>Regiones:</strong><br>
-                                {% for region in planta.regiones.split(', ') %}
-                                    <span class="badge bg-info me-1">{{ region }}</span>
-                                {% endfor %}
-                                </p>
-                                {% endif %}
-                                
-                                {% if planta.ecoregiones %}
-                                <p><strong>Ecoregiones:</strong><br>
-                                {% for eco in planta.ecoregiones.split(', ') %}
-                                    <span class="badge bg-warning text-dark me-1">{{ eco }}</span>
-                                {% endfor %}
-                                </p>
-                                {% endif %}
-                            </div>
-                            
-                            <!-- Datos morfológicos -->
-                            <div class="col-md-6 mb-3">
-                                {% if planta.datoMorfologico %}
-                                <h6><i class="bi bi-eye text-success"></i> Datos Morfológicos</h6>
-                                <div class="text-muted small" style="max-height: 120px; overflow-y: auto;">
-                                    {{ planta.datoMorfologico }}
-                                </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <!-- Usos medicinales -->
-                        {% if planta.usos %}
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <h6><i class="bi bi-heart-pulse text-danger"></i> Usos Medicinales</h6>
-                                <div class="text-muted small">
-                                    {% for uso in planta.usos.split('; ') %}
-                                        <div class="mb-1">• {{ uso }}</div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
-                        
-                        <!-- Saberes culturales -->
-                        {% if planta.saberes_culturales %}
-                        <div class="row">
-                            <div class="col-12">
-                                <h6><i class="bi bi-book text-warning"></i> Saberes Culturales</h6>
-                                <div class="text-muted small">
-                                    {% for saber in planta.saberes_culturales.split('; ') %}
-                                        <div class="mb-1">• {{ saber }}</div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
-                    </div>
+        {% if estadisticas %}
+        <div class="stats-section">
+            <h2 class="stats-title">📊 Estadísticas Generales</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">{{ estadisticas.total_plantas_activas or 0 }}</div>
+                    <div class="stat-label">Plantas Activas</div>
                 </div>
-            </div>
-        </div>
-        {% endfor %}
-        
-        {% if not plantas %}
-        <div class="row">
-            <div class="col-12">
-                <div class="alert alert-info text-center">
-                    <i class="bi bi-info-circle fs-1"></i>
-                    <h4 class="mt-2">No hay plantas registradas</h4>
-                    <p>Aún no se han registrado plantas en la base de datos.</p>
+                <div class="stat-card">
+                    <div class="stat-number">{{ estadisticas.total_familias or 0 }}</div>
+                    <div class="stat-label">Familias</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ estadisticas.total_nombres_comunes or 0 }}</div>
+                    <div class="stat-label">Nombres Comunes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ estadisticas.total_usos_activos or 0 }}</div>
+                    <div class="stat-label">Usos Medicinales</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ estadisticas.total_saberes_activos or 0 }}</div>
+                    <div class="stat-label">Saberes Culturales</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ estadisticas.total_regiones or 0 }}</div>
+                    <div class="stat-label">Regiones</div>
                 </div>
             </div>
         </div>
         {% endif %}
-        
-        <!-- Footer del reporte -->
-        <div class="row mt-5 mb-4">
-            <div class="col-12">
-                <div class="text-center text-muted">
-                    <small>
-                        Reporte generado el {{ fecha_generacion }} por el Sistema de Plantas Medicinales<br>
-                        Total de plantas incluidas en este reporte: {{ plantas|length }}
-                    </small>
+
+        <div class="distribution-section">
+            <div class="distribution-grid">
+                {% if plantas_por_familia %}
+                <div>
+                    <table class="distribution-table">
+                        <thead>
+                            <tr>
+                                <th>Familia</th>
+                                <th>Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for familia in plantas_por_familia[:10] %}
+                            <tr>
+                                <td>{{ familia.nomFamilia }}</td>
+                                <td><strong>{{ familia.cantidad_plantas }}</strong></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
+                {% endif %}
+
+                {% if plantas_por_ecoregion %}
+                <div>
+                    <h3 class="distribution-title">🌍 Ecoregiones</h3>
+                    <table class="distribution-table">
+                        <thead>
+                            <tr>
+                                <th>Ecoregión</th>
+                                <th>Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for eco in plantas_por_ecoregion %}
+                            <tr>
+                                <td>{{ eco.ecoregion }}</td>
+                                <td><strong>{{ eco.cantidad_plantas }}</strong></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
             </div>
         </div>
-    </div>
 
+        <div class="search-filter">
+            <input type="text" id="plantSearch" class="search-input" placeholder="🔍 Buscar plantas por nombre científico...">
+        </div>
+
+        <div class="plants-section">
+            <h2 class="plants-title">🌱 Detalle de Plantas Medicinales ({{ plantas|length }} plantas)</h2>
+            
+            {% for planta in plantas %}
+            <div class="plant-card" data-plant-name="{{ planta.nombreCientifico|lower }}">
+                <div class="plant-header">
+                    <span class="plant-name">{{ planta.nombreCientifico or 'Nombre no disponible' }}</span>
+                    <span class="plant-id">ID: {{ planta.idPlanta }}</span>
+                </div>
+                
+                <div class="plant-info">
+                    <div class="info-item">
+                        <span class="info-label">Familia:</span>
+                        <span class="info-value">{{ planta.nomFamilia or 'No especificada' }}</span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">Nombres Comunes:</span>
+                        <span class="info-value">{{ planta.nombres_comunes or 'Sin nombres comunes registrados' }}</span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">Regiones:</span>
+                        <span class="info-value">{{ planta.regiones or 'Sin regiones registradas' }}</span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">Provincias:</span>
+                        <span class="info-value">{{ planta.provincias or 'Sin provincias registradas' }}</span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">Ecoregiones:</span>
+                        <span class="info-value">{{ planta.ecoregiones or 'Sin ecoregiones registradas' }}</span>
+                    </div>
+                </div>
+
+                <div class="detailed-info">
+                    {% if planta.datos_morfologicos %}
+                    <div class="detail-section">
+                        <div class="detail-title">🔬 Datos Morfológicos:</div>
+                        <div class="detail-content">{{ planta.datos_morfologicos }}</div>
+                    </div>
+                    {% endif %}
+
+                    {% if planta.usos %}
+                    <div class="detail-section">
+                        <div class="detail-title">💊 Usos Medicinales:</div>
+                        <div class="detail-content">{{ planta.usos }}</div>
+                    </div>
+                    {% endif %}
+
+                    {% if planta.saberes_culturales %}
+                    <div class="detail-section">
+                        <div class="detail-title">📚 Saberes Culturales:</div>
+                        <div class="detail-content">{{ planta.saberes_culturales }}</div>
+                    </div>
+                    {% endif %}
+
+                    {% if not planta.datos_morfologicos and not planta.usos and not planta.saberes_culturales %}
+                    <div class="detail-section">
+                        <div class="detail-content no-data">Sin información detallada disponible</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if not plantas %}
+        <div style="text-align: center; padding: 50px; color: #666;">
+            <h3>No se encontraron plantas para mostrar</h3>
+            <p>Verifica que existen plantas activas en la base de datos.</p>
+        </div>
+        {% endif %}
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../static/js/reportes/reporte_pdf.js"></script>
 </body>
 </html>
