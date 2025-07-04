@@ -2,7 +2,6 @@
 
 ![Python](https://img.shields.io/badge/python-3.10.4-blue.svg)
 ![Flask](https://img.shields.io/badge/Flask-3.1.1-green.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0+-orange.svg)
 
