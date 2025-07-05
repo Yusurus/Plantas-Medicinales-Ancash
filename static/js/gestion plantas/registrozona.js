@@ -213,14 +213,14 @@
             } else {
                 provincias.forEach(provincia => {
                     const row = document.createElement('tr');
+                    console.log("Provincia recibida:", provincia.idprovincias, provincia.nombreProvincia, regionId);
                     row.innerHTML = `
-                        <td>${provincia.idProvincia}</td>
                         <td>${provincia.nombreProvincia}</td>
                         <td>
-                            <button class="btn btn-sm btn-warning" onclick="editarProvincia(${provincia.idProvincia}, '${provincia.nombreProvincia}')">
+                            <button class="btn btn-sm btn-warning" onclick="editarProvincia(${provincia.idprovincias}, '${provincia.nombreProvincia}', ${regionId})">
                                 Editar
                             </button>
-                            <button class="btn btn-sm btn-danger" onclick="eliminarProvincia(${provincia.idProvincia})">
+                            <button class="btn btn-sm btn-danger" onclick="eliminarProvincia(${provincia.idprovincias})">
                                 Eliminar
                             </button>
                         </td>
@@ -450,12 +450,14 @@
     }
 
     // Funciones adicionales para provincias
-    function editarProvincia(id, nombre) {
+    function editarProvincia(id, nombre, idRegion) {
         document.getElementById('editModalTitle').textContent = 'Editar Provincia';
         document.getElementById('editLabel').textContent = 'Nombre de la Provincia';
         document.getElementById('editInput').value = nombre;
         document.getElementById('editId').value = id;
         document.getElementById('editType').value = 'provincia';
+        document.getElementById('regionProvincia').value = idRegion;
+        console.log("Datos de edición:", id, nombre, idRegion);
         
         new bootstrap.Modal(document.getElementById('editModal')).show();
     }
@@ -604,7 +606,8 @@
         const id = document.getElementById('editId').value;
         const tipo = document.getElementById('editType').value;
         const valor = document.getElementById('editInput').value;
-        
+        const idRegion = document.getElementById('regionProvincia').value;
+        console.log("Datos de edición:", id, valor, idRegion, tipo);
         if (tipo === 'region') {
             try {
                 const response = await fetch(`/api/regiones/${id}`, {
@@ -630,9 +633,30 @@
                 alert('Error al actualizar la región');
             }
         } else if (tipo === 'provincia') {
-            // Para provincias necesitamos el ID de la región también
-            // Esto requeriría modificar el modal para incluir la región
-            alert('Función de edición de provincia en desarrollo');
+            try {
+                const response = await fetch(`/api/provincias/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        nombreProvincia: valor,
+                        idRegion: idRegion
+                    })
+                });
+                
+                const result = await response.json();
+                if (response.ok) {
+                    alert('provicia actualizada exitosamente');
+                    bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+                    cargarRegiones();
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error actualizando Provincia:', error);
+                alert('Error al actualizar la provincia');
+            }
         }
     }
 

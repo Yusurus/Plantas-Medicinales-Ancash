@@ -234,17 +234,19 @@ def actualizar_provincia(id_provincia):
     """Actualizar una provincia existente"""
     try:
         data = request.get_json()
-        
+
         if not data or 'nombreProvincia' not in data or 'idRegion' not in data:
             return jsonify({'error': 'Los campos "nombreProvincia" y "idRegion" son requeridos'}), 400
+        
+        nombreProvincia = data['nombreProvincia']
+        idRegion = data['idRegion']
         
         conn = get_connection()
         cursor = conn.cursor()
         
-        # Llamar al procedimiento almacenado para actualizar
-        cursor.callproc('crud_provincias', [2, id_provincia, data['nombreProvincia'], data['idRegion']])
+        cursor.callproc('crud_provincias', [2, id_provincia, nombreProvincia, idRegion])
         
-        # Obtener el mensaje de resultado
+        mensaje = None
         for result in cursor.stored_results():
             mensaje = result.fetchone()
         
