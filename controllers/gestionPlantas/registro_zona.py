@@ -1,273 +1,532 @@
-from flask import  request, jsonify, Blueprint
-from mysql.connector import Error
+from flask import request, jsonify, Blueprint
 from config.db import get_connection
+import mysql.connector
 
+# Crear el blueprint
 registro_zona = Blueprint("registro_zona", __name__)
 
-@registro_zona.route('/buscar_plantas')
-def buscar_plantas():
-    """Busca plantas por nombre científico o común"""
+@registro_zona.route('/api/todas_plantas_zonas', methods=['GET'])
+def get_plantas():
+    """Obtener todas las plantas con sus nombres científicos y comunes"""
     try:
-        search_term = request.args.get('q', '').strip()
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
         
-        connection = get_connection()
-        if not connection:
-            return jsonify({'error': 'Error de conexión a la base de datos'}), 500
-            
-        cursor = connection.cursor(dictionary=True)
-        
-        if search_term:
-            # Búsqueda con filtro
-            query = """
-            SELECT DISTINCT 
-                p.idPlanta,
-                p.nombreCientifico,
-                fp.nomFamilia,
-                GROUP_CONCAT(DISTINCT nc.nombreComun SEPARATOR ', ') as nombres_comunes
-            FROM plantas p
-            LEFT JOIN familias_plantas fp ON p.fk_familiasplantas = fp.idfamiliaPlanta
-            LEFT JOIN nombres_comunes nc ON p.idPlanta = nc.fk_plantas
-            WHERE p.nombreCientifico LIKE %s 
-               OR nc.nombreComun LIKE %s
-            GROUP BY p.idPlanta, p.nombreCientifico, fp.nomFamilia
-            ORDER BY p.nombreCientifico
-            LIMIT 20
-            """
-            search_pattern = f"%{search_term}%"
-            cursor.execute(query, (search_pattern, search_pattern))
-        else:
-            # Sin filtro, mostrar todas las plantas
-            query = """
-            SELECT DISTINCT 
-                p.idPlanta,
-                p.nombreCientifico,
-                fp.nomFamilia,
-                GROUP_CONCAT(DISTINCT nc.nombreComun SEPARATOR ', ') as nombres_comunes
-            FROM plantas p
-            LEFT JOIN familias_plantas fp ON p.fk_familiasplantas = fp.idfamiliaPlanta
-            LEFT JOIN nombres_comunes nc ON p.idPlanta = nc.fk_plantas
-            GROUP BY p.idPlanta, p.nombreCientifico, fp.nomFamilia
-            ORDER BY p.nombreCientifico
-            LIMIT 50
-            """
-            cursor.execute(query)
-        
-        plantas = cursor.fetchall()
-        
-        # Formatear los datos
-        for planta in plantas:
-            if not planta['nombres_comunes']:
-                planta['nombres_comunes'] = 'Sin nombres comunes registrados'
-        
-        cursor.close()
-        connection.close()
-        
-        return jsonify({
-            'success': True,
-            'plantas': plantas,
-            'total': len(plantas)
-        })
-        
-    except Error as e:
-        print(f"Error en búsqueda de plantas: {e}")
-        return jsonify({'error': 'Error al buscar plantas'}), 500
-
-@registro_zona.route('/obtener_regiones')
-def obtener_regiones():
-    """Obtiene todas las regiones disponibles"""
-    try:
-        connection = get_connection()
-        if not connection:
-            return jsonify({'error': 'Error de conexión a la base de datos'}), 500
-            
-        cursor = connection.cursor(dictionary=True)
-        
-        query = "SELECT idRegion, region FROM regiones ORDER BY region"
-        cursor.execute(query)
-        
-        regiones = cursor.fetchall()
-        
-        cursor.close()
-        connection.close()
-        
-        return jsonify({
-            'success': True,
-            'regiones': regiones
-        })
-        
-    except Error as e:
-        print(f"Error al obtener regiones: {e}")
-        return jsonify({'error': 'Error al obtener regiones'}), 500
-
-@registro_zona.route('/obtener_info_planta/<int:planta_id>')
-def obtener_info_planta(planta_id):
-    """Obtiene información detallada de una planta específica"""
-    try:
-        connection = get_connection()
-        if not connection:
-            return jsonify({'error': 'Error de conexión a la base de datos'}), 500
-            
-        cursor = connection.cursor(dictionary=True)
-        
-        # Información básica de la planta
         query = """
-        SELECT 
+        SELECT DISTINCT 
             p.idPlanta,
             p.nombreCientifico,
             fp.nomFamilia,
-            GROUP_CONCAT(DISTINCT nc.nombreComun SEPARATOR ', ') as nombres_comunes
+            GROUP_CONCAT(nc.nombreComun SEPARATOR ', ') as nombresComunes
         FROM plantas p
         LEFT JOIN familias_plantas fp ON p.fk_familiasplantas = fp.idfamiliaPlanta
         LEFT JOIN nombres_comunes nc ON p.idPlanta = nc.fk_plantas
-        WHERE p.idPlanta = %s
         GROUP BY p.idPlanta, p.nombreCientifico, fp.nomFamilia
+        ORDER BY p.nombreCientifico
         """
-        cursor.execute(query, (planta_id,))
-        planta = cursor.fetchone()
         
-        if not planta:
-            return jsonify({'error': 'Planta no encontrada'}), 404
-        
-        # Obtener zonas ya registradas para esta planta
-        query_zonas = """
-        SELECT DISTINCT 
-            r.region,
-            e.ecoregion,
-            nc.nombreComun
-        FROM ecoregiones e
-        JOIN region_ecoregion re ON e.idecoregion = re.fk_ecoregiones
-        JOIN regiones r ON re.fk_regiones = r.idRegion
-        LEFT JOIN nombres_comunes nc ON e.fk_plantas = nc.fk_plantas
-        LEFT JOIN ubicaciones_nombres un ON nc.idNombrecomun = un.fk_nombres_comunes 
-            AND un.fk_regiones = r.idRegion
-        WHERE e.fk_plantas = %s
-        ORDER BY r.region, e.ecoregion
-        """
-        cursor.execute(query_zonas, (planta_id,))
-        zonas_existentes = cursor.fetchall()
-        
-        planta['zonas_existentes'] = zonas_existentes
+        cursor.execute(query)
+        plantas = cursor.fetchall()
         
         cursor.close()
-        connection.close()
+        conn.close()
         
-        return jsonify({
-            'success': True,
-            'planta': planta
-        })
+        return jsonify(plantas)
+    
+    except mysql.connector.Error as e:
+        return jsonify({'error': f'Error de base de datos: {str(e)}'}), 500
+    except Exception as e:
+        return jsonify({'error': f'Error inesperado: {str(e)}'}), 500
+    
+@registro_zona.route('/api/ecoregiones', methods=['GET'])
+def get_ecoregiones():
+    """Obtener todas las ecoregiones"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
         
-    except Error as e:
-        print(f"Error al obtener info de planta: {e}")
-        return jsonify({'error': 'Error al obtener información de la planta'}), 500
+        cursor.callproc('visor_ecoregiones')
+        
+        # Obtener resultados del procedimiento almacenado
+        results = []
+        for result in cursor.stored_results():
+            results = result.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        return jsonify(results)
+    
+    except mysql.connector.Error as e:
+        return jsonify({'error': f'Error de base de datos: {str(e)}'}), 500
+    except Exception as e:
+        return jsonify({'error': f'Error inesperado: {str(e)}'}), 500
 
-@registro_zona.route('/guardar_zona', methods=['POST'])
-def guardar_zona():
-    """Guarda una nueva zona para una planta"""
+# ==================== CRUD REGIONES ====================
+
+@registro_zona.route('/api/regiones', methods=['GET'])
+def get_regiones():
+    """Obtener todas las regiones"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.callproc('visor_regiones')
+        
+        # Obtener resultados del procedimiento almacenado
+        results = []
+        for result in cursor.stored_results():
+            results = result.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        return jsonify(results)
+    
+    except mysql.connector.Error as e:
+        return jsonify({'error': f'Error de base de datos: {str(e)}'}), 500
+    except Exception as e:
+        return jsonify({'error': f'Error inesperado: {str(e)}'}), 500
+
+@registro_zona.route('/api/regiones', methods=['POST'])
+def crear_region():
+    """Crear una nueva región"""
     try:
         data = request.get_json()
         
-        planta_id = data.get('planta_id')
-        region_id = data.get('region_id')
-        ecoregion = data.get('ecoregion', '').strip()
-        nombre_common = data.get('nombre_comun', '').strip()
+        if not data or 'region' not in data:
+            return jsonify({'error': 'El campo "region" es requerido'}), 400
         
-        # Validaciones
-        if not planta_id or not region_id or not ecoregion:
-            return jsonify({'error': 'Faltan datos obligatorios'}), 400
+        conn = get_connection()
+        cursor = conn.cursor()
         
-        connection = get_connection()
-        if not connection:
-            return jsonify({'error': 'Error de conexión a la base de datos'}), 500
+        # Llamar al procedimiento almacenado para insertar
+        cursor.callproc('crud_regiones', [1, None, data['region']])
         
-        cursor = connection.cursor()
+        # Obtener el mensaje de resultado
+        for result in cursor.stored_results():
+            mensaje = result.fetchone()
         
-        # Iniciar transacción
-        connection.start_transaction()
+        conn.commit()
+        cursor.close()
+        conn.close()
         
-        try:
-            # 1. Insertar o verificar ecoregión
-            cursor.execute("""
-                SELECT idecoregion FROM ecoregiones 
-                WHERE fk_plantas = %s AND ecoregion = %s
-            """, (planta_id, ecoregion))
-            
-            ecoregion_row = cursor.fetchone()
-            
-            if ecoregion_row:
-                ecoregion_id = ecoregion_row[0]
-            else:
-                # Insertar nueva ecoregión
-                cursor.execute("""
-                    INSERT INTO ecoregiones (ecoregion, fk_plantas) 
-                    VALUES (%s, %s)
-                """, (ecoregion, planta_id))
-                ecoregion_id = cursor.lastrowid
-            
-            # 2. Verificar si ya existe la relación región-ecoregión
-            cursor.execute("""
-                SELECT 1 FROM region_ecoregion 
-                WHERE fk_ecoregiones = %s AND fk_regiones = %s
-            """, (ecoregion_id, region_id))
-            
-            if not cursor.fetchone():
-                # Insertar relación región-ecoregión
-                cursor.execute("""
-                    INSERT INTO region_ecoregion (fk_ecoregiones, fk_regiones) 
-                    VALUES (%s, %s)
-                """, (ecoregion_id, region_id))
-            
-            # 3. Si hay nombre común, procesarlo
-            nombre_comun_id = None
-            if nombre_common:
-                # Verificar si ya existe este nombre común para la planta
-                cursor.execute("""
-                    SELECT idNombrecomun FROM nombres_comunes 
-                    WHERE fk_plantas = %s AND nombreComun = %s
-                """, (planta_id, nombre_common))
-                
-                nombre_row = cursor.fetchone()
-                
-                if nombre_row:
-                    nombre_comun_id = nombre_row[0]
-                else:
-                    # Insertar nuevo nombre común
-                    cursor.execute("""
-                        INSERT INTO nombres_comunes (nombreComun, fk_plantas) 
-                        VALUES (%s, %s)
-                    """, (nombre_common, planta_id))
-                    nombre_comun_id = cursor.lastrowid
-                
-                # Verificar y crear relación ubicación-nombre
-                cursor.execute("""
-                    SELECT 1 FROM ubicaciones_nombres 
-                    WHERE fk_nombres_comunes = %s AND fk_regiones = %s
-                """, (nombre_comun_id, region_id))
-                
-                if not cursor.fetchone():
-                    cursor.execute("""
-                        INSERT INTO ubicaciones_nombres (fk_nombres_comunes, fk_regiones) 
-                        VALUES (%s, %s)
-                    """, (nombre_comun_id, region_id))
-            
-            # Confirmar transacción
-            connection.commit()
-            
-            cursor.close()
-            connection.close()
-            
-            return jsonify({
-                'success': True,
-                'message': 'Zona agregada exitosamente'
-            })
-            
-        except Exception as e:
-            # Revertir transacción en caso de error
-            connection.rollback()
-            raise e
-            
-    except Error as e:
-        print(f"Error al guardar zona: {e}")
-        return jsonify({'error': 'Error al guardar la zona'}), 500
+        return jsonify({'message': mensaje[0] if mensaje else 'Región creada exitosamente'}), 201
+    
+    except mysql.connector.Error as e:
+        return jsonify({'error': f'Error de base de datos: {str(e)}'}), 500
     except Exception as e:
-        print(f"Error general: {e}")
-        return jsonify({'error': 'Error interno del servidor'}), 500
+        return jsonify({'error': f'Error inesperado: {str(e)}'}), 500
+
+@registro_zona.route('/api/regiones/<int:id_region>', methods=['PUT'])
+def actualizar_region(id_region):
+    """Actualizar una región existente"""
+    try:
+        data = request.get_json()
+        
+        if not data or 'region' not in data:
+            return jsonify({'error': 'El campo "region" es requerido'}), 400
+        
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        # Llamar al procedimiento almacenado para actualizar
+        cursor.callproc('crud_regiones', [2, id_region, data['region']])
+        
+        # Obtener el mensaje de resultado
+        for result in cursor.stored_results():
+            mensaje = result.fetchone()
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({'message': mensaje[0] if mensaje else 'Región actualizada exitosamente'})
+    
+    except mysql.connector.Error as e:
+        return jsonify({'error': f'Error de base de datos: {str(e)}'}), 500
+    except Exception as e:
+        return jsonify({'error': f'Error inesperado: {str(e)}'}), 500
+
+@registro_zona.route('/api/regiones/<int:id_region>', methods=['DELETE'])
+def eliminar_region(id_region):
+    """Eliminar una región"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        # Llamar al procedimiento almacenado para eliminar
+        cursor.callproc('crud_regiones', [3, id_region, None])
+        
+        # Obtener el mensaje de resultado
+        for result in cursor.stored_results():
+            mensaje = result.fetchone()
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({'message': mensaje[0] if mensaje else 'Región eliminada exitosamente'})
+    
+    except mysql.connector.Error as e:
+        return jsonify({'error': f'Error de base de datos: {str(e)}'}), 500
+    except Exception as e:
+        return jsonify({'error': f'Error inesperado: {str(e)}'}), 500
+
+# ==================== CRUD PROVINCIAS ====================
+
+@registro_zona.route('/api/regiones/<int:id_region>/provincias', methods=['GET'])
+def get_provincias_por_region(id_region):
+    """Obtener todas las provincias de una región"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.callproc('visor_provincias_por_region', [id_region])
+        
+        # Obtener resultados del procedimiento almacenado
+        results = []
+        for result in cursor.stored_results():
+            results = result.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        return jsonify(results)
+    
+    except mysql.connector.Error as e:
+        return jsonify({'error': f'Error de base de datos: {str(e)}'}), 500
+    except Exception as e:
+        return jsonify({'error': f'Error inesperado: {str(e)}'}), 500
+
+@registro_zona.route('/api/provincias', methods=['POST'])
+def crear_provincia():
+    """Crear una nueva provincia"""
+    try:
+        data = request.get_json()
+        
+        if not data or 'nombreProvincia' not in data or 'idRegion' not in data:
+            return jsonify({'error': 'Los campos "nombreProvincia" y "idRegion" son requeridos'}), 400
+        
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        # Llamar al procedimiento almacenado para insertar
+        cursor.callproc('crud_provincias', [1, None, data['nombreProvincia'], data['idRegion']])
+        
+        # Obtener el mensaje de resultado
+        for result in cursor.stored_results():
+            mensaje = result.fetchone()
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({'message': mensaje[0] if mensaje else 'Provincia creada exitosamente'}), 201
+    
+    except mysql.connector.Error as e:
+        return jsonify({'error': f'Error de base de datos: {str(e)}'}), 500
+    except Exception as e:
+        return jsonify({'error': f'Error inesperado: {str(e)}'}), 500
+
+@registro_zona.route('/api/provincias/<int:id_provincia>', methods=['PUT'])
+def actualizar_provincia(id_provincia):
+    """Actualizar una provincia existente"""
+    try:
+        data = request.get_json()
+        
+        if not data or 'nombreProvincia' not in data or 'idRegion' not in data:
+            return jsonify({'error': 'Los campos "nombreProvincia" y "idRegion" son requeridos'}), 400
+        
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        # Llamar al procedimiento almacenado para actualizar
+        cursor.callproc('crud_provincias', [2, id_provincia, data['nombreProvincia'], data['idRegion']])
+        
+        # Obtener el mensaje de resultado
+        for result in cursor.stored_results():
+            mensaje = result.fetchone()
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({'message': mensaje[0] if mensaje else 'Provincia actualizada exitosamente'})
+    
+    except mysql.connector.Error as e:
+        return jsonify({'error': f'Error de base de datos: {str(e)}'}), 500
+    except Exception as e:
+        return jsonify({'error': f'Error inesperado: {str(e)}'}), 500
+
+@registro_zona.route('/api/provincias/<int:id_provincia>', methods=['DELETE'])
+def eliminar_provincia(id_provincia):
+    """Eliminar una provincia"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        # Llamar al procedimiento almacenado para eliminar
+        cursor.callproc('crud_provincias', [3, id_provincia, None, None])
+        
+        # Obtener el mensaje de resultado
+        for result in cursor.stored_results():
+            mensaje = result.fetchone()
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({'message': mensaje[0] if mensaje else 'Provincia eliminada exitosamente'})
+    
+    except mysql.connector.Error as e:
+        return jsonify({'error': f'Error de base de datos: {str(e)}'}), 500
+    except Exception as e:
+        return jsonify({'error': f'Error inesperado: {str(e)}'}), 500
+
+# ==================== PROVINCIA-ECOREGION ====================
+
+@registro_zona.route('/api/provincias/<int:id_provincia>/ecoregiones', methods=['GET'])
+def get_ecoregiones_por_provincia(id_provincia):
+    """Obtener todas las ecoregiones de una provincia"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.callproc('visor_provincia_ecoregion', [id_provincia])
+        
+        # Obtener resultados del procedimiento almacenado
+        results = []
+        for result in cursor.stored_results():
+            results = result.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        return jsonify(results)
+    
+    except mysql.connector.Error as e:
+        return jsonify({'error': f'Error de base de datos: {str(e)}'}), 500
+    except Exception as e:
+        return jsonify({'error': f'Error inesperado: {str(e)}'}), 500
+
+@registro_zona.route('/api/provincia-ecoregion', methods=['POST'])
+def asociar_provincia_ecoregion():
+    """Asociar una provincia con una ecoregión"""
+    try:
+        data = request.get_json()
+        
+        if not data or 'idProvincia' not in data or 'idEcoregion' not in data:
+            return jsonify({'error': 'Los campos "idProvincia" y "idEcoregion" son requeridos'}), 400
+        
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        # Llamar al procedimiento almacenado para asociar
+        cursor.callproc('crud_provincia_ecoregion', [1, data['idProvincia'], data['idEcoregion']])
+        
+        # Obtener el mensaje de resultado
+        for result in cursor.stored_results():
+            mensaje = result.fetchone()
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({'message': mensaje[0] if mensaje else 'Asociación creada exitosamente'}), 201
+    
+    except mysql.connector.Error as e:
+        return jsonify({'error': f'Error de base de datos: {str(e)}'}), 500
+    except Exception as e:
+        return jsonify({'error': f'Error inesperado: {str(e)}'}), 500
+
+@registro_zona.route('/api/provincia-ecoregion', methods=['DELETE'])
+def eliminar_provincia_ecoregion():
+    """Eliminar asociación entre provincia y ecoregión"""
+    try:
+        data = request.get_json()
+        
+        if not data or 'idProvincia' not in data or 'idEcoregion' not in data:
+            return jsonify({'error': 'Los campos "idProvincia" y "idEcoregion" son requeridos'}), 400
+        
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        # Llamar al procedimiento almacenado para eliminar
+        cursor.callproc('crud_provincia_ecoregion', [2, data['idProvincia'], data['idEcoregion']])
+        
+        # Obtener el mensaje de resultado
+        for result in cursor.stored_results():
+            mensaje = result.fetchone()
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({'message': mensaje[0] if mensaje else 'Asociación eliminada exitosamente'})
+    
+    except mysql.connector.Error as e:
+        return jsonify({'error': f'Error de base de datos: {str(e)}'}), 500
+    except Exception as e:
+        return jsonify({'error': f'Error inesperado: {str(e)}'}), 500
+
+# ==================== ECOREGION-PLANTA ====================
+
+@registro_zona.route('/api/plantas/<int:id_planta>/ecoregiones', methods=['GET'])
+def get_ecoregiones_por_planta(id_planta):
+    """Obtener todas las ecoregiones de una planta"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.callproc('visor_ecoregion_planta', [1, id_planta])
+        
+        # Obtener resultados del procedimiento almacenado
+        results = []
+        for result in cursor.stored_results():
+            results = result.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        return jsonify(results)
+    
+    except mysql.connector.Error as e:
+        return jsonify({'error': f'Error de base de datos: {str(e)}'}), 500
+    except Exception as e:
+        return jsonify({'error': f'Error inesperado: {str(e)}'}), 500
+
+@registro_zona.route('/api/ecoregiones/<int:id_ecoregion>/plantas', methods=['GET'])
+def get_plantas_por_ecoregion(id_ecoregion):
+    """Obtener todas las plantas de una ecoregión"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.callproc('visor_ecoregion_planta', [2, id_ecoregion])
+        
+        # Obtener resultados del procedimiento almacenado
+        results = []
+        for result in cursor.stored_results():
+            results = result.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        return jsonify(results)
+    
+    except mysql.connector.Error as e:
+        return jsonify({'error': f'Error de base de datos: {str(e)}'}), 500
+    except Exception as e:
+        return jsonify({'error': f'Error inesperado: {str(e)}'}), 500
+
+@registro_zona.route('/api/ecoregion-planta', methods=['POST'])
+def asociar_ecoregion_planta():
+    """Asociar una planta con una ecoregión"""
+    try:
+        data = request.get_json()
+        
+        if not data or 'idPlanta' not in data or 'idEcoregion' not in data:
+            return jsonify({'error': 'Los campos "idPlanta" y "idEcoregion" son requeridos'}), 400
+        
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        # Llamar al procedimiento almacenado para asociar
+        cursor.callproc('crud_ecoregion_planta', [1, None, data['idPlanta'], data['idEcoregion']])
+        
+        # Obtener el mensaje de resultado
+        for result in cursor.stored_results():
+            mensaje = result.fetchone()
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({'message': mensaje[0] if mensaje else 'Asociación creada exitosamente'}), 201
+    
+    except mysql.connector.Error as e:
+        return jsonify({'error': f'Error de base de datos: {str(e)}'}), 500
+    except Exception as e:
+        return jsonify({'error': f'Error inesperado: {str(e)}'}), 500
+
+@registro_zona.route('/api/ecoregion-planta/actualizar/<int:id_ecoregion_planta>', methods=['PUT'])
+def actualizar_ecoregion_planta(id_ecoregion_planta):
+    """Actualizar la ecoregión de una asociación planta-ecoregión"""
+    try:
+        data = request.get_json()
+        
+        if not data or 'idEcoregion' not in data:
+            return jsonify({'error': 'El campo "idEcoregion" es requerido'}), 400
+        
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        # Llamar al procedimiento almacenado para actualizar
+        cursor.callproc('crud_ecoregion_planta', [2, id_ecoregion_planta, None, data['idEcoregion']])
+        
+        # Obtener el mensaje de resultado
+        for result in cursor.stored_results():
+            mensaje = result.fetchone()
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({'message': mensaje[0] if mensaje else 'Asociación actualizada exitosamente'})
+    
+    except mysql.connector.Error as e:
+        return jsonify({'error': f'Error de base de datos: {str(e)}'}), 500
+    except Exception as e:
+        return jsonify({'error': f'Error inesperado: {str(e)}'}), 500
+    
+@registro_zona.route('/api/ecoregion-planta/eliminar/<int:id_ecoregion_planta>', methods=['DELETE'])
+def eliminarEcoregionPlanta(id_ecoregion_planta):
+    """Eliminar la ecoregión de una asociación planta-ecoregión"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        # Llamar al procedimiento almacenado para eliminar
+        cursor.callproc('crud_ecoregion_planta', [3, id_ecoregion_planta, None, None])
+        
+        # Obtener el mensaje de resultado
+        mensaje = None
+        for result in cursor.stored_results():
+            mensaje = result.fetchone()
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({'message': mensaje[0] if mensaje else 'Eliminación exitosa'})
+    
+    except mysql.connector.Error as e:
+        return jsonify({'error': f'Error de base de datos: {str(e)}'}), 500
+    except Exception as e:
+        return jsonify({'error': f'Error inesperado: {str(e)}'}), 500
+
+@registro_zona.route('/api/ecoregion-planta/<int:id_ecoregion_planta>', methods=['DELETE'])
+def archivar_ecoregion_planta(id_ecoregion_planta):
+    """Archivar una asociación planta-ecoregión"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        # Llamar al procedimiento almacenado para archivar
+        cursor.callproc('crud_ecoregion_planta', [3, id_ecoregion_planta, None, None])
+        
+        # Obtener el mensaje de resultado
+        for result in cursor.stored_results():
+            mensaje = result.fetchone()
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({'message': mensaje[0] if mensaje else 'Asociación archivada exitosamente'})
+    
+    except mysql.connector.Error as e:
+        return jsonify({'error': f'Error de base de datos: {str(e)}'}), 500
+    except Exception as e:
+        return jsonify({'error': f'Error inesperado: {str(e)}'}), 500
