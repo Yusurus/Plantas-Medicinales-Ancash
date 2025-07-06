@@ -71,9 +71,7 @@ def registrar_planta(id_planta=None):
 
             ev = 2 if id_planta else 1
             cursor.callproc(
-                # cambio solo mio para que el registrar planta funcione con el procedimiento
-                # "gestionar_plantas",
-                "gestionar_plantas2",
+                "gestionar_plantas",
                 [
                     ev,
                     id_planta,
