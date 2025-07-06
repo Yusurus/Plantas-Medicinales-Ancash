@@ -6,6 +6,52 @@
     --dark-green: #11892d;
 }
 
+.plant-management-system .plants-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    max-height: 500px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.plant-management-system .plant-card {
+    background: white;
+    border: 2px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 10px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    min-height: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.plant-management-system .plant-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #28a745;
+}
+
+.plant-management-system .plant-card.selected {
+    border-color: #28a745;
+    background: rgba(40, 167, 69, 0.02);
+}
+
+.plant-management-system .plant-scientific {
+    color: #28a745;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+.plant-management-system .plant-name {
+    color: #703c0bad;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
 /* Estilos para pestañas principales */
 .plant-management-system .nav-tabs .nav-link {
     background: white;
@@ -49,40 +95,6 @@
     background: var(--primary-color);
     border-color: var(--primary-color);
     color: white;
-}
-
-/* Estilos para cards */
-.plant-management-system .card {
-    border: none;
-    border-radius: 15px;
-    box-shadow: 0 5px 25px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
-}
-
-.plant-management-system .card:hover {
-    transform: translateY(-5px);
-}
-
-.plant-management-system .card-header {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    border-radius: 15px 15px 0 0;
-    padding: 20px;
-    border: none;
-}
-
-.plant-management-system .card-header h3 {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 400;
-}
-
-.plant-management-system .section-card {
-    background: white;
-    border-radius: 15px;
-    padding: 25px;
-    margin-bottom: 25px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
 }
 
 .plant-management-system .section-title {
@@ -182,48 +194,6 @@
     margin-bottom: 15px;
 }
 
-/* Search container */
-.plant-management-system .search-container {
-    position: relative;
-}
-
-.plant-management-system .search-container .input-group {
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
-}
-
-.plant-management-system .search-container .form-control {
-    border-right: none;
-    border-radius: 0;
-}
-
-.plant-management-system .search-container .btn {
-    border-left: none;
-    border-radius: 0;
-}
-
-/* Plants container */
-.plant-management-system #plantasContainer {
-    max-height: 350px;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--accent-color) transparent;
-}
-
-.plant-management-system #plantasContainer::-webkit-scrollbar {
-    width: 6px;
-}
-
-.plant-management-system #plantasContainer::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.plant-management-system #plantasContainer::-webkit-scrollbar-thumb {
-    background: var(--accent-color);
-    border-radius: 3px;
-}
-
 /* Info panel */
 .plant-management-system .info-panel {
     background: var(--light-green);
@@ -243,24 +213,4 @@
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: white;
     border-radius: 15px 15px 0 0;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .plant-management-system .main-container {
-        padding: 10px;
-    }
-    
-    .plant-management-system .page-header h1 {
-        font-size: 2rem;
-    }
-    
-    .plant-management-system .nav-tabs .nav-link {
-        padding: 10px 15px;
-        font-size: 0.9rem;
-    }
-    
-    .plant-management-system .section-card {
-        padding: 15px;
-    }
 }

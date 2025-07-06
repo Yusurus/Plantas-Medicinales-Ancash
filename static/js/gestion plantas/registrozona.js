@@ -106,17 +106,18 @@ class PlantManagement {
         
         filteredPlants.forEach(planta => {
             const cardDiv = document.createElement('div');
-            cardDiv.className = 'col-12 col-sm-6 col-md-12 col-lg-6';
+            cardDiv.className = 'plant-card';
+            cardDiv.setAttribute('data-plant-id', planta.idPlanta);
+            cardDiv.onclick = () => this.handlePlantSelection(planta.idPlanta);
             
             cardDiv.innerHTML = `
-                <div class="card plant-card" onclick="plantManager.handlePlantSelection('${planta.idPlanta}')" data-plant-id="${planta.idPlanta}">
-                    <div class="plant-card-body">
-                        <div class="plant-name">${planta.nombreCientifico}</div>
-                        <div class="plant-common">${planta.nombresComunes || 'Sin nombres comunes'}</div>
-                    </div>
+                <div>
+                    <h6 class="plant-scientific">${planta.nombreCientifico}</h6>
+                    <div class="plant-card-header">
+                        <p class="plant-name">${planta.nombresComunes || 'Sin nombre común'}</p>
+                    </div>                    
                 </div>
-            `;
-            
+            `;            
             container.appendChild(cardDiv);
         });
     }
@@ -201,26 +202,27 @@ class PlantManagement {
         const container = document.getElementById('plantasContainer');
         const emptyState = document.getElementById('emptyState');
         
-        if (this.data.plantaszona.length === 0) {
+        if (!this.data.plantaszona || this.data.plantaszona.length === 0) {
             emptyState.style.display = 'block';
             container.innerHTML = '';
             return;
         }
         
-        // Ocultar el estado vacío cuando hay plantas
         emptyState.style.display = 'none';
         container.innerHTML = '';
         
         this.data.plantaszona.forEach(planta => {
             const cardDiv = document.createElement('div');
-            cardDiv.className = 'col-12 col-sm-6 col-md-12 col-lg-6';
+            cardDiv.className = 'plant-card';
+            cardDiv.setAttribute('data-plant-id', planta.idPlanta);
+            cardDiv.onclick = () => this.handlePlantSelection(planta.idPlanta);
             
             cardDiv.innerHTML = `
-                <div class="card plant-card" onclick="plantManager.handlePlantSelection('${planta.idPlanta}')" data-plant-id="${planta.idPlanta}">
-                    <div class="plant-card-body">
-                        <div class="plant-name">${planta.nombreCientifico}</div>
-                        <div class="plant-common">${planta.nombresComunes || 'Sin nombres comunes'}</div>
-                    </div>
+                <div>
+                    <h6 class="plant-scientific">${planta.nombreCientifico}</h6>
+                    <div class="plant-card-header">
+                        <p class="plant-name">${planta.nombresComunes || 'Sin nombre común'}</p>
+                    </div>                    
                 </div>
             `;
             
