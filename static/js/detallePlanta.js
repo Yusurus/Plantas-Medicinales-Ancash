@@ -95,7 +95,6 @@ function displayPlantData(data) {
     document.getElementById('plantFamily').innerHTML = `<i class="bi bi-flower1"></i> Familia: ${data.nomFamilia || 'No especificada'}`;
     
     // Información básica
-    document.getElementById('plantId').textContent = data.idPlanta || '-';
     document.getElementById('plantFamilyInfo').textContent = data.nomFamilia || '-';
     document.getElementById('scientificName').textContent = data.nombreCientifico || '-';
     
