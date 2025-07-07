@@ -1,4 +1,18 @@
 <div class="card">
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-dismissible fade show 
+        {% if category == 'success' %}alert-success text-success
+        {% elif category == 'warning' %}alert-warning text-primary
+        {% elif category == 'danger' %}alert-danger text-danger
+        {% else %}alert-{{ category }}{% endif %}" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
   <div class="card-body">
     <h5 class="card-title">{{ 'Editar Planta' if id_planta else 'Registrar Nueva Planta' }}</h5>
 
@@ -88,9 +102,9 @@
     </form>
 
     <!-- Mensaje -->
-    <p id="mensaje"
+    <!-- <p id="mensaje"
       class="mt-3 text-center {{ 'text-primary' if mensaje and mensaje.startswith('La planta ya existe') else 'text-success' }}">
       {{ mensaje if mensaje }}
-    </p>
+    </p> -->
   </div>
 </div>

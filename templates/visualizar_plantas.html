@@ -22,7 +22,7 @@
       <option value="nombres_comunes">Nombre común</option>
       <option value="nomFamilia">Familia</option>
     </select>
-    <input type="text" id="inputBusqueda" class="form-control flex-grow-1 me-2" placeholder="Barra de busqueda ...">
+    <input type="text" id="inputBusqueda" class="form-control flex-grow-1 me-2" placeholder="Barra de búsqueda ...">
   </form>
 </div>
 </section>
@@ -56,8 +56,16 @@
         </div>
         <div class="card-body text-center">
           <h5 class="card-title fst-italic">{{ planta.nombreCientifico }}</h5>
-          <p class="card-text text-black-50">{{ planta.nomFamilia }}</p>
-          <p class="card-text text-muted small">{{ planta.nombres_comunes }}</p>
+            <span style="display: inline-block; background-color: #41b65c; color: #fff; border-radius: 20px; padding: 2px 16px; margin-bottom: 8px; font-size: 0.95em;">
+            {{ planta.nomFamilia }}
+            </span>
+            <div class="mb-2">
+            {% for nombre in planta.nombres_comunes.split(', ') %}
+              <span style="display: inline-block; background-color: #458de4; color: #fff; border-radius: 20px; padding: 2px 12px; margin: 2px 2px 2px 0; font-size: 0.85em;">
+              {{ nombre }}
+              </span>
+            {% endfor %}
+            </div>
           <a href="/detalles/{{ planta.idPlanta }}" class="btn-ver-detalles mt-2">
             <i class="bi bi-eye"></i> Ver detalles
           </a>

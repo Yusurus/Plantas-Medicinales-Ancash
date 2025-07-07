@@ -1,4 +1,13 @@
-from flask import Blueprint, jsonify, render_template, request, session
+from flask import (
+    Blueprint,
+    jsonify,
+    render_template,
+    request,
+    session,
+    flash,
+    redirect,
+    url_for,
+)
 from config.db import get_connection
 from services.plantnet_service import identificar_por_nombre
 from services.wikipedia_service import (
@@ -77,13 +86,27 @@ def registrar_planta(id_planta=None):
             for result in cursor.stored_results():
                 mensaje = result.fetchall()[0]["respuesta"]
                 if mensaje.startswith("Error: Duplicate entry"):
-                    mensaje = "La planta ya existe en la base de datos"
-                # if mensaje == "Planta actualizada correctamente":
-                #     flash(mensaje)
-                #     return redirect(url_for("registro_planta.registro_planta"))
+                    mensaje = "Ya existe una planta con ese nombre científico"
+                if "existe" in mensaje:
+                    flash(mensaje, "warning")
+                elif "correctamente" in mensaje:
+                    flash(mensaje, "success")
+                    return redirect(url_for("registro_bp.registrar_planta"))
+                else:
+                    flash(mensaje, "danger")
             conn.commit()
+            # for result in cursor.stored_results():
+            #     mensaje = result.fetchall()[0]["respuesta"]
+            #     if mensaje.startswith("Error: Duplicate entry"):
+            #         mensaje = "La planta ya existe en la base de datos"
+            #     # if mensaje == "Planta actualizada correctamente":
+            #     #     flash(mensaje)
+            #     #     return redirect(url_for("registro_planta.registro_planta"))
+            # conn.commit()
         except Exception as e:
             mensaje = f"Error en el servidor: {str(e)}"
+            flash(mensaje, "danger")
+
         finally:
             cursor.close()
             conn.close()

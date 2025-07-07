@@ -1,71 +1,71 @@
 const imagenes = [];
 
-    function agregarImagen() {
-      const input = document.getElementById('imagen');
-      const url = input.value.trim();
+function agregarImagen() {
+  const input = document.getElementById('imagen');
+  const url = input.value.trim();
 
-      // Validar que sea una URL de imagen
-      if (!url.match(/\.(jpeg|jpg|png|gif|webp)$/i)) {
-        alert('La URL no es una imagen válida.');
-        return;
-      }
+  // Validar que sea una URL de imagen
+  if (!url.match(/\.(jpeg|jpg|png|gif|webp)$/i)) {
+    alert('La URL no es una imagen válida.');
+    return;
+  }
 
-      // Comprobar si se carga la imagen
-      const img = new Image();
-      img.onload = function () {
-        // Evitar duplicados
-        if (imagenes.includes(url)) {
-          alert('La imagen ya fue añadida.');
-          return;
-        }
-
-        imagenes.push(url);
-        actualizarGaleria();
-        input.value = '';
-        input.focus();
-      };
-      img.onerror = function () {
-        alert('No se pudo cargar la imagen desde la URL proporcionada.');
-      };
-      img.src = url;
+  // Comprobar si se carga la imagen
+  const img = new Image();
+  img.onload = function () {
+    // Evitar duplicados
+    if (imagenes.includes(url)) {
+      alert('La imagen ya fue añadida.');
+      return;
     }
 
-    function actualizarGaleria() {
-      const contenedor = document.getElementById('contenedorImagenes');
-      contenedor.innerHTML = '';
+    imagenes.push(url);
+    actualizarGaleria();
+    input.value = '';
+    input.focus();
+  };
+  img.onerror = function () {
+    alert('No se pudo cargar la imagen desde la URL proporcionada.');
+  };
+  img.src = url;
+}
 
-      imagenes.forEach((url, index) => {
-        const div = document.createElement('div');
-        div.style.position = 'relative';
+function actualizarGaleria() {
+  const contenedor = document.getElementById('contenedorImagenes');
+  contenedor.innerHTML = '';
 
-        const img = document.createElement('img');
-        img.src = url;
-        img.style.width = '100px';
-        img.style.height = '100px';
-        img.style.objectFit = 'cover';
-        img.style.border = '1px solid #ccc';
-        img.classList.add('rounded');
+  imagenes.forEach((url, index) => {
+    const div = document.createElement('div');
+    div.style.position = 'relative';
 
-        const btn = document.createElement('button');
-        btn.textContent = '×';
-        btn.type = 'button';
-        btn.style.position = 'absolute';
-        btn.style.top = '2px';
-        btn.style.right = '2px';
-        btn.className = 'btn btn-sm btn-danger';
-        btn.onclick = () => {
-          imagenes.splice(index, 1);
-          actualizarGaleria();
-        };
+    const img = document.createElement('img');
+    img.src = url;
+    img.style.width = '100px';
+    img.style.height = '100px';
+    img.style.objectFit = 'cover';
+    img.style.border = '1px solid #ccc';
+    img.classList.add('rounded');
 
-        div.appendChild(img);
-        div.appendChild(btn);
-        contenedor.appendChild(div);
-      });
+    const btn = document.createElement('button');
+    btn.textContent = '×';
+    btn.type = 'button';
+    btn.style.position = 'absolute';
+    btn.style.top = '2px';
+    btn.style.right = '2px';
+    btn.className = 'btn btn-sm btn-danger';
+    btn.onclick = () => {
+      imagenes.splice(index, 1);
+      actualizarGaleria();
+    };
 
-      // Guardar en campo oculto separado por comas
-      document.getElementById('imagenesInput').value = imagenes.join(', ');
-    }
+    div.appendChild(img);
+    div.appendChild(btn);
+    contenedor.appendChild(div);
+  });
+
+  // Guardar en campo oculto separado por comas
+  document.getElementById('imagenesInput').value = imagenes.join(', ');
+}
 
 //--------------------------------------------------------------------------------
 const input = document.getElementById('imagen');

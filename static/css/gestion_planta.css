@@ -21,6 +21,11 @@ h2 {
   color: var(--verde-oscuro);
 }
 
+.mi-contenedor {
+    max-width: 99%;
+    padding: 20px;
+}
+
 .card {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   border: none;

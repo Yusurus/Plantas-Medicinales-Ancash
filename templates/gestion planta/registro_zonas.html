@@ -1,0 +1,359 @@
+<link rel="stylesheet" href="../../static/css/GestionPlanta/registrozona.css">
+
+<div class="plant-management-system">
+    <div class="main-container">
+        <!-- Pestañas principales -->
+        <ul class="nav nav-tabs mb-4" id="mainTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="plantas-tab" data-bs-toggle="tab" data-bs-target="#plantas" type="button" role="tab">
+                    <i class="fas fa-leaf"></i> Gestión Plantas-Ecorregiones
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="geografico-tab" data-bs-toggle="tab" data-bs-target="#geografico" type="button" role="tab">
+                    <i class="fas fa-map"></i> Gestión Geográfica
+                </button>
+            </li>
+        </ul>
+
+        <!-- Contenido de las pestañas -->
+        <div class="tab-content" id="mainTabsContent">
+            
+            <!-- PESTAÑA 1: GESTIÓN PLANTAS-ECOREGIONES -->
+            <div class="tab-pane fade show active" id="plantas" role="tabpanel">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Columna izquierda: Selección de plantas -->
+                            <div class="col-lg-7">
+                                <div class="section-card">
+                                    <h5 class="section-title"><i class="fas fa-search"></i> Seleccionar Planta</h5>
+                                    
+                                    <div class="search-container mb-4">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="searchPlants" placeholder="Buscar plantas por nombre científico o común...">
+                                            <button class="btn btn-outline-secondary text-secondy" type="button" id="clearSearch">
+                                                <i class="fas fa-times">X</i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="empty-state" id="emptyState">
+                                        <div class="empty-state-icon">🌱</div>
+                                        <h6>Selecciona una planta</h6>
+                                        <p>Elige una planta de la lista para ver y gestionar sus ecorregiones</p>
+                                    </div>
+                                    
+                                    <div id="plantasContainer" class="plants-grid">
+                                        <!-- Los cards de plantas se cargarán aquí -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Columna derecha: Información y gestión -->
+                            <div class="col-lg-5">
+                                <!-- Información de la planta -->
+                                <div class="section-card">
+                                    <h5 class="section-title"><i class="fas fa-info-circle"></i> Información de la Planta</h5>
+                                    <div id="infoPlanta" class="info-panel">
+                                        <i class="fas fa-hand-pointer"></i> Seleccione una planta para ver su información
+                                    </div>
+                                </div>
+
+                                <!-- Agregar ecoregión -->
+                                <div class="section-card">
+                                    <h5 class="section-title"><i class="fas fa-plus-circle"></i> Agregar Nueva Ecorregión</h5>
+                                    <form id="formAgregarEcoregion">
+                                        <div class="mb-3">
+                                            <label class="form-label">Ecorregión</label>
+                                            <select class="form-select" id="selectEcoregion" required>
+                                                <option value="">Seleccione una ecorregión...</option>
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-success w-100">
+                                            <i class="fas fa-plus"></i> Agregar Ecorregión
+                                        </button>
+                                    </form>
+                                </div>
+
+                                <!-- Ecoregiones actuales -->
+                                <div class="section-card">
+                                    <h5 class="section-title"><i class="fas fa-list"></i> Ecorregiones Actuales</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-striped" id="tablaEcoregionesPlanta">
+                                            <thead>
+                                                <tr>
+                                                    <th>Ecorregión</th>
+                                                    <th>Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="2" class="text-center">
+                                                        <i class="fas fa-hand-pointer"></i> Seleccione una planta
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PESTAÑA 2: GESTIÓN GEOGRÁFICA -->
+            <div class="tab-pane fade" id="geografico" role="tabpanel">
+                <div class="card">
+                    <div class="card-body">
+                        
+                        <!-- Pestañas secundarias -->
+                        <ul class="nav nav-pills mb-4" id="geoTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="regiones-tab" data-bs-toggle="pill" data-bs-target="#regiones" type="button" role="tab">
+                                    <i class="fas fa-map-marked-alt"></i> Regiones
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="provincias-tab" data-bs-toggle="pill" data-bs-target="#provincias" type="button" role="tab">
+                                    <i class="fas fa-map-signs"></i> Provincias
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="ecoregiones-tab" data-bs-toggle="pill" data-bs-target="#ecoregiones" type="button" role="tab">
+                                    <i class="fas fa-mountain"></i> Ecorregiones
+                                </button>
+                            </li>
+                        </ul>
+
+                        <!-- Contenido pestañas secundarias -->
+                        <div class="tab-content" id="geoTabsContent">
+                            
+                            <!-- GESTIÓN REGIONES -->
+                            <div class="tab-pane fade show active" id="regiones" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="section-card">
+                                            <h5 class="section-title"><i class="fas fa-plus"></i> Nueva Región</h5>
+                                            <form id="formRegion">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Nombre de la Región</label>
+                                                    <input type="text" class="form-control" id="nombreRegion" required>
+                                                </div>
+                                                <button type="submit" class="btn btn-success w-100">
+                                                    <i class="fas fa-save"></i> Crear Región
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="section-card">
+                                            <h5 class="section-title"><i class="fas fa-list"></i> Regiones Existentes</h5>
+                                            <div class="table-responsive">
+                                                <table class="table table-striped" id="tablaRegiones">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Región</th>
+                                                            <th>Acciones</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td colspan="2" class="text-center">
+                                                                <i class="fas fa-spinner fa-spin"></i> Cargando...
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- GESTIÓN PROVINCIAS -->
+                            <div class="tab-pane fade" id="provincias" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="section-card">
+                                            <h5 class="section-title"><i class="fas fa-plus"></i> Nueva Provincia</h5>
+                                            <form id="formProvincia">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Región</label>
+                                                    <select class="form-select" id="regionProvincia" required>
+                                                        <option value="">Seleccione una región...</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Nombre de la Provincia</label>
+                                                    <input type="text" class="form-control" id="nombreProvincia" required>
+                                                </div>
+                                                <button type="submit" class="btn btn-success w-100">
+                                                    <i class="fas fa-save"></i> Crear Provincia
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="section-card">
+                                            <h5 class="section-title"><i class="fas fa-filter"></i> Provincias por Región</h5>
+                                            <div class="mb-3">
+                                                <select class="form-select" id="filtroRegionProvincia">
+                                                    <option value="">Seleccione una región para ver provincias...</option>
+                                                </select>
+                                            </div>
+                                            <div class="table-responsive">
+                                                <table class="table table-striped" id="tablaProvincias">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Provincia</th>
+                                                            <th>Acciones</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td colspan="2" class="text-center">
+                                                                <i class="fas fa-hand-pointer"></i> Seleccione una región
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- GESTIÓN ECOREGIONES -->
+                            <div class="tab-pane fade" id="ecoregiones" role="tabpanel">
+                                <div class="section-card mb-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Filtrar por Región</label>
+                                        <select class="form-select" id="regionEcoregion" required>
+                                            <option value="">Seleccione una región...</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="section-card">
+                                            <h5 class="section-title"><i class="fas fa-link"></i> Asociar Ecorregión a Provincia</h5>
+                                            <form id="formEcoregionProvincia">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Provincia</label>
+                                                    <select class="form-select" id="provinciaEcoregion" required>
+                                                        <option value="">Seleccione una provincia...</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Ecorregión</label>
+                                                    <select class="form-select" id="ecoregionAsociar" required>
+                                                        <option value="">Seleccione una ecorregión...</option>
+                                                    </select>
+                                                </div>
+                                                <button type="submit" class="btn btn-success w-100">
+                                                    <i class="fas fa-link"></i> Asociar Ecorregión
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-6">
+                                        <div class="section-card">
+                                            <h5 class="section-title"><i class="fas fa-eye"></i> Ecorregiones por Provincia</h5>
+                                            <div class="mb-3">
+                                                <select class="form-select" id="filtroProvinciaEcoregion">
+                                                    <option value="">Seleccione una provincia para ver ecorregiones...</option>
+                                                </select>
+                                            </div>
+                                            <div class="table-responsive">
+                                                <table class="table table-striped" id="tablaEcoregionesGeografico">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Ecorregión</th>
+                                                            <th>Acciones</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td colspan="2" class="text-center">
+                                                                <i class="fas fa-hand-pointer"></i> Seleccione una provincia
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar -->
+<div class="modal fade plant-management-system" id="editModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalTitle"><i class="fas fa-edit"></i> Editar</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <div class="mb-3">
+                        <label class="form-label" id="editLabel">Nombre</label>
+                        <input type="text" class="form-control" id="editInput" required>
+                        <input type="hidden" id="editId">
+                        <input type="hidden" id="editType">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" id="saveEdit">
+                    <i class="fas fa-save"></i> Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para confirmar eliminación -->
+<div class="modal fade plant-management-system" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p id="deleteMessage">
+                    <i class="fas fa-question-circle"></i> ¿Está seguro de que desea eliminar este elemento?
+                </p>
+                <input type="hidden" id="deleteId">
+                <input type="hidden" id="deleteType">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">
+                    <i class="fas fa-trash"></i> Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="../../static/js/gestion plantas/registrozona.js"></script>
