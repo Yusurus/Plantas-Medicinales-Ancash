@@ -17,6 +17,7 @@ from controllers.gestionPlantas.registro_usos import registro_usos
 from controllers.reportes.reportes_pdf import reporte_bp
 from controllers.reportes.reporte_grafico import reportes_bp2
 from controllers.visor_codigo import visorcodigo_bp
+from controllers.gestionPlantas.registro_archivaciones import registro_archivaciones
 
 app = Flask(__name__)
 app.secret_key = '1234'
@@ -36,6 +37,7 @@ app.register_blueprint(detalles_bp)
 app.register_blueprint(registro_zona)
 app.register_blueprint(registro_saberes)
 app.register_blueprint(registro_usos)
+app.register_blueprint(registro_archivaciones)
 #----
 app.register_blueprint(reporte_bp)
 app.register_blueprint(reportes_bp2)
