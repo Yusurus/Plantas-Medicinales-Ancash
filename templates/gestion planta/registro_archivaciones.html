@@ -1,7 +1,116 @@
-<link rel="stylesheet" href="../../static/css/GestionPlanta/regisrtroarchivacion.css">
+<link rel="stylesheet" href="../../static/css/GestionPlanta/registro_archivaciones.css">
 
-<div class="zona-construccion">
-    <img src="https://cdn-kmmdh.nitrocdn.com/IlkczOshSMOaFaARyPpayXBygaSmgpwx/assets/images/optimized/rev-2ca9059/feconlider.com.pe/wp-content/uploads/2022/12/SENAL-PREVENTIVA-HOMBRES-TRABAJANDO-0.90X0.90.PNG.png" alt="Hombres trabajando">
-    <img src="../../static/img/zona_contruc.jpg" alt="Zona en construcción">
-    <img src="../../static/img/Ao.gif" alt="Gato programando">
+<div class="archivaciones-container">
+    <h2>Selecciona la Sección de Archivación</h2>
+
+    <div class="section-selection-buttons">
+        <button id="btnArchivarPlantas" class="selection-button">📁 Archivar Plantas</button>
+        <button id="btnArchivarZonas" class="selection-button">🌍 Archivar Zonas</button>
+        <button id="btnArchivarSaberes" class="selection-button">📚 Archivar Saberes Culturales</button>
+        <button id="btnArchivarUsos" class="selection-button">💊 Archivar Usos Medicinales</button>
+    </div>
+
+    <div id="plantasArchivingSection" class="archiving-section hidden">
+        <h3>Gestión de Archivación de Plantas</h3>
+        <div class="search-bar-container">
+            <input type="text" id="plantasSearchInput" class="search-input" placeholder="Buscar plantas...">
+        </div>
+        <div class="plantas-secciones-container">
+            <div class="seccion-plantas activas">
+                <h4>Plantas Activas</h4>
+                <div id="plantas-activas-list" class="item-list">
+                    <div class="loading-spinner" style="display: none;">Cargando plantas activas...</div>
+                </div>
+            </div>
+            <div class="seccion-plantas archivadas">
+                <h4>Plantas Archivadas</h4>
+                <div id="plantas-archivadas-list" class="item-list">
+                    <div class="loading-spinner" style="display: none;">Cargando plantas archivadas...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="zonasArchivingSection" class="archiving-section hidden">
+        <h3>Gestión de Archivación de Zonas</h3>
+        <div class="search-bar-container">
+            <input type="text" id="zonasSearchInput" class="search-input" placeholder="Buscar zonas...">
+        </div>
+        <div class="plantas-secciones-container">
+            <div class="seccion-plantas activas">
+                <h4>Zonas Activas</h4>
+                <div id="zonas-activas-list" class="item-list">
+                    <div class="loading-spinner" style="display: none;">Cargando zonas activas...</div>
+                </div>
+            </div>
+            <div class="seccion-plantas archivadas">
+                <h4>Zonas Archivadas</h4>
+                <div id="zonas-archivadas-list" class="item-list">
+                    <div class="loading-spinner" style="display: none;">Cargando zonas archivadas...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="saberesArchivingSection" class="archiving-section hidden">
+        <h3>Gestión de Archivación de Saberes Culturales</h3>
+        <div class="search-bar-container">
+            <input type="text" id="saberesSearchInput" class="search-input" placeholder="Buscar saberes...">
+        </div>
+        <div class="plantas-secciones-container">
+            <div class="seccion-plantas activas">
+                <h4>Saberes Culturales Activos</h4>
+                <div id="saberes-activas-list" class="item-list">
+                    <div class="loading-spinner" style="display: none;">Cargando saberes activos...</div>
+                </div>
+            </div>
+            <div class="seccion-plantas archivadas">
+                <h4>Saberes Culturales Archivados</h4>
+                <div id="saberes-archivadas-list" class="item-list">
+                    <div class="loading-spinner" style="display: none;">Cargando saberes archivados...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="usosArchivingSection" class="archiving-section hidden">
+        <h3>Gestión de Archivación de Usos Medicinales</h3>
+        <div class="search-bar-container">
+            <input type="text" id="usosSearchInput" class="search-input" placeholder="Buscar usos medicinales...">
+        </div>
+        <div class="plantas-secciones-container">
+            <div class="seccion-plantas activas">
+                <h4>Usos Medicinales Activos</h4>
+                <div id="usos-activas-list" class="item-list">
+                    <div class="loading-spinner" style="display: none;">Cargando usos activos...</div>
+                </div>
+            </div>
+            <div class="seccion-plantas archivadas">
+                <h4>Usos Medicinales Archivados</h4>
+                <div id="usos-archivadas-list" class="item-list">
+                    <div class="loading-spinner" style="display: none;">Cargando usos archivados...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h4>Confirmación de Archivación</h4>
+            <p>¿Estás seguro de que deseas archivar "<span id="itemNameToArchive"></span>"?</p>
+
+            <div class="modal-motivo">
+                <label for="motivoArchivacion">Motivo de archivación:</label>
+                <textarea id="motivoArchivacion" class="input-motivo" placeholder="Escribe el motivo..."></textarea>
+            </div>
+
+            <div class="modal-buttons">
+                <button id="confirmArchiveBtn" class="btn-confirm">Sí, Archivar</button>
+                <button id="cancelArchiveBtn" class="btn-cancel">Cancelar</button>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script src="../../static/js/gestion plantas/registro_archivaciones.js"></script>
