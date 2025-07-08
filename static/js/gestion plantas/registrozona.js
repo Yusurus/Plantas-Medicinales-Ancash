@@ -34,7 +34,7 @@ class PlantManagement {
     // Configuración de eventos
     setupEventListeners() {
         // Selección de planta
-        document.getElementById('selectPlanta').addEventListener('change', (e) => {
+        document.getElementById('selectPlanta')?.addEventListener('change', (e) => {
             this.handlePlantSelection(e.target.value);
         });
 
@@ -46,7 +46,82 @@ class PlantManagement {
         
         // Modales
         this.setupModalListeners();
+        
+        // AGREGAR ESTA LÍNEA:
+        this.setupSearchListeners();
     }
+
+
+    setupSearchListeners() {
+        const searchInput = document.getElementById('searchPlants');
+        const clearBtn = document.getElementById('clearSearch');
+        
+        if (!searchInput || !clearBtn) return;
+        
+        // Búsqueda en tiempo real
+        searchInput.addEventListener('input', (e) => {
+            this.filterPlants(e.target.value);
+        });
+        
+        // Limpiar búsqueda
+        clearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            this.filterPlants('');
+            searchInput.focus();
+        });
+    }
+
+    // Método para filtrar plantas
+    filterPlants(searchTerm) {
+        const container = document.getElementById('plantasContainer');
+        const emptyState = document.getElementById('emptyState');
+        
+        if (!searchTerm.trim()) {
+            // Si no hay término de búsqueda, mostrar todas las plantas
+            this.populatePlantSelect();
+            return;
+        }
+        
+        // Filtrar plantas que coincidan con el término
+        const filteredPlants = this.data.plantaszona.filter(planta => {
+            const cientificoMatch = planta.nombreCientifico.toLowerCase().includes(searchTerm.toLowerCase());
+            const comunMatch = planta.nombresComunes && planta.nombresComunes.toLowerCase().includes(searchTerm.toLowerCase());
+            return cientificoMatch || comunMatch;
+        });
+        
+        // Mostrar resultados filtrados
+        if (filteredPlants.length === 0) {
+            emptyState.style.display = 'block';
+            emptyState.innerHTML = `
+                <div class="empty-state-icon">🔍</div>
+                <h6>No se encontraron plantas</h6>
+                <p>No hay plantas que coincidan con "${searchTerm}"</p>
+            `;
+            container.innerHTML = '';
+            return;
+        }
+        
+        emptyState.style.display = 'none';
+        container.innerHTML = '';
+        
+        filteredPlants.forEach(planta => {
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'plant-card';
+            cardDiv.setAttribute('data-plant-id', planta.idPlanta);
+            cardDiv.onclick = () => this.handlePlantSelection(planta.idPlanta);
+            
+            cardDiv.innerHTML = `
+                <div>
+                    <h6 class="plant-scientific">${planta.nombreCientifico}</h6>
+                    <div class="plant-card-header">
+                        <p class="plant-name">${planta.nombresComunes || 'Sin nombre común'}</p>
+                    </div>                    
+                </div>
+            `;            
+            container.appendChild(cardDiv);
+        });
+    }
+
 
     setupFormListeners() {
         const forms = {
@@ -124,14 +199,34 @@ class PlantManagement {
 
     // === POBLACIÓN DE SELECTS ===
     populatePlantSelect() {
-        const select = document.getElementById('selectPlanta');
-        select.innerHTML = '<option value="">Seleccione una planta...</option>';
+        const container = document.getElementById('plantasContainer');
+        const emptyState = document.getElementById('emptyState');
+        
+        if (!this.data.plantaszona || this.data.plantaszona.length === 0) {
+            emptyState.style.display = 'block';
+            container.innerHTML = '';
+            return;
+        }
+        
+        emptyState.style.display = 'none';
+        container.innerHTML = '';
         
         this.data.plantaszona.forEach(planta => {
-            const option = document.createElement('option');
-            option.value = planta.idPlanta;
-            option.textContent = `${planta.nombreCientifico} - ${planta.nombresComunes || 'Sin nombres comunes'}`;
-            select.appendChild(option);
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'plant-card';
+            cardDiv.setAttribute('data-plant-id', planta.idPlanta);
+            cardDiv.onclick = () => this.handlePlantSelection(planta.idPlanta);
+            
+            cardDiv.innerHTML = `
+                <div>
+                    <h6 class="plant-scientific">${planta.nombreCientifico}</h6>
+                    <div class="plant-card-header">
+                        <p class="plant-name">${planta.nombresComunes || 'Sin nombre común'}</p>
+                    </div>                    
+                </div>
+            `;
+            
+            container.appendChild(cardDiv);
         });
     }
 
@@ -160,6 +255,17 @@ class PlantManagement {
     // === MANEJO DE PLANTAS ===
     handlePlantSelection(plantaId) {
         if (plantaId) {
+            // Remover selección anterior
+            document.querySelectorAll('.plant-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Agregar selección a la card clickeada
+            const selectedCard = document.querySelector(`[data-plant-id="${plantaId}"]`);
+            if (selectedCard) {
+                selectedCard.classList.add('selected');
+            }
+            
             this.data.plantaSeleccionada = this.data.plantaszona.find(p => p.idPlanta == plantaId);
             this.showPlantInfo(this.data.plantaSeleccionada);
             this.loadPlantEcoregiones(plantaId);
@@ -180,7 +286,12 @@ class PlantManagement {
     clearPlantInfo() {
         document.getElementById('infoPlanta').innerHTML = 'Seleccione una planta para ver su información';
         document.getElementById('tablaEcoregionesPlanta').querySelector('tbody').innerHTML = 
-            '<tr><td colspan="3" class="text-center">Seleccione una planta</td></tr>';
+            '<tr><td colspan="2" class="text-center">Seleccione una planta</td></tr>';
+        
+        // Limpiar selección visual
+        document.querySelectorAll('.plant-card').forEach(card => {
+            card.classList.remove('selected');
+        });
     }
 
     async loadPlantEcoregiones(plantaId) {
@@ -260,7 +371,6 @@ class PlantManagement {
         this.data.regiones.forEach(region => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${region.idRegion}</td>
                 <td>${region.region}</td>
                 <td>
                     <button class="btn btn-sm btn-warning" onclick="plantManager.editRegion(${region.idRegion}, '${region.region}')">
@@ -661,6 +771,7 @@ class PlantManagement {
             }
         }, 5000);
     }
+    
 }
 
 // Inicializar cuando el DOM esté listo
