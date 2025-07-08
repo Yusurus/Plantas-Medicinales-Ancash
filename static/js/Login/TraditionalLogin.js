@@ -137,3 +137,14 @@ class TraditionalLogin {
 
     }
 }
+document.addEventListener('DOMContentLoaded', function () {
+    const passwordInput = document.getElementById('password');
+    const toggleBtn = document.getElementById('togglePassword');
+    const toggleIcon = document.getElementById('togglePasswordIcon');
+    toggleBtn.addEventListener('click', function () {
+        const type = passwordInput.type === 'password' ? 'text' : 'password';
+        passwordInput.type = type;
+        toggleIcon.classList.toggle('fa-eye');
+        toggleIcon.classList.toggle('fa-eye-slash');
+    });
+});
