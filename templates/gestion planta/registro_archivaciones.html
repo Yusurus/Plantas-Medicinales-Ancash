@@ -1,116 +1,83 @@
 <link rel="stylesheet" href="../../static/css/GestionPlanta/registro_archivaciones.css">
+<main class="flex-grow p-6">
+  <div class="plantas-medicinales-module">
+    <div id="pmPlantasMedicinalesApp">
+      <div class="pm-search-section mb-4">
+  <div class="pm-search-container">
+    <input type="text" id="archiveSearchInput" class="pm-search-input" placeholder="Buscar plantas por nombre cientifico, nombre comun, o familia..." autocomplete="off">
+    <span class="pm-search-icon">🔍</span>
+  </div>
+</div>
 
-<div class="archivaciones-container">
-    <h2>Selecciona la Sección de Archivación</h2>
+      <div id="archivaciones-content-wrapper" class="flex flex-col lg:flex-row gap-6">
+        <!-- Plantas activas -->
+        <div class="flex-1 pm-plants-section">
+          <div class="pm-plants-header mb-2">
+            <h3 class="pm-plants-title text-green-700">Plantas Activas</h3>
+            <span id="active-plants-count" class="pm-plants-count bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">0 plantas</span>
+          </div>
+          <div id="active-plants-container" class="pm-plants-grid"></div>
+        </div>
 
-    <div class="section-selection-buttons">
-        <button id="btnArchivarPlantas" class="selection-button">📁 Archivar Plantas</button>
-        <button id="btnArchivarZonas" class="selection-button">🌍 Archivar Zonas</button>
-        <button id="btnArchivarSaberes" class="selection-button">📚 Archivar Saberes Culturales</button>
-        <button id="btnArchivarUsos" class="selection-button">💊 Archivar Usos Medicinales</button>
+        <!-- Detalles / Archivaciones -->
+        <div class="flex-1 pm-plants-section">
+          <div class="pm-plants-header mb-2">
+            <h3 class="pm-plants-title text-green-700">Archivaciones</h3>
+          </div>
+          <div id="selected-plant-details-container" class="p-4 rounded-lg bg-white border border-gray-200 shadow-inner min-h-[300px]">
+            <p id="placeholder-message" class="text-gray-500 text-center py-10">
+              Seleccione una planta activa para ver sus detalles y opciones de archivación.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
+</main>
 
-    <div id="plantasArchivingSection" class="archiving-section hidden">
-        <h3>Gestión de Archivación de Plantas</h3>
-        <div class="search-bar-container">
-            <input type="text" id="plantasSearchInput" class="search-input" placeholder="Buscar plantas...">
-        </div>
-        <div class="plantas-secciones-container">
-            <div class="seccion-plantas activas">
-                <h4>Plantas Activas</h4>
-                <div id="plantas-activas-list" class="item-list">
-                    <div class="loading-spinner" style="display: none;">Cargando plantas activas...</div>
-                </div>
-            </div>
-            <div class="seccion-plantas archivadas">
-                <h4>Plantas Archivadas</h4>
-                <div id="plantas-archivadas-list" class="item-list">
-                    <div class="loading-spinner" style="display: none;">Cargando plantas archivadas...</div>
-                </div>
-            </div>
-        </div>
+<!-- Modal 1: Confirmación + motivo -->
+<div id="confirmation-modal" class="fixed inset-0 flex items-center justify-center hidden pm-modal-overlay">
+  <div class="pm-modal-content p-6 flex flex-col items-center text-center">
+    <h4 class="pm-modal-title mb-4" id="first-modal-title">Confirmar Archivación</h4>
+    <p class="text-gray-700 mb-4">¿Estás seguro de que deseas archivar <span id="item-name-to-archive" class="font-semibold"></span>?</p>
+    <div class="pm-form-group w-full">
+      <label class="pm-form-label" for="archive-reason">Motivo de Archivación:</label>
+      <textarea class="pm-form-textarea" id="archive-reason" placeholder="Escribe el motivo..." rows="3"></textarea>
     </div>
-
-    <div id="zonasArchivingSection" class="archiving-section hidden">
-        <h3>Gestión de Archivación de Zonas</h3>
-        <div class="search-bar-container">
-            <input type="text" id="zonasSearchInput" class="search-input" placeholder="Buscar zonas...">
-        </div>
-        <div class="plantas-secciones-container">
-            <div class="seccion-plantas activas">
-                <h4>Zonas Activas</h4>
-                <div id="zonas-activas-list" class="item-list">
-                    <div class="loading-spinner" style="display: none;">Cargando zonas activas...</div>
-                </div>
-            </div>
-            <div class="seccion-plantas archivadas">
-                <h4>Zonas Archivadas</h4>
-                <div id="zonas-archivadas-list" class="item-list">
-                    <div class="loading-spinner" style="display: none;">Cargando zonas archivadas...</div>
-                </div>
-            </div>
-        </div>
+    <div class="flex space-x-4 mt-4">
+      <button id="cancel-archive" class="pm-btn pm-btn-cancel">Cancelar</button>
+      <button id="confirm-archive" class="pm-btn pm-btn-save">Continuar</button>
     </div>
+  </div>
+</div>
 
-    <div id="saberesArchivingSection" class="archiving-section hidden">
-        <h3>Gestión de Archivación de Saberes Culturales</h3>
-        <div class="search-bar-container">
-            <input type="text" id="saberesSearchInput" class="search-input" placeholder="Buscar saberes...">
-        </div>
-        <div class="plantas-secciones-container">
-            <div class="seccion-plantas activas">
-                <h4>Saberes Culturales Activos</h4>
-                <div id="saberes-activas-list" class="item-list">
-                    <div class="loading-spinner" style="display: none;">Cargando saberes activos...</div>
-                </div>
-            </div>
-            <div class="seccion-plantas archivadas">
-                <h4>Saberes Culturales Archivados</h4>
-                <div id="saberes-archivadas-list" class="item-list">
-                    <div class="loading-spinner" style="display: none;">Cargando saberes archivados...</div>
-                </div>
-            </div>
-        </div>
+<!-- Modal 2: Confirmación final -->
+<div id="second-confirmation-modal" class="fixed inset-0 flex items-center justify-center hidden pm-modal-overlay">
+  <div class="pm-modal-content p-6 flex flex-col items-center text-center">
+    <h4 class="pm-modal-title mb-4">Confirmación Final</h4>
+    <p class="text-gray-700 mb-6">¿Estás absolutamente seguro de archivar este elemento?</p>
+    <div class="flex space-x-4">
+      <button id="cancel-final-archive" class="pm-btn pm-btn-cancel">Cancelar</button>
+      <button id="confirm-final-archive" class="pm-btn pm-btn-save">Sí, Archivar</button>
     </div>
+  </div>
+</div>
 
-    <div id="usosArchivingSection" class="archiving-section hidden">
-        <h3>Gestión de Archivación de Usos Medicinales</h3>
-        <div class="search-bar-container">
-            <input type="text" id="usosSearchInput" class="search-input" placeholder="Buscar usos medicinales...">
-        </div>
-        <div class="plantas-secciones-container">
-            <div class="seccion-plantas activas">
-                <h4>Usos Medicinales Activos</h4>
-                <div id="usos-activas-list" class="item-list">
-                    <div class="loading-spinner" style="display: none;">Cargando usos activos...</div>
-                </div>
-            </div>
-            <div class="seccion-plantas archivadas">
-                <h4>Usos Medicinales Archivados</h4>
-                <div id="usos-archivadas-list" class="item-list">
-                    <div class="loading-spinner" style="display: none;">Cargando usos archivados...</div>
-                </div>
-            </div>
-        </div>
+<!-- Modal 3: Confirmación especial para plantas -->
+<div id="third-confirmation-modal" class="fixed inset-0 flex items-center justify-center hidden pm-modal-overlay">
+  <div class="pm-modal-content p-6 flex flex-col items-center text-center">
+    <h4 class="pm-modal-title mb-4">Confirmar Archivación de Planta</h4>
+    <p class="text-gray-700 mb-4">Escribe esta frase exactamente:</p>
+    <p class="text-red-600 font-bold text-lg mb-4" id="required-confirmation-text"></p>
+    <div class="pm-form-group w-full">
+      <input type="text" class="pm-form-input" id="third-confirmation-input" placeholder="Escribe la frase aquí...">
+      <p id="third-confirmation-error" class="text-red-500 text-sm mt-2 hidden">Texto incorrecto</p>
     </div>
-
-    <div id="confirmationModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h4>Confirmación de Archivación</h4>
-            <p>¿Estás seguro de que deseas archivar "<span id="itemNameToArchive"></span>"?</p>
-
-            <div class="modal-motivo">
-                <label for="motivoArchivacion">Motivo de archivación:</label>
-                <textarea id="motivoArchivacion" class="input-motivo" placeholder="Escribe el motivo..."></textarea>
-            </div>
-
-            <div class="modal-buttons">
-                <button id="confirmArchiveBtn" class="btn-confirm">Sí, Archivar</button>
-                <button id="cancelArchiveBtn" class="btn-cancel">Cancelar</button>
-            </div>
-        </div>
+    <div class="flex space-x-4 mt-4">
+      <button id="cancel-third-archive" class="pm-btn pm-btn-cancel">Cancelar</button>
+      <button id="confirm-third-archive" class="pm-btn pm-btn-save">Confirmar</button>
     </div>
+  </div>
 </div>
 
 <script src="../../static/js/gestion plantas/registro_archivaciones.js"></script>
