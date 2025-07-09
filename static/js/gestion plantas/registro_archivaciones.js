@@ -1,358 +1,240 @@
-class ArchivacionesApp {
-    constructor() {
-        this.currentArchiver = null;
-        this.archivers = {};
-        
-        this.initElements();
-        this.initEventListeners();
-        this.initArchivers();
-    }
-
-    initElements() {
-        this.sectionButtons = {
-            plantas: document.getElementById('btnArchivarPlantas'),
-            zonas: document.getElementById('btnArchivarZonas'),
-            saberes: document.getElementById('btnArchivarSaberes'),
-            usos: document.getElementById('btnArchivarUsos')
-        };
-
-        this.sections = {
-            plantas: document.getElementById('plantasArchivingSection'),
-            zonas: document.getElementById('zonasArchivingSection'),
-            saberes: document.getElementById('saberesArchivingSection'),
-            usos: document.getElementById('usosArchivingSection')
-        };
-
-        this.confirmationModal = document.getElementById('confirmationModal');
-        this.closeButton = document.querySelector('.close-button');
-        this.confirmArchiveBtn = document.getElementById('confirmArchiveBtn');
-        this.cancelArchiveBtn = document.getElementById('cancelArchiveBtn');
-        this.itemNameToArchiveSpan = document.getElementById('itemNameToArchive');
-    }
-
-    initEventListeners() {
-        // Botones de selección de sección
-        this.sectionButtons.plantas.addEventListener('click', () => this.showSection('plantas'));
-        this.sectionButtons.zonas.addEventListener('click', () => this.showSection('zonas'));
-        this.sectionButtons.saberes.addEventListener('click', () => this.showSection('saberes'));
-        this.sectionButtons.usos.addEventListener('click', () => this.showSection('usos'));
-
-        // Modal events
-        this.closeButton.addEventListener('click', () => this.closeModal());
-        this.cancelArchiveBtn.addEventListener('click', () => this.closeModal());
-        this.confirmArchiveBtn.addEventListener('click', () => this.confirmArchive());
-
-        // Cerrar modal al hacer clic fuera
-        window.addEventListener('click', (event) => {
-            if (event.target === this.confirmationModal) {
-                this.closeModal();
-            }
-        });
-
-        // Cerrar modal con Escape
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && this.confirmationModal.style.display === 'flex') {
-                this.closeModal();
-            }
-        });
-    }
-
-    initArchivers() {
-        this.archivers = {
-            plantas: new Archiver(
-                'plantas',
-                'plantas-activas-list',
-                'plantas-archivadas-list',
-                'plantasSearchInput',
-                '/api/archive_plant',
-                '/api/plantas_activas',
-                '/api/plantas_archivadas',
-                'nombreCientifico',
-                [
-                    { key: 'nomFamilia', label: 'Familia' },
-                    { key: 'nombres_comunes', label: 'Nombres Comunes' },
-                    { key: 'linkImagen', label: 'Imagen' }
-                ],
-                'idPlanta'
-            ),
-            zonas: new Archiver(
-                'zonas',
-                'zonas-activas-list',
-                'zonas-archivadas-list',
-                'zonasSearchInput',
-                '/api/archive_zona',
-                '/api/zonas_activas',
-                '/api/zonas_archivadas',
-                'ecoregion',
-                [
-                    { key: 'nombreProvincia', label: 'Provincia' },
-                    { key: 'region', label: 'Región' }
-                ],
-                'idZona'
-            ),
-            saberes: new Archiver(
-                'saberes',
-                'saberes-activas-list',
-                'saberes-archivadas-list',
-                'saberesSearchInput',
-                '/api/archive_saber',
-                '/api/saberes_culturales_activos',
-                '/api/saberes_culturales_archivados',
-                'descripcionSaber',
-                [
-                    { key: 'nombreCientifico', label: 'Planta Asociada' }
-                ],
-                'idSaberesCulturales'
-            ),
-            usos: new Archiver(
-                'usos',
-                'usos-activas-list',
-                'usos-archivadas-list',
-                'usosSearchInput',
-                '/api/archive_uso',
-                '/api/usos_medicinales_activos',
-                '/api/usos_medicinales_archivados',
-                'uso',
-                [
-                    { key: 'parte', label: 'Parte Usada' },
-                    { key: 'nombreCientifico', label: 'Planta Asociada' },
-                    { key: 'preparacion', label: 'Preparación' }
-                ],
-                'idUsos'
-            )
-        };
-    }
-
-    async showSection(sectionType) {
-        // Ocultar todas las secciones
-        Object.values(this.sections).forEach(sec => sec.classList.add('hidden'));
-        
-        // Mostrar la sección seleccionada
-        this.sections[sectionType].classList.remove('hidden');
-        
-        // Establecer el archiver actual
-        this.currentArchiver = this.archivers[sectionType];
-        
-        // Cargar datos
-        await this.currentArchiver.loadItems();
-    }
-
-    closeModal() {
-        this.confirmationModal.style.display = 'none';
-        if (this.currentArchiver) {
-            this.currentArchiver.currentItemToArchive = null;
-        }
-    }
-
-    async confirmArchive() {
-        if (this.currentArchiver && this.currentArchiver.currentItemToArchive) {
-            await this.currentArchiver.archiveItem();
-            this.closeModal();
-        }
-    }
-}
-
-class Archiver {
-    constructor(type, activeListId, archivedListId, searchInputId, archiveEndpoint, activeEndpoint, archivedEndpoint, itemNameKey, displayKeys, idKey) {
-        this.type = type;
-        this.activeListContainer = document.getElementById(activeListId);
-        this.archivedListContainer = document.getElementById(archivedListId);
-        this.searchInput = document.getElementById(searchInputId);
-        this.archiveEndpoint = archiveEndpoint;
-        this.activeEndpoint = activeEndpoint;
-        this.archivedEndpoint = archivedEndpoint;
-        this.itemNameKey = itemNameKey;
-        this.displayKeys = displayKeys;
-        this.idKey = idKey;
-        this.currentItemToArchive = null;
-        this.allActiveItems = [];
-        this.allArchivedItems = [];
-        this.motivoInput = document.getElementById('motivoArchivacion');
-
-        if (this.searchInput) {
-            this.searchInput.addEventListener('input', () => this.filterItems());
-        }
-    }
-
-    async archiveItem() {
-        if (!this.currentItemToArchive) return;
-
-        try {
-            const motivo = this.motivoInput?.value || 'Sin motivo especificado';
-
-            const response = await fetch(`${this.archiveEndpoint}/${this.currentItemToArchive.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ motivo })
-            });
-
-            if (response.ok) {
-                this.showSuccess(`${this.currentItemToArchive.name} ha sido archivado correctamente`);
-                await this.loadItems();
-                this.searchInput.value = '';
-                this.motivoInput.value = '';
-            } else {
-                const error = await response.json();
-                this.showError(error.error || 'Error al archivar el elemento');
-            }
-        } catch (error) {
-            console.error('Error archivando elemento:', error);
-            this.showError('Error de conexión');
-        }
-    }
-
-    async loadItems() {
-        try {
-            // Mostrar loading
-            this.showLoading(true);
-            
-            // Cargar elementos activos y archivados en paralelo
-            const [activeResponse, archivedResponse] = await Promise.all([
-                fetch(this.activeEndpoint),
-                fetch(this.archivedEndpoint)
-            ]);
-
-            if (!activeResponse.ok || !archivedResponse.ok) {
-                throw new Error('Error al cargar los datos');
-            }
-
-            this.allActiveItems = await activeResponse.json();
-            this.allArchivedItems = await archivedResponse.json();
-
-            // Renderizar elementos
-            this.renderItemCards(this.allActiveItems, this.activeListContainer, 'active');
-            this.renderItemCards(this.allArchivedItems, this.archivedListContainer, 'archived');
-
-        } catch (error) {
-            console.error('Error cargando elementos:', error);
-            this.showError('Error al cargar los elementos');
-        } finally {
-            this.showLoading(false);
-        }
-    }
-
-    showLoading(show) {
-        const activeSpinner = this.activeListContainer.querySelector('.loading-spinner');
-        const archivedSpinner = this.archivedListContainer.querySelector('.loading-spinner');
-        
-        if (activeSpinner) activeSpinner.style.display = show ? 'block' : 'none';
-        if (archivedSpinner) archivedSpinner.style.display = show ? 'block' : 'none';
-    }
-
-    filterItems() {
-        const searchTerm = this.searchInput.value.toLowerCase();
-
-        const filteredActiveItems = this.allActiveItems.filter(item => {
-            const nameMatch = item[this.itemNameKey] && item[this.itemNameKey].toLowerCase().includes(searchTerm);
-            const fieldsMatch = this.displayKeys.some(keyInfo =>
-                item[keyInfo.key] && String(item[keyInfo.key]).toLowerCase().includes(searchTerm)
-            );
-            return nameMatch || fieldsMatch;
-        });
-
-        const filteredArchivedItems = this.allArchivedItems.filter(item => {
-            const nameMatch = item[this.itemNameKey] && item[this.itemNameKey].toLowerCase().includes(searchTerm);
-            const fieldsMatch = this.displayKeys.some(keyInfo =>
-                item[keyInfo.key] && String(item[keyInfo.key]).toLowerCase().includes(searchTerm)
-            );
-            return nameMatch || fieldsMatch;
-        });
-
-        this.renderItemCards(filteredActiveItems, this.activeListContainer, 'active');
-        this.renderItemCards(filteredArchivedItems, this.archivedListContainer, 'archived');
-    }
-
-    renderItemCards(items, container, statusType) {
-        // Limpiar contenedor pero mantener spinner
-        const spinner = container.querySelector('.loading-spinner');
-        container.innerHTML = '';
-        if (spinner) container.appendChild(spinner);
-
-        if (items.length === 0) {
-            const emptyMessage = document.createElement('p');
-            emptyMessage.textContent = `No hay ${this.type} ${statusType === 'active' ? 'activos' : 'archivados'} que coincidan con la búsqueda.`;
-            emptyMessage.className = 'empty-message';
-            container.appendChild(emptyMessage);
-            return;
-        }
-
-        items.forEach(item => {
-            const itemCard = document.createElement('div');
-            itemCard.classList.add('item-card');
-            itemCard.dataset.itemId = item[this.idKey];
-            itemCard.dataset.itemName = item[this.itemNameKey];
-
-            let cardContent = `<h5>${item[this.itemNameKey] || 'Sin nombre'}</h5>`;
-
-            this.displayKeys.forEach(keyInfo => {
-                if (item[keyInfo.key]) {
-                    if (keyInfo.key === 'linkImagen') {
-                        const imageUrl = item[keyInfo.key] || 'placeholder_image.jpg';
-                        cardContent += `<img src="${imageUrl}" alt="${item[this.itemNameKey]}" style="width:100px; height:auto; margin-top: 10px; border-radius: 5px;">`;
-                    } else {
-                        cardContent += `<p><strong>${keyInfo.label}:</strong> ${item[keyInfo.key]}</p>`;
-                    }
-                }
-            });
-
-            itemCard.innerHTML = cardContent;
-
-            // Solo elementos activos pueden ser archivados
-            if (statusType === 'active') {
-                itemCard.classList.add('clickable');
-                itemCard.addEventListener('click', () => {
-                    this.currentItemToArchive = {
-                        id: item[this.idKey],
-                        name: item[this.itemNameKey]
-                    };
-                    document.getElementById('itemNameToArchive').textContent = item[this.itemNameKey];
-                    document.getElementById('confirmationModal').style.display = 'flex';
-                });
-            }
-
-            container.appendChild(itemCard);
-        });
-    }
-
-    async archiveItem() {
-        if (!this.currentItemToArchive) return;
-
-        try {
-            const response = await fetch(`${this.archiveEndpoint}/${this.currentItemToArchive.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-
-            if (response.ok) {
-                this.showSuccess(`${this.currentItemToArchive.name} ha sido archivado correctamente`);
-                // Recargar datos
-                await this.loadItems();
-                // Limpiar búsqueda
-                this.searchInput.value = '';
-            } else {
-                const error = await response.json();
-                this.showError(error.error || 'Error al archivar el elemento');
-            }
-        } catch (error) {
-            console.error('Error archivando elemento:', error);
-            this.showError('Error de conexión');
-        }
-    }
-
-    showError(message) {
-        alert('Error: ' + message);
-    }
-
-    showSuccess(message) {
-        alert('Éxito: ' + message);
-    }
-}
-
-// Inicializar la aplicación
 document.addEventListener('DOMContentLoaded', () => {
-    new ArchivacionesApp();
+  const activeContainer = document.getElementById('active-plants-container');
+  const activeCount = document.getElementById('active-plants-count');
+  const archiveSearchInput = document.getElementById('archiveSearchInput');
+  const placeholder = document.getElementById('placeholder-message');
+  const detailsContainer = document.getElementById('selected-plant-details-container');
+
+  const modal1 = document.getElementById('confirmation-modal');
+  const modal2 = document.getElementById('second-confirmation-modal');
+  const modal3 = document.getElementById('third-confirmation-modal');
+
+  const cancel1 = document.getElementById('cancel-archive');
+  const confirm1 = document.getElementById('confirm-archive');
+
+  const cancel2 = document.getElementById('cancel-final-archive');
+  const confirm2 = document.getElementById('confirm-final-archive');
+
+  const cancel3 = document.getElementById('cancel-third-archive');
+  const confirm3 = document.getElementById('confirm-third-archive');
+
+  const inputReason = document.getElementById('archive-reason');
+  const inputPhrase = document.getElementById('third-confirmation-input');
+  const requiredPhrase = document.getElementById('required-confirmation-text');
+  const errorPhrase = document.getElementById('third-confirmation-error');
+  const itemNameSpan = document.getElementById('item-name-to-archive');
+
+  let allPlants = [];
+  let selectedPlant = null;
+  let currentArchive = { type: '', id: null, name: '' };
+
+  function toggleModal(modal, show) {
+    modal.classList.toggle('hidden', !show);
+    modal.classList.toggle('active', show);
+  }
+
+  function createPlantCard(plant) {
+    const card = document.createElement('div');
+    card.className = 'bg-white p-4 shadow rounded-lg cursor-pointer hover:bg-green-100';
+    card.setAttribute('data-nombre', plant.nombreCientifico.toLowerCase());
+    card.setAttribute('data-familia', plant.nomFamilia.toLowerCase());
+    card.setAttribute('data-comun', (plant.nombres_comunes || '').toLowerCase());
+    card.innerHTML = `
+      <h4 class="font-semibold text-lg text-green-800">${plant.nombreCientifico}</h4>
+      <p class="text-sm text-gray-600">Familia: ${plant.nomFamilia}</p>
+      <p class="text-sm text-gray-500">${plant.nombres_comunes || ''}</p>
+    `;
+    card.addEventListener('click', () => {
+      selectedPlant = plant;
+      loadPlantDetails(plant);
+    });
+    return card;
+  }
+
+  async function fetchPlantasActivas() {
+    try {
+      const res = await fetch('/api/plantas_activas');
+      const data = await res.json();
+      allPlants = data;
+      renderPlantas(data);
+    } catch (err) {
+      console.error('Error cargando plantas:', err);
+    }
+  }
+
+  function renderPlantas(plantas) {
+    activeContainer.innerHTML = '';
+    if (plantas.length === 0) {
+      activeContainer.innerHTML = '<p class="text-gray-500">No hay plantas activas</p>';
+    } else {
+      plantas.forEach(p => activeContainer.appendChild(createPlantCard(p)));
+    }
+    activeCount.textContent = `${plantas.length} plantas`;
+  }
+
+  if (archiveSearchInput) {
+    archiveSearchInput.addEventListener('input', e => {
+      const value = e.target.value.toLowerCase();
+      const cards = activeContainer.querySelectorAll('.bg-white'); // Solo plant cards
+      cards.forEach(card => {
+        const match = card.dataset.nombre.includes(value) ||
+                      card.dataset.familia.includes(value) ||
+                      card.dataset.comun.includes(value);
+        card.style.display = match ? 'block' : 'none';
+      });
+    });
+  }
+
+  async function loadPlantDetails(plant) {
+    placeholder.classList.add('hidden');
+    detailsContainer.innerHTML = '<p class="text-sm text-gray-500">Cargando detalles...</p>';
+
+    try {
+      const res = await fetch(`/api/plantas/${plant.idPlanta}/detalles`);
+      const data = await res.json();
+      renderDetallesPlanta(plant, data);
+    } catch (err) {
+      detailsContainer.innerHTML = '<p class="text-red-500">Error al cargar detalles.</p>';
+    }
+  }
+
+  function renderDetallesPlanta(plant, detalles) {
+    const zonas = detalles.zonas.map(z => `
+      <div class="detail-item">
+        <div class="detail-label">${z.ecoregion}</div>
+        <button class="pm-btn pm-btn-save" data-type="zona" data-id="${z.idZona}" data-name="${z.ecoregion}">Archivar Zona</button>
+      </div>`).join('');
+
+    const saberes = detalles.saberes.map(s => `
+      <div class="detail-item">
+        <div class="detail-label">${s.descripcionSaber}</div>
+        <button class="pm-btn pm-btn-save" data-type="saber" data-id="${s.idSaberesCulturales}" data-name="${s.descripcionSaber}">Archivar Saber</button>
+      </div>`).join('');
+
+    const usos = detalles.usos.map(u => `
+      <div class="detail-item">
+        <div class="detail-label">${u.uso}: ${u.parte} - ${u.preparacion}</div>
+        <button class="pm-btn pm-btn-save" data-type="uso" data-id="${u.idUsos}" data-name="${u.uso}">Archivar Uso</button>
+      </div>`).join('');
+
+    detailsContainer.innerHTML = `
+      <div class="mb-4">
+        <h4 class="text-lg font-semibold text-green-800">Detalles de ${plant.nombreCientifico}</h4>
+        <p class="text-sm text-gray-700">Familia: ${plant.nomFamilia} | Nombres Comunes: ${plant.nombres_comunes || '—'}</p>
+      </div>
+      <div class="mb-4">
+        <h5 class="font-semibold">Zonas</h5>
+        ${zonas || '<p class="text-sm text-gray-400">No hay zonas</p>'}
+      </div>
+      <div class="mb-4">
+        <h5 class="font-semibold">Saberes Culturales</h5>
+        ${saberes || '<p class="text-sm text-gray-400">No hay saberes</p>'}
+      </div>
+      <div class="mb-4">
+        <h5 class="font-semibold">Usos Medicinales</h5>
+        ${usos || '<p class="text-sm text-gray-400">No hay usos</p>'}
+      </div>
+      <div class="mt-6 text-center">
+        <button id="btn-archive-plant" class="pm-btn pm-btn-save">Archivar Planta Completa</button>
+      </div>
+    `;
+
+    document.querySelectorAll('[data-type]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentArchive = {
+          type: btn.dataset.type,
+          id: btn.dataset.id,
+          name: btn.dataset.name
+        };
+        itemNameSpan.textContent = currentArchive.name;
+        inputReason.value = '';
+        toggleModal(modal1, true);
+      });
+    });
+
+    document.getElementById('btn-archive-plant').addEventListener('click', () => {
+      currentArchive = {
+        type: 'planta',
+        id: plant.idPlanta,
+        name: plant.nombreCientifico
+      };
+      requiredPhrase.textContent = `ARCHIVAR PLANTA ${plant.nombreCientifico}`;
+      inputPhrase.value = '';
+      errorPhrase.classList.add('hidden');
+      toggleModal(modal3, true);
+    });
+  }
+
+  confirm3.addEventListener('click', () => {
+    const expected = requiredPhrase.textContent.trim();
+    const typed = inputPhrase.value.trim();
+    if (typed !== expected) {
+      errorPhrase.classList.remove('hidden');
+      return;
+    }
+    toggleModal(modal3, false);
+    itemNameSpan.textContent = currentArchive.name;
+    inputReason.value = '';
+    toggleModal(modal1, true);
+  });
+
+  cancel1.addEventListener('click', () => toggleModal(modal1, false));
+  cancel2.addEventListener('click', () => toggleModal(modal2, false));
+  cancel3.addEventListener('click', () => toggleModal(modal3, false));
+
+  confirm1.addEventListener('click', () => {
+    toggleModal(modal1, false);
+    toggleModal(modal2, true);
+  });
+
+  confirm2.addEventListener('click', async () => {
+    const motivo = inputReason.value.trim();
+    toggleModal(modal2, false);
+
+    let endpoint = '';
+    switch (currentArchive.type) {
+      case 'zona': endpoint = `/api/archive_zona/${currentArchive.id}`; break;
+      case 'saber': endpoint = `/api/archive_saber/${currentArchive.id}`; break;
+      case 'uso': endpoint = `/api/archive_uso/${currentArchive.id}`; break;
+      case 'planta': endpoint = `/api/archive_plant/${currentArchive.id}`; break;
+    }
+
+    try {
+      await fetch(endpoint, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ motivo })
+      });
+      if (currentArchive.type === 'planta') {
+        // Ocultar detalles y volver al mensaje por defecto
+        detailsContainer.innerHTML = `
+          <p id="placeholder-message" class="text-gray-500 text-center py-10">
+            Seleccione una planta activa para ver sus detalles y opciones de archivación.
+          </p>
+        `;
+        selectedPlant = null;
+          // Limpiar barra de búsqueda
+        searchInput.value = "";
+        fetchPlantasActivas(); // Recargar lista de plantas activas
+      } else {
+        // Eliminar visualmente el elemento archivado (zona, saber o uso)
+        const archivedElement = document.querySelector(
+          `[data-type="${currentArchive.type}"][data-id="${currentArchive.id}"]`
+        );
+        if (archivedElement && archivedElement.closest('.detail-item')) {
+          archivedElement.closest('.detail-item').remove();
+        }
+      }
+      fetchPlantasActivas();
+      // Ocultar visualmente el elemento archivado
+      const archivedElement = document.querySelector(`[data-type="${currentArchive.type}"][data-id="${currentArchive.id}"]`);
+      if (archivedElement && archivedElement.closest('.detail-item')) {
+        archivedElement.closest('.detail-item').remove();
+      }
+    } catch (err) {
+      console.error('Error al archivar:', err);
+    }
+  });
+
+  fetchPlantasActivas();
 });
