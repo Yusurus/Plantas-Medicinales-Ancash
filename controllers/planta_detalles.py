@@ -14,7 +14,6 @@ def obtener_detalles_planta(plant_id):
     try:
         conn = get_connection()
         cursor = conn.cursor()
-        # Llamada al procedimiento almacenado para obtener los detalles de la planta
         # query = """CALL sp_info_planta_activa(%s);"""
         query = """CALL sp_obtener_info_completa_planta(%s);"""
         cursor.execute(query, (plant_id,))
@@ -48,28 +47,27 @@ def obtener_detalles_planta(plant_id):
         cursor.close()
         conn.close()
 
+
 @detalles_bp.route("/api/planta/<int:plant_id>/imagenes")
 def obtener_imagenes_planta(plant_id):
     try:
         conn = get_connection()
         cursor = conn.cursor()
-        
+
         # Consulta para obtener todas las imágenes de la planta
         query = """SELECT linkimagen FROM linksimagenes WHERE fk_plantas = %s;"""
         cursor.execute(query, (plant_id,))
         rows = cursor.fetchall()
-        
+
         # Convertir los resultados en una lista de diccionarios
         imagenes = []
         for row in rows:
-            imagenes.append({
-                'linkimagen': row[0]
-            })
-        
+            imagenes.append({"linkimagen": row[0]})
+
         print(f"Imágenes encontradas para planta {plant_id}:", len(imagenes))
-        
+
         return jsonify(imagenes)
-    
+
     except Exception as e:
         print(f"Error al obtener imágenes: {str(e)}")
         return jsonify({"error": str(e)}), 500
