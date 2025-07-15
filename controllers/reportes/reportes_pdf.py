@@ -61,7 +61,7 @@ def obtener_datos_completos_plantas():
         plantas = cursor.fetchall()
         
         # Obtener estadísticas adicionales
-        stats_query = """SELECT * FROM vta_reportesPlantasGneral"""
+        stats_query = """SELECT * FROM vta_reporteEstadisticaGeneral"""
 
         # stats_query = """
         # SELECT 
@@ -132,7 +132,7 @@ def obtener_plantas_por_ecoregion():
     cursor = connection.cursor(dictionary=True)
     
     try:
-        query = """SELECT * FROM vta_reporteolantasPorEcorregion;"""
+        query = """SELECT * FROM vta_reporteolantasPorEcorregion"""
         # query = """
         # SELECT 
         #     eco.ecoregion,
