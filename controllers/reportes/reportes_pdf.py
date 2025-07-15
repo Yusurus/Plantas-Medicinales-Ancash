@@ -17,68 +17,71 @@ def obtener_datos_completos_plantas():
     cursor = connection.cursor(dictionary=True)
     
     try:
-        # Query principal adaptada al esquema real de la BD
-        query = """
-        SELECT 
-            p.idPlanta,
-            p.nombreCientifico,
-            fp.nomFamilia,
-            GROUP_CONCAT(DISTINCT nc.nombreComun SEPARATOR ', ') as nombres_comunes,
-            GROUP_CONCAT(DISTINCT r.region SEPARATOR ', ') as regiones,
-            GROUP_CONCAT(DISTINCT pr.nombreProvincia SEPARATOR ', ') as provincias,
-            GROUP_CONCAT(DISTINCT eco.ecoregion SEPARATOR ', ') as ecoregiones,
-            GROUP_CONCAT(DISTINCT dm.datoMorfologico SEPARATOR '; ') as datos_morfologicos,
-            GROUP_CONCAT(DISTINCT CONCAT(
-                'Parte: ', u.parte, 
-                ' | Uso: ', u.uso, 
-                ' | Preparación: ', u.preparacion,
-                CASE WHEN u.contraIndicaciones != '' THEN CONCAT(' | Contraindicaciones: ', u.contraIndicaciones) ELSE '' END
-            ) SEPARATOR '; ') as usos,
-            GROUP_CONCAT(DISTINCT sc.descripcionSaber SEPARATOR '; ') as saberes_culturales,
-            GROUP_CONCAT(DISTINCT li.linkImagen SEPARATOR '; ') as imagenes
-        FROM plantas p
-        INNER JOIN familias_plantas fp ON p.fk_familiasplantas = fp.idfamiliaPlanta
-        LEFT JOIN nombres_comunes nc ON p.idPlanta = nc.fk_plantas
-        LEFT JOIN ubicaciones_nombres un ON nc.idNombrecomun = un.fk_nombres_comunes
-        LEFT JOIN regiones r ON un.fk_regiones = r.idRegion
-        LEFT JOIN ecoregion_planta ep ON p.idPlanta = ep.fk_plantas
-        LEFT JOIN ecoregiones eco ON ep.fk_ecoregiones = eco.idecoregion
-        LEFT JOIN provincia_ecoregion pe ON eco.idecoregion = pe.fk_ecoregiones
-        LEFT JOIN provincias pr ON pe.fk_provincias = pr.idprovincias
-        LEFT JOIN datos_morfologicos dm ON p.idPlanta = dm.fk_plantas
-        LEFT JOIN usos u ON p.idPlanta = u.fk_plantas
-        LEFT JOIN saberes_culturales sc ON p.idPlanta = sc.fk_plantas
-        LEFT JOIN linksimagenes li ON p.idPlanta = li.fk_plantas
-        WHERE p.idPlanta NOT IN (
-            SELECT DISTINCT fk_plantas FROM archivacionesplantas
-        )
-        GROUP BY p.idPlanta, p.nombreCientifico, fp.nomFamilia
-        ORDER BY p.nombreCientifico
-        """
+
+        query = """SELECT * FROM vta_reportesPlantasGeneral"""
+        # query = """
+        # SELECT 
+        #     p.idPlanta,
+        #     p.nombreCientifico,
+        #     fp.nomFamilia,
+        #     GROUP_CONCAT(DISTINCT nc.nombreComun SEPARATOR ', ') as nombres_comunes,
+        #     GROUP_CONCAT(DISTINCT r.region SEPARATOR ', ') as regiones,
+        #     GROUP_CONCAT(DISTINCT pr.nombreProvincia SEPARATOR ', ') as provincias,
+        #     GROUP_CONCAT(DISTINCT eco.ecoregion SEPARATOR ', ') as ecoregiones,
+        #     GROUP_CONCAT(DISTINCT dm.datoMorfologico SEPARATOR '; ') as datos_morfologicos,
+        #     GROUP_CONCAT(DISTINCT CONCAT(
+        #         'Parte: ', u.parte, 
+        #         ' | Uso: ', u.uso, 
+        #         ' | Preparación: ', u.preparacion,
+        #         CASE WHEN u.contraIndicaciones != '' THEN CONCAT(' | Contraindicaciones: ', u.contraIndicaciones) ELSE '' END
+        #     ) SEPARATOR '; ') as usos,
+        #     GROUP_CONCAT(DISTINCT sc.descripcionSaber SEPARATOR '; ') as saberes_culturales,
+        #     GROUP_CONCAT(DISTINCT li.linkImagen SEPARATOR '; ') as imagenes
+        # FROM plantas p
+        # INNER JOIN familias_plantas fp ON p.fk_familiasplantas = fp.idfamiliaPlanta
+        # LEFT JOIN nombres_comunes nc ON p.idPlanta = nc.fk_plantas
+        # LEFT JOIN ubicaciones_nombres un ON nc.idNombrecomun = un.fk_nombres_comunes
+        # LEFT JOIN regiones r ON un.fk_regiones = r.idRegion
+        # LEFT JOIN ecoregion_planta ep ON p.idPlanta = ep.fk_plantas
+        # LEFT JOIN ecoregiones eco ON ep.fk_ecoregiones = eco.idecoregion
+        # LEFT JOIN provincia_ecoregion pe ON eco.idecoregion = pe.fk_ecoregiones
+        # LEFT JOIN provincias pr ON pe.fk_provincias = pr.idprovincias
+        # LEFT JOIN datos_morfologicos dm ON p.idPlanta = dm.fk_plantas
+        # LEFT JOIN usos u ON p.idPlanta = u.fk_plantas
+        # LEFT JOIN saberes_culturales sc ON p.idPlanta = sc.fk_plantas
+        # LEFT JOIN linksimagenes li ON p.idPlanta = li.fk_plantas
+        # WHERE p.idPlanta NOT IN (
+        #     SELECT DISTINCT fk_plantas FROM archivacionesplantas
+        # )
+        # GROUP BY p.idPlanta, p.nombreCientifico, fp.nomFamilia
+        # ORDER BY p.nombreCientifico
+        # """
         
         cursor.execute(query)
         plantas = cursor.fetchall()
         
         # Obtener estadísticas adicionales
-        stats_query = """
-        SELECT 
-            (SELECT COUNT(*) FROM plantas WHERE idPlanta NOT IN (
-                SELECT DISTINCT fk_plantas FROM archivacionesplantas
-            )) as total_plantas_activas,
-            (SELECT COUNT(*) FROM plantas) as total_plantas,
-            (SELECT COUNT(*) FROM familias_plantas) as total_familias,
-            (SELECT COUNT(*) FROM nombres_comunes) as total_nombres_comunes,
-            (SELECT COUNT(*) FROM usos WHERE fk_plantas NOT IN (
-                SELECT DISTINCT fk_plantas FROM archivacionesplantas
-            )) as total_usos_activos,
-            (SELECT COUNT(*) FROM saberes_culturales WHERE fk_plantas NOT IN (
-                SELECT DISTINCT fk_plantas FROM archivacionesplantas
-            )) as total_saberes_activos,
-            (SELECT COUNT(*) FROM regiones) as total_regiones,
-            (SELECT COUNT(*) FROM ecoregiones) as total_ecoregiones,
-            (SELECT COUNT(*) FROM provincias) as total_provincias,
-            (SELECT COUNT(*) FROM archivacionesplantas) as total_plantas_archivadas
-        """
+        stats_query = """SELECT * FROM vta_reportesPlantasGneral"""
+
+        # stats_query = """
+        # SELECT 
+        #     (SELECT COUNT(*) FROM plantas WHERE idPlanta NOT IN (
+        #         SELECT DISTINCT fk_plantas FROM archivacionesplantas
+        #     )) as total_plantas_activas,
+        #     (SELECT COUNT(*) FROM plantas) as total_plantas,
+        #     (SELECT COUNT(*) FROM familias_plantas) as total_familias,
+        #     (SELECT COUNT(*) FROM nombres_comunes) as total_nombres_comunes,
+        #     (SELECT COUNT(*) FROM usos WHERE fk_plantas NOT IN (
+        #         SELECT DISTINCT fk_plantas FROM archivacionesplantas
+        #     )) as total_usos_activos,
+        #     (SELECT COUNT(*) FROM saberes_culturales WHERE fk_plantas NOT IN (
+        #         SELECT DISTINCT fk_plantas FROM archivacionesplantas
+        #     )) as total_saberes_activos,
+        #     (SELECT COUNT(*) FROM regiones) as total_regiones,
+        #     (SELECT COUNT(*) FROM ecoregiones) as total_ecoregiones,
+        #     (SELECT COUNT(*) FROM provincias) as total_provincias,
+        #     (SELECT COUNT(*) FROM archivacionesplantas) as total_plantas_archivadas
+        # """
         
         cursor.execute(stats_query)
         estadisticas = cursor.fetchone()
@@ -98,19 +101,20 @@ def obtener_plantas_por_familia():
     cursor = connection.cursor(dictionary=True)
     
     try:
-        query = """
-        SELECT 
-            fp.nomFamilia,
-            COUNT(p.idPlanta) as cantidad_plantas
-        FROM familias_plantas fp
-        LEFT JOIN plantas p ON fp.idfamiliaPlanta = p.fk_familiasplantas
-        WHERE p.idPlanta IS NULL OR p.idPlanta NOT IN (
-            SELECT DISTINCT fk_plantas FROM archivacionesplantas
-        )
-        GROUP BY fp.idfamiliaPlanta, fp.nomFamilia
-        HAVING COUNT(p.idPlanta) > 0
-        ORDER BY cantidad_plantas DESC, fp.nomFamilia
-        """
+        query = """SELECT * FROM vta_reporteolantasPorFamilia"""
+        # query = """
+        # SELECT 
+        #     fp.nomFamilia,
+        #     COUNT(p.idPlanta) as cantidad_plantas
+        # FROM familias_plantas fp
+        # LEFT JOIN plantas p ON fp.idfamiliaPlanta = p.fk_familiasplantas
+        # WHERE p.idPlanta IS NULL OR p.idPlanta NOT IN (
+        #     SELECT DISTINCT fk_plantas FROM archivacionesplantas
+        # )
+        # GROUP BY fp.idfamiliaPlanta, fp.nomFamilia
+        # HAVING COUNT(p.idPlanta) > 0
+        # ORDER BY cantidad_plantas DESC, fp.nomFamilia
+        # """
         
         cursor.execute(query)
         return cursor.fetchall()
@@ -128,20 +132,21 @@ def obtener_plantas_por_ecoregion():
     cursor = connection.cursor(dictionary=True)
     
     try:
-        query = """
-        SELECT 
-            eco.ecoregion,
-            COUNT(DISTINCT p.idPlanta) as cantidad_plantas
-        FROM ecoregiones eco
-        LEFT JOIN ecoregion_planta ep ON eco.idecoregion = ep.fk_ecoregiones
-        LEFT JOIN plantas p ON ep.fk_plantas = p.idPlanta
-        WHERE p.idPlanta IS NULL OR p.idPlanta NOT IN (
-            SELECT DISTINCT fk_plantas FROM archivacionesplantas
-        )
-        GROUP BY eco.idecoregion, eco.ecoregion
-        HAVING COUNT(DISTINCT p.idPlanta) > 0
-        ORDER BY cantidad_plantas DESC, eco.ecoregion
-        """
+        query = """SELECT * FROM vta_reporteolantasPorEcorregion;"""
+        # query = """
+        # SELECT 
+        #     eco.ecoregion,
+        #     COUNT(DISTINCT p.idPlanta) as cantidad_plantas
+        # FROM ecoregiones eco
+        # LEFT JOIN ecoregion_planta ep ON eco.idecoregion = ep.fk_ecoregiones
+        # LEFT JOIN plantas p ON ep.fk_plantas = p.idPlanta
+        # WHERE p.idPlanta IS NULL OR p.idPlanta NOT IN (
+        #     SELECT DISTINCT fk_plantas FROM archivacionesplantas
+        # )
+        # GROUP BY eco.idecoregion, eco.ecoregion
+        # HAVING COUNT(DISTINCT p.idPlanta) > 0
+        # ORDER BY cantidad_plantas DESC, eco.ecoregion
+        # """
         
         cursor.execute(query)
         return cursor.fetchall()
