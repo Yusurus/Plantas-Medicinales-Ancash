@@ -26,21 +26,23 @@ def plantas_por_familia():
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
 
-        query = """
-        SELECT 
-            fp.nomFamilia as familia,
-            COUNT(p.idPlanta) as cantidad_plantas
-        FROM familias_plantas fp
-        LEFT JOIN plantas p ON fp.idfamiliaPlanta = p.fk_familiasplantas
-		WHERE 
-        p.idPlanta IN (SELECT DISTINCT
-                archivacionesplantas.fk_plantas
-            FROM
-                archivacionesplantas)
-            IS FALSE
-        GROUP BY fp.idfamiliaPlanta, fp.nomFamilia
-        ORDER BY cantidad_plantas DESC
-        """
+        query = """select * from vta_plantasPorFamilia"""
+
+        # query = """
+        # SELECT 
+        #     fp.nomFamilia as familia,
+        #     COUNT(p.idPlanta) as cantidad_plantas
+        # FROM familias_plantas fp
+        # LEFT JOIN plantas p ON fp.idfamiliaPlanta = p.fk_familiasplantas
+		# WHERE 
+        # p.idPlanta IN (SELECT DISTINCT
+        #         archivacionesplantas.fk_plantas
+        #     FROM
+        #         archivacionesplantas)
+        #     IS FALSE
+        # GROUP BY fp.idfamiliaPlanta, fp.nomFamilia
+        # ORDER BY cantidad_plantas DESC
+        # """
 
         cursor.execute(query)
         resultado = cursor.fetchall()
@@ -62,23 +64,25 @@ def plantas_por_region():
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
 
-        query = """
-        SELECT 
-            r.region,
-            COUNT(DISTINCT p.idPlanta) as cantidad_plantas
-        FROM regiones r
-        LEFT JOIN ubicaciones_nombres un ON r.idRegion = un.fk_regiones
-        LEFT JOIN nombres_comunes nc ON un.fk_nombres_comunes = nc.idNombrecomun
-        LEFT JOIN plantas p ON nc.fk_plantas = p.idPlanta
-        WHERE
-        p.idPlanta IN (SELECT DISTINCT
-                archivacionesplantas.fk_plantas
-            FROM
-                archivacionesplantas)
-            IS FALSE
-        GROUP BY r.idRegion, r.region
-        ORDER BY cantidad_plantas DESC
-        """
+        query = """select * from vta_plantasPorRegion"""
+
+        # query = """
+        # SELECT 
+        #     r.region,
+        #     COUNT(DISTINCT p.idPlanta) as cantidad_plantas
+        # FROM regiones r
+        # LEFT JOIN ubicaciones_nombres un ON r.idRegion = un.fk_regiones
+        # LEFT JOIN nombres_comunes nc ON un.fk_nombres_comunes = nc.idNombrecomun
+        # LEFT JOIN plantas p ON nc.fk_plantas = p.idPlanta
+        # WHERE
+        # p.idPlanta IN (SELECT DISTINCT
+        #         archivacionesplantas.fk_plantas
+        #     FROM
+        #         archivacionesplantas)
+        #     IS FALSE
+        # GROUP BY r.idRegion, r.region
+        # ORDER BY cantidad_plantas DESC
+        # """
 
         cursor.execute(query)
         resultado = cursor.fetchall()
