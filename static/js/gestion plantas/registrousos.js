@@ -188,13 +188,11 @@ class PlantasMedicinalesApp {
         this.currentUsos.forEach((uso, index) => {
             const usoElement = document.createElement('div');
             usoElement.className = 'pm-usage-item';
-            
+
             usoElement.innerHTML = `
                 <div class="pm-usage-header">
                     <h4 class="pm-usage-part">${uso.parte || 'Parte no especificada'}</h4>
                     <div class="pm-usage-actions">
-                        <button class="btn btn-warning pm-btn-edit" data-index="${index}">Editar</button>
-                        <button class="btn btn-danger pm-btn-delete" data-index="${index}">Eliminar</button>
                     </div>
                 </div>
                 <div class="pm-usage-content">
@@ -212,6 +210,30 @@ class PlantasMedicinalesApp {
                     </div>
                 </div>
             `;
+            
+            // usoElement.innerHTML = `
+            //     <div class="pm-usage-header">
+            //         <h4 class="pm-usage-part">${uso.parte || 'Parte no especificada'}</h4>
+            //         <div class="pm-usage-actions">
+            //             <button class="btn btn-warning pm-btn-edit" data-index="${index}">Editar</button>
+            //             <button class="btn btn-danger pm-btn-delete" data-index="${index}">Eliminar</button>
+            //         </div>
+            //     </div>
+            //     <div class="pm-usage-content">
+            //         <div class="pm-usage-field">
+            //             <strong>Uso Medicinal:</strong>
+            //             <p>${uso.uso || 'No especificado'}</p>
+            //         </div>
+            //         <div class="pm-usage-field">
+            //             <strong>Contraindicaciones:</strong>
+            //             <p>${uso.contraIndicaciones || 'No especificadas'}</p>
+            //         </div>
+            //         <div class="pm-usage-field">
+            //             <strong>Preparación:</strong>
+            //             <p>${uso.preparacion || 'No especificada'}</p>
+            //         </div>
+            //     </div>
+            // `;
 
             this.usageList.appendChild(usoElement);
         });

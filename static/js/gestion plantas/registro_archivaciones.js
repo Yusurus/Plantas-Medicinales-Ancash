@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   const activeContainer = document.getElementById('active-plants-container');
   const activeCount = document.getElementById('active-plants-count');
-  const archiveSearchInput = document.getElementById('archiveSearchInput');
+  const searchInput = document.getElementById('plantSearchInput');
   const placeholder = document.getElementById('placeholder-message');
   const detailsContainer = document.getElementById('selected-plant-details-container');
 
@@ -23,6 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const requiredPhrase = document.getElementById('required-confirmation-text');
   const errorPhrase = document.getElementById('third-confirmation-error');
   const itemNameSpan = document.getElementById('item-name-to-archive');
+
+  const tabActivos = document.getElementById('tab-activos');
+  const tabArchivados = document.getElementById('tab-archivados');
 
   let allPlants = [];
   let selectedPlant = null;
@@ -72,10 +75,10 @@ document.addEventListener('DOMContentLoaded', () => {
     activeCount.textContent = `${plantas.length} plantas`;
   }
 
-  if (archiveSearchInput) {
-    archiveSearchInput.addEventListener('input', e => {
+  if (searchInput) {
+    searchInput.addEventListener('input', e => {
       const value = e.target.value.toLowerCase();
-      const cards = activeContainer.querySelectorAll('.bg-white'); // Solo plant cards
+      const cards = activeContainer.querySelectorAll('.bg-white');
       cards.forEach(card => {
         const match = card.dataset.nombre.includes(value) ||
                       card.dataset.familia.includes(value) ||
@@ -99,43 +102,54 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderDetallesPlanta(plant, detalles) {
-    const zonas = detalles.zonas.map(z => `
-      <div class="detail-item">
-        <div class="detail-label">${z.ecoregion}</div>
-        <button class="pm-btn pm-btn-save" data-type="zona" data-id="${z.idZona}" data-name="${z.ecoregion}">Archivar Zona</button>
-      </div>`).join('');
+    function renderItems(items, type, mostrarBoton = true) {
+      return items.map(item => {
+        let label = '';
+        let id = '';
+        let name = '';
+        if (type === 'zona') {
+          label = item.ecoregion;
+          id = item.idZona;
+          name = item.ecoregion;
+        } else if (type === 'saber') {
+          label = item.descripcionSaber;
+          id = item.idSaberesCulturales;
+          name = item.descripcionSaber;
+        } else if (type === 'uso') {
+          label = `${item.uso}: ${item.parte} - ${item.preparacion}`;
+          id = item.idUsos;
+          name = item.uso;
+        }
+        return `
+          <div class="detail-item">
+            <div class="detail-label">${label}</div>
+            ${mostrarBoton ? `<button class="pm-btn pm-btn-save" data-type="${type}" data-id="${id}" data-name="${name}">Archivar ${type.charAt(0).toUpperCase() + type.slice(1)}</button>` : ''}
+          </div>`;
+      }).join('');
+    }
 
-    const saberes = detalles.saberes.map(s => `
-      <div class="detail-item">
-        <div class="detail-label">${s.descripcionSaber}</div>
-        <button class="pm-btn pm-btn-save" data-type="saber" data-id="${s.idSaberesCulturales}" data-name="${s.descripcionSaber}">Archivar Saber</button>
-      </div>`).join('');
-
-    const usos = detalles.usos.map(u => `
-      <div class="detail-item">
-        <div class="detail-label">${u.uso}: ${u.parte} - ${u.preparacion}</div>
-        <button class="pm-btn pm-btn-save" data-type="uso" data-id="${u.idUsos}" data-name="${u.uso}">Archivar Uso</button>
-      </div>`).join('');
+    const zonas = renderItems(detalles.zonas, 'zona');
+    const saberes = renderItems(detalles.saberes, 'saber');
+    const usos = renderItems(detalles.usos, 'uso');
 
     detailsContainer.innerHTML = `
       <div class="mb-4">
         <h4 class="text-lg font-semibold text-green-800">Detalles de ${plant.nombreCientifico}</h4>
         <p class="text-sm text-gray-700">Familia: ${plant.nomFamilia} | Nombres Comunes: ${plant.nombres_comunes || '—'}</p>
       </div>
-      <div class="mb-4">
+      <div class="mb-4" id="tab-panel-activos">
         <h5 class="font-semibold">Zonas</h5>
         ${zonas || '<p class="text-sm text-gray-400">No hay zonas</p>'}
-      </div>
-      <div class="mb-4">
-        <h5 class="font-semibold">Saberes Culturales</h5>
+        <h5 class="font-semibold mt-4">Saberes Culturales</h5>
         ${saberes || '<p class="text-sm text-gray-400">No hay saberes</p>'}
-      </div>
-      <div class="mb-4">
-        <h5 class="font-semibold">Usos Medicinales</h5>
+        <h5 class="font-semibold mt-4">Usos Medicinales</h5>
         ${usos || '<p class="text-sm text-gray-400">No hay usos</p>'}
+        <div class="mt-6 text-center">
+          <button id="btn-archive-plant" class="pm-btn pm-btn-save">Archivar Planta Completa</button>
+        </div>
       </div>
-      <div class="mt-6 text-center">
-        <button id="btn-archive-plant" class="pm-btn pm-btn-save">Archivar Planta Completa</button>
+      <div class="mb-4 hidden" id="tab-panel-archivados">
+        <p class="text-sm text-gray-400">Cargando elementos archivados...</p>
       </div>
     `;
 
@@ -163,6 +177,39 @@ document.addEventListener('DOMContentLoaded', () => {
       errorPhrase.classList.add('hidden');
       toggleModal(modal3, true);
     });
+
+    tabActivos.addEventListener('click', () => {
+      tabActivos.classList.add('active-tab');
+      tabArchivados.classList.remove('active-tab');
+      document.getElementById('tab-panel-activos').classList.remove('hidden');
+      document.getElementById('tab-panel-archivados').classList.add('hidden');
+    });
+
+    tabArchivados.addEventListener('click', async () => {
+      tabArchivados.classList.add('active-tab');
+      tabActivos.classList.remove('active-tab');
+      document.getElementById('tab-panel-activos').classList.add('hidden');
+      const archivadosPanel = document.getElementById('tab-panel-archivados');
+      archivadosPanel.classList.remove('hidden');
+
+      try {
+        const res = await fetch(`/api/plantas/${plant.idPlanta}/archivados`);
+        const data = await res.json();
+
+        archivadosPanel.innerHTML = `
+          <div class="mb-4">
+            <h5 class="font-semibold">Zonas Archivadas</h5>
+            ${renderItems(data.zonas, 'zona', false) || '<p class="text-sm text-gray-400">No hay zonas archivadas</p>'}
+            <h5 class="font-semibold mt-4">Saberes Archivados</h5>
+            ${renderItems(data.saberes, 'saber', false) || '<p class="text-sm text-gray-400">No hay saberes archivados</p>'}
+            <h5 class="font-semibold mt-4">Usos Archivados</h5>
+            ${renderItems(data.usos, 'uso', false) || '<p class="text-sm text-gray-400">No hay usos archivados</p>'}
+          </div>
+        `;
+      } catch (err) {
+        archivadosPanel.innerHTML = '<p class="text-red-500">Error al cargar archivados.</p>';
+      }
+    });
   }
 
   confirm3.addEventListener('click', () => {
@@ -172,6 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
       errorPhrase.classList.remove('hidden');
       return;
     }
+    errorPhrase.classList.add('hidden');
     toggleModal(modal3, false);
     itemNameSpan.textContent = currentArchive.name;
     inputReason.value = '';
@@ -206,30 +254,21 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({ motivo })
       });
       if (currentArchive.type === 'planta') {
-        // Ocultar detalles y volver al mensaje por defecto
         detailsContainer.innerHTML = `
           <p id="placeholder-message" class="text-gray-500 text-center py-10">
             Seleccione una planta activa para ver sus detalles y opciones de archivación.
           </p>
         `;
         selectedPlant = null;
-          // Limpiar barra de búsqueda
         searchInput.value = "";
-        fetchPlantasActivas(); // Recargar lista de plantas activas
+        fetchPlantasActivas();
       } else {
-        // Eliminar visualmente el elemento archivado (zona, saber o uso)
         const archivedElement = document.querySelector(
           `[data-type="${currentArchive.type}"][data-id="${currentArchive.id}"]`
         );
         if (archivedElement && archivedElement.closest('.detail-item')) {
           archivedElement.closest('.detail-item').remove();
         }
-      }
-      fetchPlantasActivas();
-      // Ocultar visualmente el elemento archivado
-      const archivedElement = document.querySelector(`[data-type="${currentArchive.type}"][data-id="${currentArchive.id}"]`);
-      if (archivedElement && archivedElement.closest('.detail-item')) {
-        archivedElement.closest('.detail-item').remove();
       }
     } catch (err) {
       console.error('Error al archivar:', err);

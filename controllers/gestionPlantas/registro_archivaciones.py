@@ -34,18 +34,8 @@ def get_detalles_planta(id):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Zonas
     cursor.execute("""
-        SELECT ep.idecoregion_planta AS idZona, e.ecoregion,
-               (SELECT GROUP_CONCAT(DISTINCT pr.nombreProvincia SEPARATOR ', ')
-                FROM provincia_ecoregion pe
-                JOIN provincias pr ON pe.fk_provincias = pr.idprovincias
-                WHERE pe.fk_ecoregiones = e.idecoregion) AS nombreProvincia,
-               (SELECT GROUP_CONCAT(DISTINCT r.region SEPARATOR ', ')
-                FROM provincia_ecoregion pe
-                JOIN provincias pr ON pe.fk_provincias = pr.idprovincias
-                JOIN regiones r ON r.idRegion = pr.fk_regiones
-                WHERE pe.fk_ecoregiones = e.idecoregion) AS region
+        SELECT ep.idecoregion_planta AS idZona, e.ecoregion
         FROM ecoregion_planta ep
         JOIN ecoregiones e ON ep.fk_ecoregiones = e.idecoregion
         WHERE ep.fk_plantas = %s
@@ -53,7 +43,6 @@ def get_detalles_planta(id):
     """, (id,))
     zonas = cursor.fetchall()
 
-    # Saberes
     cursor.execute("""
         SELECT sc.idSaberes AS idSaberesCulturales, sc.descripcionSaber
         FROM saberes_culturales sc
@@ -62,12 +51,46 @@ def get_detalles_planta(id):
     """, (id,))
     saberes = cursor.fetchall()
 
-    # Usos
     cursor.execute("""
         SELECT u.idUsos, u.uso, u.parte, u.preparacion
         FROM usos u
         WHERE u.fk_plantas = %s
           AND u.idUsos NOT IN (SELECT fk_usos FROM archivaciones_usos)
+    """, (id,))
+    usos = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return jsonify({"zonas": zonas, "saberes": saberes, "usos": usos})
+
+@registro_archivaciones.route('/api/plantas/<int:id>/archivados', methods=['GET'])
+def get_detalles_archivados(id):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT ep.idecoregion_planta AS idZona, e.ecoregion
+        FROM ecoregion_planta ep
+        JOIN ecoregiones e ON ep.fk_ecoregiones = e.idecoregion
+        WHERE ep.fk_plantas = %s
+          AND ep.idecoregion_planta IN (SELECT fk_ecoregion_plantas FROM archivaciones_ubicaciones)
+    """, (id,))
+    zonas = cursor.fetchall()
+
+    cursor.execute("""
+        SELECT sc.idSaberes AS idSaberesCulturales, sc.descripcionSaber
+        FROM saberes_culturales sc
+        WHERE sc.fk_plantas = %s
+          AND sc.idSaberes IN (SELECT fk_saberes_culturales FROM archivaciones_saberes)
+    """, (id,))
+    saberes = cursor.fetchall()
+
+    cursor.execute("""
+        SELECT u.idUsos, u.uso, u.parte, u.preparacion
+        FROM usos u
+        WHERE u.fk_plantas = %s
+          AND u.idUsos IN (SELECT fk_usos FROM archivaciones_usos)
     """, (id,))
     usos = cursor.fetchall()
 
@@ -94,13 +117,11 @@ def archive_plant(plant_id):
         conn.close()
         return jsonify({"success": False, "message": "Ya archivado"})
 
-    # Archivar planta
     cursor.execute("""
         INSERT INTO archivacionesplantas (fecha, motivo, fk_plantas, fk_empleados)
         VALUES (%s, %s, %s, %s)
     """, (datetime.today(), motivo, plant_id, empleado))
 
-    # Archivar zonas
     cursor.execute("""
         SELECT idecoregion_planta FROM ecoregion_planta
         WHERE fk_plantas = %s
@@ -113,7 +134,6 @@ def archive_plant(plant_id):
             VALUES (%s, %s, %s, %s)
         """, (datetime.today(), motivo, z['idecoregion_planta'], empleado))
 
-    # Archivar saberes
     cursor.execute("""
         SELECT idSaberes FROM saberes_culturales
         WHERE fk_plantas = %s
@@ -126,7 +146,6 @@ def archive_plant(plant_id):
             VALUES (%s, %s, %s, %s)
         """, (datetime.today(), motivo, s['idSaberes'], empleado))
 
-    # Archivar usos
     cursor.execute("""
         SELECT idUsos FROM usos
         WHERE fk_plantas = %s

@@ -81,16 +81,21 @@ const SaberesModule = (function() {
         lista.innerHTML = saberes.map(saber => `
             <div class="saber-item">
                 <div class="saber-description">${saber.descripcionSaber}</div>
-                <div class="saber-actions">
-                    <button class="btn btn-edit" onclick="SaberesModule.editarSaber(${saber.idSaberes}, '${saber.descripcionSaber.replace(/'/g, "\\'")}')">
-                        ✏️ Editar
-                    </button>
-                    <button class="btn btn-delete" onclick="SaberesModule.eliminarSaber(${saber.idSaberes})">
-                        🗑️ Eliminar
-                    </button>
-                </div>
             </div>
         `).join('');
+        // lista.innerHTML = saberes.map(saber => `
+        //     <div class="saber-item">
+        //         <div class="saber-description">${saber.descripcionSaber}</div>
+        //         <div class="saber-actions">
+        //             <button class="btn btn-edit" onclick="SaberesModule.editarSaber(${saber.idSaberes}, '${saber.descripcionSaber.replace(/'/g, "\\'")}')">
+        //                 ✏️ Editar
+        //             </button>
+        //             <button class="btn btn-delete" onclick="SaberesModule.eliminarSaber(${saber.idSaberes})">
+        //                 🗑️ Eliminar
+        //             </button>
+        //         </div>
+        //     </div>
+        // `).join('');
     }
 
     // Función privada para guardar/actualizar saber
