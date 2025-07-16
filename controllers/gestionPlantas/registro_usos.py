@@ -116,10 +116,11 @@ def get_todos_usos():
         return jsonify({'error': f'Error de base de datos: {str(e)}'}), 500
     except Exception as e:
         return jsonify({'error': f'Error inesperado: {str(e)}'}), 500
-
+    
+    
 @registro_usos.route('/api/usos', methods=['POST'])
 def add_uso():
-    """Añadir un nuevo uso para una planta"""
+    """Añadir un nuevo uso para una planta usando procedimiento almacenado"""
     try:
         data = request.get_json()
         
@@ -141,23 +142,10 @@ def add_uso():
         conn = get_connection()
         cursor = conn.cursor()
         
-        # Verificar que la planta existe
-        cursor.execute("SELECT idPlanta FROM plantas WHERE idPlanta = %s", (planta_id,))
-        if not cursor.fetchone():
-            cursor.close()
-            conn.close()
-            return jsonify({'error': 'La planta especificada no existe'}), 404
+        # Llamar al procedimiento almacenado
+        cursor.callproc('insertar_uso', [parte, uso, contra_indicaciones, preparacion, planta_id])
         
-        # Insertar el nuevo uso
-        query = """
-        INSERT INTO usos (parte, uso, contraIndicaciones, preparacion, fk_plantas)
-        VALUES (%s, %s, %s, %s, %s)
-        """
-        
-        cursor.execute(query, (parte, uso, contra_indicaciones, preparacion, planta_id))
-        conn.commit()
-        
-        # Obtener el ID del uso recién insertado
+        # Obtener el ID del último registro insertado
         nuevo_id = cursor.lastrowid
         
         cursor.close()
@@ -170,9 +158,74 @@ def add_uso():
         }), 201
     
     except mysql.connector.Error as e:
-        return jsonify({'error': f'Error de base de datos: {str(e)}'}), 500
+        error_msg = str(e)
+        
+        # Determinar el código de estado según el mensaje de error
+        if 'no existe' in error_msg:
+            return jsonify({'error': error_msg}), 404
+        elif any(msg in error_msg for msg in ['no puede estar vacía', 'no puede estar vacío', 'especificar una planta válida']):
+            return jsonify({'error': error_msg}), 400
+        else:
+            return jsonify({'error': f'Error de base de datos: {error_msg}'}), 500
     except Exception as e:
         return jsonify({'error': f'Error inesperado: {str(e)}'}), 500
+
+# @registro_usos.route('/api/usos', methods=['POST'])
+# def add_uso():
+#     """Añadir un nuevo uso para una planta"""
+#     try:
+#         data = request.get_json()
+        
+#         # Validar datos requeridos
+#         required_fields = ['parte', 'uso', 'contraIndicaciones', 'preparacion', 'fk_plantas']
+#         if not data or not all(field in data for field in required_fields):
+#             return jsonify({'error': 'Datos incompletos. Se requieren: parte, uso, contraIndicaciones, preparacion, fk_plantas'}), 400
+        
+#         parte = data['parte'].strip()
+#         uso = data['uso'].strip()
+#         contra_indicaciones = data['contraIndicaciones'].strip()
+#         preparacion = data['preparacion'].strip()
+#         planta_id = data['fk_plantas']
+        
+#         # Validar que los campos no estén vacíos
+#         if not all([parte, uso, contra_indicaciones, preparacion]):
+#             return jsonify({'error': 'Ningún campo puede estar vacío'}), 400
+        
+#         conn = get_connection()
+#         cursor = conn.cursor()
+        
+#         # Verificar que la planta existe
+#         cursor.execute("SELECT idPlanta FROM plantas WHERE idPlanta = %s", (planta_id,))
+#         if not cursor.fetchone():
+#             cursor.close()
+#             conn.close()
+#             return jsonify({'error': 'La planta especificada no existe'}), 404
+        
+#         # Insertar el nuevo uso
+#         query = """
+#         INSERT INTO usos (parte, uso, contraIndicaciones, preparacion, fk_plantas)
+#         VALUES (%s, %s, %s, %s, %s)
+#         """
+        
+#         cursor.execute(query, (parte, uso, contra_indicaciones, preparacion, planta_id))
+#         conn.commit()
+        
+#         # Obtener el ID del uso recién insertado
+#         nuevo_id = cursor.lastrowid
+        
+#         cursor.close()
+#         conn.close()
+        
+#         return jsonify({
+#             'success': True,
+#             'message': 'Uso añadido exitosamente',
+#             'id': nuevo_id
+#         }), 201
+    
+#     except mysql.connector.Error as e:
+#         return jsonify({'error': f'Error de base de datos: {str(e)}'}), 500
+#     except Exception as e:
+#         return jsonify({'error': f'Error inesperado: {str(e)}'}), 500
 
 @registro_usos.route('/api/usos/<int:uso_id>', methods=['GET'])
 def get_uso_by_id(uso_id):

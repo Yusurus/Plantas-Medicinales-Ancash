@@ -69,10 +69,11 @@ def get_saberes_planta(planta_id):
         return jsonify({'error': f'Error de base de datos: {str(e)}'}), 500
     except Exception as e:
         return jsonify({'error': f'Error inesperado: {str(e)}'}), 500
+    
 
 @registro_saberes.route('/api/saberes', methods=['POST'])
 def add_saber_cultural():
-    """Añadir un nuevo saber cultural"""
+    """Añadir un nuevo saber cultural usando procedimiento almacenado"""
     try:
         data = request.get_json()
         
@@ -88,23 +89,10 @@ def add_saber_cultural():
         conn = get_connection()
         cursor = conn.cursor()
         
-        # Verificar que la planta existe
-        cursor.execute("SELECT idPlanta FROM plantas WHERE idPlanta = %s", (planta_id,))
-        if not cursor.fetchone():
-            cursor.close()
-            conn.close()
-            return jsonify({'error': 'La planta especificada no existe'}), 404
+        # Llamar al procedimiento almacenado
+        cursor.callproc('insertar_saber_cultural', [descripcion, planta_id])
         
-        # Insertar el nuevo saber cultural
-        query = """
-        INSERT INTO saberes_culturales (descripcionSaber, fk_plantas)
-        VALUES (%s, %s)
-        """
-        
-        cursor.execute(query, (descripcion, planta_id))
-        conn.commit()
-        
-        # Obtener el ID del saber recién insertado
+        # Obtener el ID del último registro insertado
         nuevo_id = cursor.lastrowid
         
         cursor.close()
@@ -115,6 +103,65 @@ def add_saber_cultural():
             'message': 'Saber cultural añadido exitosamente',
             'id': nuevo_id
         }), 201
+    
+    except mysql.connector.Error as e:
+        error_msg = str(e)
+        
+        # Determinar el código de estado según el mensaje de error
+        if 'no existe' in error_msg:
+            return jsonify({'error': error_msg}), 404
+        elif 'no puede estar vacía' in error_msg or 'especificar una planta válida' in error_msg:
+            return jsonify({'error': error_msg}), 400
+        else:
+            return jsonify({'error': f'Error de base de datos: {error_msg}'}), 500
+    except Exception as e:
+        return jsonify({'error': f'Error inesperado: {str(e)}'}), 500
+
+# @registro_saberes.route('/api/saberes', methods=['POST'])
+# def add_saber_cultural():
+#     """Añadir un nuevo saber cultural"""
+#     try:
+#         data = request.get_json()
+        
+#         if not data or 'descripcionSaber' not in data or 'fk_plantas' not in data:
+#             return jsonify({'error': 'Datos incompletos'}), 400
+        
+#         descripcion = data['descripcionSaber'].strip()
+#         planta_id = data['fk_plantas']
+        
+#         if not descripcion:
+#             return jsonify({'error': 'La descripción no puede estar vacía'}), 400
+        
+#         conn = get_connection()
+#         cursor = conn.cursor()
+        
+#         # Verificar que la planta existe
+#         cursor.execute("SELECT idPlanta FROM plantas WHERE idPlanta = %s", (planta_id,))
+#         if not cursor.fetchone():
+#             cursor.close()
+#             conn.close()
+#             return jsonify({'error': 'La planta especificada no existe'}), 404
+        
+#         # Insertar el nuevo saber cultural
+#         query = """
+#         INSERT INTO saberes_culturales (descripcionSaber, fk_plantas)
+#         VALUES (%s, %s)
+#         """
+        
+#         cursor.execute(query, (descripcion, planta_id))
+#         conn.commit()
+        
+#         # Obtener el ID del saber recién insertado
+#         nuevo_id = cursor.lastrowid
+        
+#         cursor.close()
+#         conn.close()
+        
+#         return jsonify({
+#             'success': True,
+#             'message': 'Saber cultural añadido exitosamente',
+#             'id': nuevo_id
+#         }), 201
     
     except mysql.connector.Error as e:
         return jsonify({'error': f'Error de base de datos: {str(e)}'}), 500
