@@ -194,7 +194,6 @@ class PlantasMedicinalesApp {
                     <h4 class="pm-usage-part">${uso.parte || 'Parte no especificada'}</h4>
                     <div class="pm-usage-actions">
                         <button class="btn btn-warning pm-btn-edit" data-index="${index}">Editar</button>
-                        <button class="btn btn-danger pm-btn-delete" data-index="${index}">Eliminar</button>
                     </div>
                 </div>
                 <div class="pm-usage-content">
