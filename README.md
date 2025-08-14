@@ -183,6 +183,11 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 ## 👥 Autores
 
 - **Yusurus** - *Desarrollo inicial* - [Mi GitHub](https://github.com/Yusurus)
+- **FernandoM42** - *Desarrollo inicial* - [Mi GitHub](https://github.com/FernandoM42)
+- **youngblood-007** - *Desarrollo inicial* - [Mi GitHub](https://github.com/youngblood-007)
+- **sanrer16** - *Desarrollo inicial* - [Mi GitHub](https://github.com/sanrer16)
+- **NicoSM20** - *Desarrollo inicial* - [Mi GitHub](https://github.com/NicoSM20)
+- **TonyNay** - *Desarrollo inicial* - [Mi GitHub](https://github.com/TonyNay)
 
 ## 🙏 Agradecimientos
 

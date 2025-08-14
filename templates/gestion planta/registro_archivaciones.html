@@ -1,13 +1,15 @@
 <link rel="stylesheet" href="../../static/css/GestionPlanta/registro_archivaciones.css">
+
 <main class="flex-grow p-6">
   <div class="plantas-medicinales-module">
     <div id="pmPlantasMedicinalesApp" data-module="archivaciones">
+      <!-- Sección de búsqueda -->
       <div class="pm-search-section mb-4">
-  <div class="pm-search-container">
-    <input type="text" id="archiveSearchInput" class="pm-search-input" placeholder="Buscar plantas por nombre cientifico, nombre comun, o familia..." autocomplete="off">
-    <span class="pm-search-icon">🔍</span>
-  </div>
-</div>
+        <div class="pm-search-container">
+          <input type="text" id="plantSearchInput" class="pm-search-input" placeholder="Buscar plantas..." autocomplete="off">
+          <span class="pm-search-icon">🔍</span>
+        </div>
+      </div>
 
       <div id="archivaciones-content-wrapper" class="flex flex-col lg:flex-row gap-6">
         <!-- Plantas activas -->
@@ -19,15 +21,24 @@
           <div id="active-plants-container" class="pm-plants-grid"></div>
         </div>
 
-        <!-- Detalles / Archivaciones -->
+        <!-- Sección de Detalles-->
         <div class="flex-1 pm-plants-section">
           <div class="pm-plants-header mb-2">
             <h3 class="pm-plants-title text-green-700">Archivaciones</h3>
           </div>
-          <div id="selected-plant-details-container" class="p-4 rounded-lg bg-white border border-gray-200 shadow-inner min-h-[300px]">
-            <p id="placeholder-message" class="text-gray-500 text-center py-10">
-              Seleccione una planta activa para ver sus detalles y opciones de archivación.
-            </p>
+
+          <!-- NAV TAB agregado -->
+          <div class="flex flex-col">
+            <div class="flex space-x-4 mb-4">
+              <button id="tab-activos" class="pm-tab-btn active-tab">Activos</button>
+              <button id="tab-archivados" class="pm-tab-btn">Archivados</button>
+            </div>
+
+            <div id="selected-plant-details-container" class="p-4 rounded-lg bg-white border border-gray-200 shadow-inner min-h-[300px]">
+              <p id="placeholder-message" class="text-gray-500 text-center py-10">
+                Seleccione una planta activa para ver sus detalles y opciones de archivación.
+              </p>
+            </div>
           </div>
         </div>
       </div>

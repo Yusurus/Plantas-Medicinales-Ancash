@@ -317,14 +317,22 @@ class PlantManagement {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${eco.ecoregion}</td>
-                <td>
-                    <button class="btn btn-sm btn-danger" onclick="plantManager.removeEcoregionFromPlant(${eco.idecoregion_planta})">
-                        Eliminar
-                    </button>
-                </td>
             `;
             tbody.appendChild(row);
         });
+
+        // ecoregiones.forEach(eco => {
+        //     const row = document.createElement('tr');
+        //     row.innerHTML = `
+        //         <td>${eco.ecoregion}</td>
+        //         <td>
+        //             <button class="btn btn-sm btn-danger" onclick="plantManager.removeEcoregionFromPlant(${eco.idecoregion_planta})">
+        //                 Eliminar
+        //             </button>
+        //         </td>
+        //     `;
+        //     tbody.appendChild(row);
+        // });
     }
 
     // === MANEJO DE REGIONES Y PROVINCIAS ===
